@@ -1,7 +1,7 @@
-# PrestasShop 1.6 Wallee Integartion
-This repository contains the PrestaShop Wallee Payment module that enables the shop to process payments with [Wallee](https://wallee.com/).
+# PrestasShop 1.6 Wallee Integration
+This repository contains the PrestaShop wallee payment module that enables the shop to process payments with [wallee](https://wallee.com/).
 
-###### To use this extension, a [Wallee](https://wallee.com/) account is required.
+###### To use this extension, a [wallee](https://wallee.com/) account is required.
 
 ## Requirements
 
