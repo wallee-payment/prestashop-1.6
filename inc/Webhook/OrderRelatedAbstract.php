@@ -20,9 +20,9 @@ abstract class Wallee_Webhook_OrderRelatedAbstract extends Wallee_Webhook_Abstra
 		try {
 		    $order = new Order($this->getOrderId($entity));			
 			if (Validate::isLoadedObject($order)) {
-			    $walleeIds = Wallee_Helper::getOrderMeta($order, 'walleeIds');
+			    $ids = Wallee_Helper::getOrderMeta($order, 'mappingIds');
 
-			    if ($walleeIds['transactionId'] != $this->getTransactionId($entity)) {
+			    if ($ids['transactionId'] != $this->getTransactionId($entity)) {
 			        return;
 			    }
 				Wallee_Helper::lockByTransactionId($request->getSpaceId(), $this->getTransactionId($entity));

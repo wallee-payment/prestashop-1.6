@@ -46,7 +46,7 @@ class Wallee_Model_TransactionInfo extends ObjectModel
      * @see ObjectModel::$definition
      */
     public static $definition = array(
-        'table' => 'wallee_transaction_info',
+        'table' => 'wle_transaction_info',
         'primary' => 'id_transaction_info',
         'fields' => array(
             'transaction_id' => array(

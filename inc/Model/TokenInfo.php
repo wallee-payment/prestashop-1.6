@@ -31,7 +31,7 @@ class Wallee_Model_TokenInfo extends ObjectModel
      * @see ObjectModel::$definition
      */
     public static $definition = array(
-        'table' => 'wallee_token_info',
+        'table' => 'wle_token_info',
         'primary' => 'id_token_info',
         'fields' => array(
             'token_id' => array(

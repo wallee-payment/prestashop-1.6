@@ -15,7 +15,7 @@ class Wallee_Helper
      */
     public static function getBaseGatewayUrl()
     {
-        $url = Configuration::getGlobalValue(Wallee_Payment::CK_BASE_URL);
+        $url = Configuration::getGlobalValue(Wallee::CK_BASE_URL);
         
         if ($url) {
             return $url;
@@ -31,8 +31,8 @@ class Wallee_Helper
     public static function getApiClient()
     {
         if (self::$apiClient === null) {
-            $userId = Configuration::getGlobalValue(Wallee_Payment::CK_USER_ID);
-            $userKey = Configuration::getGlobalValue(Wallee_Payment::CK_APP_KEY);
+            $userId = Configuration::getGlobalValue(Wallee::CK_USER_ID);
+            $userKey = Configuration::getGlobalValue(Wallee::CK_APP_KEY);
             if (! empty($userId) && ! empty($userKey)) {
                 self::$apiClient = new \Wallee\Sdk\ApiClient($userId, $userKey);
                 self::$apiClient->setBasePath(self::getBaseGatewayUrl() . '/api');
@@ -90,11 +90,11 @@ class Wallee_Helper
        
         Db::getInstance()->execute(
             'SELECT locked_at FROM ' . _DB_PREFIX_ .
-            'wallee_transaction_info WHERE transaction_id = "' . pSQL($transactionId) .
+            'wle_transaction_info WHERE transaction_id = "' . pSQL($transactionId) .
             '" AND space_id = "' . psql($spaceId) . '" FOR UPDATE;', false);
         
         Db::getInstance()->execute('UPDATE ' . _DB_PREFIX_ .
-            'wallee_transaction_info SET locked_at = "'.pSQL(date('Y-m-d H:i:s')).'" WHERE transaction_id = "' . pSQL($transactionId) .
+            'wle_transaction_info SET locked_at = "'.pSQL(date('Y-m-d H:i:s')).'" WHERE transaction_id = "' . pSQL($transactionId) .
             '" AND space_id = "' . psql($spaceId) . '";', false);
     }
 
@@ -106,7 +106,7 @@ class Wallee_Helper
      */
     public static function getCurrencyFractionDigits($currencyCode)
     {
-        /* @var WC_Wallee_Provider_Currency $currency_provider */
+        /* @var Wallee_Provider_Currency $currency_provider */
         $currencyProvider = Wallee_Provider_Currency::instance();
         $currency = $currencyProvider->find($currencyCode);
         if ($currency) {
@@ -254,7 +254,7 @@ class Wallee_Helper
     {
         Db::getInstance()->execute(
             'INSERT INTO ' . _DB_PREFIX_ .
-            'wallee_cart_meta (cart_id, meta_key, meta_value) VALUES ("' . pSQL($cart->id) .
+            'wle_cart_meta (cart_id, meta_key, meta_value) VALUES ("' . pSQL($cart->id) .
             '", "' . pSQL($key) . '", "' . pSQL(serialize($value)) .
             '") ON DUPLICATE KEY UPDATE meta_value = "' . pSQL(serialize($value)) . '";');
     }
@@ -262,7 +262,7 @@ class Wallee_Helper
     public static function getCartMeta(Cart $cart, $key)
     {
         $value = Db::getInstance()->getValue(
-            'SELECT meta_value FROM ' . _DB_PREFIX_ . 'wallee_cart_meta WHERE cart_id = "' .
+            'SELECT meta_value FROM ' . _DB_PREFIX_ . 'wle_cart_meta WHERE cart_id = "' .
             pSQL($cart->id) . '" AND meta_key = "' . pSQL($key) . '";', false);
         if ($value !== false) {
             return unserialize($value);
@@ -273,7 +273,7 @@ class Wallee_Helper
     public static function clearCartMeta(Cart $cart, $key)
     {
         Db::getInstance()->execute(
-            'DELETE FROM ' . _DB_PREFIX_ . 'wallee_cart_meta WHERE cart_id = "' . pSQL($cart->id) .
+            'DELETE FROM ' . _DB_PREFIX_ . 'wle_cart_meta WHERE cart_id = "' . pSQL($cart->id) .
             '" AND meta_key = "' . pSQL($key) . '";', false);
     }
 
@@ -305,7 +305,7 @@ class Wallee_Helper
             return $translatedString[$language];
         }
         try {
-            /* @var WC_Wallee_Provider_Language $language_provider */
+            /* @var Wallee_Provider_Language $language_provider */
             $languageProvider = Wallee_Provider_Language::instance();
             $primaryLanguage = $languageProvider->findPrimary($language);
             if ($primaryLanguage && isset($translatedString[$primaryLanguage->getIetfCode()])) {
@@ -321,7 +321,7 @@ class Wallee_Helper
     }
 
     /**
-     * Returns the URL to a resource on Wallee in the given context (space, space view, language).
+     * Returns the URL to a resource on wallee in the given context (space, space view, language).
      *
      * @param string $path
      * @param string $language
@@ -379,7 +379,7 @@ class Wallee_Helper
      */
     public static function translatePS($string, $specific = false)
     {
-        $module = Module::getInstanceByName('wallee_payment');
+        $module = Module::getInstanceByName('wallee');
         return $module->l($string, $specific);
     }
 
@@ -387,7 +387,7 @@ class Wallee_Helper
     {
         Db::getInstance()->execute(
             'INSERT INTO ' . _DB_PREFIX_ .
-                 'wallee_order_meta (order_id, meta_key, meta_value) VALUES ("' . pSQL($order->id) .
+                 'wle_order_meta (order_id, meta_key, meta_value) VALUES ("' . pSQL($order->id) .
                  '", "' . pSQL($key) . '", "' . pSQL(serialize($value)) .
                  '") ON DUPLICATE KEY UPDATE meta_value = "' . pSQL(serialize($value)) . '";');
     }
@@ -395,7 +395,7 @@ class Wallee_Helper
     public static function getOrderMeta(Order $order, $key)
     {
         $value = Db::getInstance()->getValue(
-            'SELECT meta_value FROM ' . _DB_PREFIX_ . 'wallee_order_meta WHERE order_id = "' .
+            'SELECT meta_value FROM ' . _DB_PREFIX_ . 'wle_order_meta WHERE order_id = "' .
                  pSQL($order->id) . '" AND meta_key = "' . pSQL($key) . '";', false);
         if ($value !== false) {
             return unserialize($value);
@@ -406,7 +406,7 @@ class Wallee_Helper
     public static function clearOrderMeta(Order $order, $key)
     {
         Db::getInstance()->execute(
-            'DELETE FROM ' . _DB_PREFIX_ . 'wallee_order_meta WHERE order_id = "' . pSQL($order->id) .
+            'DELETE FROM ' . _DB_PREFIX_ . 'wle_order_meta WHERE order_id = "' . pSQL($order->id) .
                  '" AND meta_key = "' . pSQL($key) . '";', false);
     }
     
@@ -414,7 +414,7 @@ class Wallee_Helper
     {
         Db::getInstance()->execute(
             'INSERT INTO ' . _DB_PREFIX_ .
-            'wallee_order_meta (order_id, meta_key, meta_value) VALUES ("' . pSQL($order->id) .
+            'wle_order_meta (order_id, meta_key, meta_value) VALUES ("' . pSQL($order->id) .
             '", "' . pSQL('mails') . '", "' . pSQL(base64_encode(serialize($mails))) .
             '") ON DUPLICATE KEY UPDATE meta_value = "' . pSQL(base64_encode(serialize($mails))) . '";');
     }
@@ -423,7 +423,7 @@ class Wallee_Helper
     {
         class_exists('Mail');
         $value = Db::getInstance()->getValue(
-            'SELECT meta_value FROM ' . _DB_PREFIX_ . 'wallee_order_meta WHERE order_id = "' .
+            'SELECT meta_value FROM ' . _DB_PREFIX_ . 'wle_order_meta WHERE order_id = "' .
             pSQL($order->id) . '" AND meta_key = "' . pSQL('mails') . '";', false);
         if ($value !== false) {
             return unserialize(base64_decode($value));
@@ -438,11 +438,11 @@ class Wallee_Helper
     public static function getWalleeFeeValues(Cart $cart,
         Wallee_Model_MethodConfiguration $methodConfiguration)
     {
-        $feeProductId = Configuration::get(Wallee_Payment::CK_FEE_ITEM);
+        $feeProductId = Configuration::get(Wallee::CK_FEE_ITEM);
         if (empty($feeProductId)) {
             return array(
-                'wallee_fee_total' => 0,
-                'wallee_fee_total_wt' => 0
+                'fee_total' => 0,
+                'fee_total_wt' => 0
             );
         }
         
@@ -459,27 +459,27 @@ class Wallee_Helper
         $feeBaseType = $methodConfiguration->getFeeBase();
         
         switch ($feeBaseType) {
-            case Wallee_Payment::TOTAL_MODE_BOTH_INC:
+            case Wallee::TOTAL_MODE_BOTH_INC:
                 $taxes = true;
                 $feeType = Cart::BOTH;
                 break;
-            case Wallee_Payment::TOTAL_MODE_BOTH_EXC:
+            case Wallee::TOTAL_MODE_BOTH_EXC:
                 $taxes = false;
                 $feeType = Cart::BOTH;
                 break;
-            case Wallee_Payment::TOTAL_MODE_WITHOUT_SHIPPING_INC:
+            case Wallee::TOTAL_MODE_WITHOUT_SHIPPING_INC:
                 $taxes = true;
                 $feeType = Cart::BOTH_WITHOUT_SHIPPING;
                 break;
-            case Wallee_Payment::TOTAL_MODE_WITHOUT_SHIPPING_EXC:
+            case Wallee::TOTAL_MODE_WITHOUT_SHIPPING_EXC:
                 $taxes = false;
                 $feeType = Cart::BOTH_WITHOUT_SHIPPING;
                 break;
-            case Wallee_Payment::TOTAL_MODE_PRODUCTS_INC:
+            case Wallee::TOTAL_MODE_PRODUCTS_INC:
                 $taxes = true;
                 $feeType = Cart::ONLY_PRODUCTS;
                 break;
-            case Wallee_Payment::TOTAL_MODE_PRODUCTS_EXC:
+            case Wallee::TOTAL_MODE_PRODUCTS_EXC:
                 $taxes = false;
                 $feeType = Cart::ONLY_PRODUCTS;
                 break;
@@ -496,8 +496,8 @@ class Wallee_Helper
         $computePrecision = $configuration->get('_PS_PRICE_COMPUTE_PRECISION_');
         
         $result = array(
-            'wallee_fee_total' => Tools::ps_round($feeTotal, $computePrecision),
-            'wallee_fee_total_wt' => Tools::ps_round($feeTotal, $computePrecision)
+            'fee_total' => Tools::ps_round($feeTotal, $computePrecision),
+            'fee_total_wt' => Tools::ps_round($feeTotal, $computePrecision)
         );
         
         if ($taxGroup != 0) {
@@ -511,12 +511,12 @@ class Wallee_Helper
             $address = $addressFactory->findOrCreate($idAddress, true);
             $taxCalculator = TaxManagerFactory::getManager($address, $taxGroup)->getTaxCalculator();
             if ($methodConfiguration->isFeeAddTax()) {
-                $result['wallee_fee_total_wt'] = Tools::ps_round(
+                $result['fee_total_wt'] = Tools::ps_round(
                     $taxCalculator->addTaxes($feeTotal), $computePrecision);
-                $result['wallee_fee_total'] = Tools::ps_round($feeTotal, $computePrecision);
+                $result['fee_total'] = Tools::ps_round($feeTotal, $computePrecision);
             } else {
-                $result['wallee_fee_total_wt'] = Tools::ps_round($feeTotal, $computePrecision);
-                $result['wallee_fee_total'] = Tools::ps_round(
+                $result['fee_total_wt'] = Tools::ps_round($feeTotal, $computePrecision);
+                $result['fee_total'] = Tools::ps_round(
                     $taxCalculator->removeTaxes($feeTotal), $computePrecision);
             }
         }
@@ -586,7 +586,7 @@ class Wallee_Helper
     }
     
     /**
-     * Returns the URL to the transaction detail view in Wallee.
+     * Returns the URL to the transaction detail view in wallee.
      *
      * @return string
      */
@@ -596,7 +596,7 @@ class Wallee_Helper
     }
     
     /**
-     * Returns the URL to the refund detail view in Wallee.
+     * Returns the URL to the refund detail view in wallee.
      *
      * @return string
      */
@@ -606,7 +606,7 @@ class Wallee_Helper
     }
     
     /**
-     * Returns the URL to the completion detail view in Wallee.
+     * Returns the URL to the completion detail view in wallee.
      *
      * @return string
      */
@@ -616,7 +616,7 @@ class Wallee_Helper
     }
     
     /**
-     * Returns the URL to the void detail view in Wallee.
+     * Returns the URL to the void detail view in wallee.
      *
      * @return string
      */
@@ -680,12 +680,12 @@ class Wallee_Helper
      * @return Wallee_Model_TransactionInfo | null
      */
     public static function getTransactionInfoForOrder($order){
-        if (! $order->module == 'wallee_payment') {
+        if (! $order->module == 'wallee') {
             return null;
         }
         $searchId = $order->id;
         
-        $mainOrder = Wallee_Helper::getOrderMeta($order, 'walleeMainOrderId');
+        $mainOrder = self::getOrderMeta($order, 'walleeMainOrderId');
         if ($mainOrder !== null) {
             $searchId = $mainOrder;
         }

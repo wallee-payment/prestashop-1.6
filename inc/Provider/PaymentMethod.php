@@ -8,7 +8,7 @@ if (! defined('_PS_VERSION_')) {
 class Wallee_Provider_PaymentMethod extends Wallee_Provider_Abstract {
 
 	protected function __construct(){
-		parent::__construct('wallee_payment_methods');
+		parent::__construct('wallee_methods');
 	}
 
 	/**

@@ -5,7 +5,7 @@ if (! defined('_PS_VERSION_')) {
 
 
 /**
- * WC_Wallee_Service_Abstract Class.
+ * Wallee_Service_Abstract Class.
  */
 abstract class Wallee_Service_Abstract {
 	private static $instances = array();

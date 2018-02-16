@@ -25,7 +25,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                     $this->module->l('You can only save the settings in a shop context.'));
                 return;
             }
-            $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID);
+            $spaceId = Configuration::get(Wallee::CK_SPACE_ID);
             if ($spaceId === false) {
                 $this->displayWarning(
                     $this->module->l('You have to configure a Space Id for the current shop.'));
@@ -84,7 +84,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                     'You have more than one shop and must select one to configure the wallee payment methods.'));
             return;
         }
-        $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID);
+        $spaceId = Configuration::get(Wallee::CK_SPACE_ID);
         if ($spaceId === false) {
             $this->displayWarning(
                 $this->module->l('You have to configure a Space Id for the current shop.'));
@@ -93,7 +93,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         $methodConfigurations = array();
         $methods = Wallee_Model_MethodConfiguration::loadValidForShop(
             Context::getContext()->shop->id);
-        $spaceViewId = Configuration::get(Wallee_Payment::CK_SPACE_VIEW_ID);
+        $spaceViewId = Configuration::get(Wallee::CK_SPACE_VIEW_ID);
         foreach ($methods as $method) {
             $methodConfigurations[] = array(
                 'id' => $method->getId(),
@@ -113,7 +113,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 $this->module->l('You can only edit the settings in a shop context.'));
             return;
         }
-        $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID);
+        $spaceId = Configuration::get(Wallee::CK_SPACE_ID);
         if ($spaceId === false) {
             $this->displayWarning(
                 $this->module->l('You have to configure a Space Id for the current shop.'));
@@ -285,27 +285,27 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                     'query' => array(
                         array(
                             'name' => $this->module->l('Total (inc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_BOTH_INC
+                            'type' => Wallee::TOTAL_MODE_BOTH_INC
                         ),
                         array(
                             'name' => $this->module->l('Total (exc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_BOTH_EXC
+                            'type' => Wallee::TOTAL_MODE_BOTH_EXC
                         ),
                         array(
                             'name' => $this->module->l('Total without shipping (inc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_WITHOUT_SHIPPING_INC
+                            'type' => Wallee::TOTAL_MODE_WITHOUT_SHIPPING_INC
                         ),
                         array(
                             'name' => $this->module->l('Total without shipping (exc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_WITHOUT_SHIPPING_EXC
+                            'type' => Wallee::TOTAL_MODE_WITHOUT_SHIPPING_EXC
                         ),
                         array(
                             'name' => $this->module->l('Products only (inc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_PRODUCTS_INC
+                            'type' => Wallee::TOTAL_MODE_PRODUCTS_INC
                         ),
                         array(
                             'name' => $this->module->l('Products only(exc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_PRODUCTS_EXC
+                            'type' => Wallee::TOTAL_MODE_PRODUCTS_EXC
                         )
                         
                     ),
@@ -446,27 +446,27 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                     'query' => array(
                         array(
                             'name' => $this->module->l('Total (inc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_BOTH_INC
+                            'type' => Wallee::TOTAL_MODE_BOTH_INC
                         ),
                         array(
                             'name' => $this->module->l('Total (exc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_BOTH_EXC
+                            'type' => Wallee::TOTAL_MODE_BOTH_EXC
                         ),
                         array(
                             'name' => $this->module->l('Total without shipping (inc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_WITHOUT_SHIPPING_INC
+                            'type' => Wallee::TOTAL_MODE_WITHOUT_SHIPPING_INC
                         ),
                         array(
                             'name' => $this->module->l('Total without shipping (exc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_WITHOUT_SHIPPING_EXC
+                            'type' => Wallee::TOTAL_MODE_WITHOUT_SHIPPING_EXC
                         ),
                         array(
                             'name' => $this->module->l('Products only (inc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_PRODUCTS_INC
+                            'type' => Wallee::TOTAL_MODE_PRODUCTS_INC
                         ),
                         array(
                             'name' => $this->module->l('Products only(exc Tax)'),
-                            'type' => Wallee_Payment::TOTAL_MODE_PRODUCTS_EXC
+                            'type' => Wallee::TOTAL_MODE_PRODUCTS_EXC
                         )
                     
                     ),

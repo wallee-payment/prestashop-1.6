@@ -46,7 +46,7 @@ class Wallee_Model_MethodConfiguration extends ObjectModel
 
     public $fee_fixed = 0;
 
-    public $fee_base = Wallee_Payment::TOTAL_MODE_BOTH_INC;
+    public $fee_base = Wallee::TOTAL_MODE_BOTH_INC;
     
     public $fee_add_tax = 0;
 
@@ -55,7 +55,7 @@ class Wallee_Model_MethodConfiguration extends ObjectModel
      * @see ObjectModel::$definition
      */
     public static $definition = array(
-        'table' => 'wallee_method_configuration',
+        'table' => 'wle_method_configuration',
         'primary' => 'id_method_configuration',
         'multishop' => true,
         'fields' => array(
@@ -308,7 +308,7 @@ class Wallee_Model_MethodConfiguration extends ObjectModel
      */
     public static function loadByIdWithChecks($id, $shopId)
     {
-        $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID, null,null,$shopId);
+        $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null,null,$shopId);
         $collection = new PrestaShopCollection('Wallee_Model_MethodConfiguration');
         $collection->where('id_method_configuration', '=', $id);
         $collection->where('id_shop', '=', $shopId);
@@ -356,7 +356,7 @@ class Wallee_Model_MethodConfiguration extends ObjectModel
      * @return Wallee_Model_MethodConfiguration[]
      */
     public static function loadValidForShop($shopId){
-        $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID, null,null,$shopId);
+        $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null,null,$shopId);
         $collection = new PrestaShopCollection('Wallee_Model_MethodConfiguration');
         $collection->where('space_id', '=', $spaceId);
         $collection->where('id_shop', '=', $shopId);
@@ -371,7 +371,7 @@ class Wallee_Model_MethodConfiguration extends ObjectModel
      * @return Wallee_Model_MethodConfiguration
      */
     public static function loadActiveForShop($shopId){
-        $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID, null,null,$shopId);
+        $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null,null,$shopId);
         $collection = new PrestaShopCollection('Wallee_Model_MethodConfiguration');
         $collection->where('space_id', '=', $spaceId);
         $collection->where('id_shop', '=', $shopId);

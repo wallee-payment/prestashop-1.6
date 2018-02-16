@@ -3,7 +3,7 @@ if (! defined('_PS_VERSION_')) {
     exit();
 }
 
-class Wallee_PaymentCronModuleFrontController extends ModuleFrontController
+class WalleeCronModuleFrontController extends ModuleFrontController
 {
 
     public $display_column_left = false;
@@ -38,7 +38,7 @@ class Wallee_PaymentCronModuleFrontController extends ModuleFrontController
         Wallee_Helper::startDBTransaction();
         try{
            
-            $sqlUpdate = 'UPDATE ' . _DB_PREFIX_ . 'wallee_cron_job SET constraint_key = 0, state = "' .
+            $sqlUpdate = 'UPDATE ' . _DB_PREFIX_ . 'wle_cron_job SET constraint_key = 0, state = "' .
                  pSQL(Wallee_Cron::STATE_PROCESSING) . '" , date_started = "' .
                  pSQL($time->format('Y-m-d H:i:s')) . '" WHERE security_token = "' . pSQL(
                     $securityToken) . '" AND state = "' . pSQL(Wallee_Cron::STATE_PENDING) . '"';
@@ -46,7 +46,7 @@ class Wallee_PaymentCronModuleFrontController extends ModuleFrontController
             $updateResult = DB::getInstance()->execute($sqlUpdate, false);
             if (! $updateResult) {
                 $code = DB::getInstance()->getNumberError();
-                if ($code == Wallee_Payment::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
+                if ($code == Wallee::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
                     Wallee_Helper::rollbackDBTransaction();
                     // Another Cron already running
                     die();
@@ -55,7 +55,7 @@ class Wallee_PaymentCronModuleFrontController extends ModuleFrontController
                     Wallee_Helper::rollbackDBTransaction();
                     PrestaShopLogger::addLog(
                         'Could not update cron job. ' . DB::getInstance()->getMsgError(), 2, null,
-                        'Wallee_Payment');
+                        'Wallee');
                     die();
                 }
             }
@@ -67,7 +67,7 @@ class Wallee_PaymentCronModuleFrontController extends ModuleFrontController
         }
         catch(PrestaShopDatabaseException $e){
             $code = DB::getInstance()->getNumberError();
-            if ($code == Wallee_Payment::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
+            if ($code == Wallee::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
                 Wallee_Helper::rollbackDBTransaction();
                 // Another Cron already running
                 die();
@@ -76,7 +76,7 @@ class Wallee_PaymentCronModuleFrontController extends ModuleFrontController
                 Wallee_Helper::rollbackDBTransaction();
                 PrestaShopLogger::addLog(
                     'Could not update cron job. ' . DB::getInstance()->getMsgError(), 2, null,
-                    'Wallee_Payment');
+                    'Wallee');
                 die();
             }
         }
@@ -120,7 +120,7 @@ class Wallee_PaymentCronModuleFrontController extends ModuleFrontController
                 $errorMessage = implode("\n", $error);
             }
             $endTime = new DateTime();
-            $sqlUpdate = 'UPDATE ' . _DB_PREFIX_ . 'wallee_cron_job SET constraint_key = id_cron_job, state = "' .
+            $sqlUpdate = 'UPDATE ' . _DB_PREFIX_ . 'wle_cron_job SET constraint_key = id_cron_job, state = "' .
                  pSQL($status) . '" , date_finished = "' . pSQL($endTime->format('Y-m-d H:i:s')) .
                  '", error_msg = "'.pSQL($errorMessage).'" WHERE security_token = "' . pSQL($securityToken) . '" AND state = "' .
                  pSQL(Wallee_Cron::STATE_PROCESSING) . '"';
@@ -130,7 +130,7 @@ class Wallee_PaymentCronModuleFrontController extends ModuleFrontController
                 Wallee_Helper::rollbackDBTransaction();
                 PrestaShopLogger::addLog(
                     'Could not update finished cron job. ' . DB::getInstance()->getMsgError(), 2, null,
-                    'Wallee_Payment');
+                    'Wallee');
                 die();
             }
             Wallee_Helper::commitDBTransaction();
@@ -139,7 +139,7 @@ class Wallee_PaymentCronModuleFrontController extends ModuleFrontController
             Wallee_Helper::rollbackDBTransaction();
             PrestaShopLogger::addLog(
                 'Could not update finished cron job. ' . DB::getInstance()->getMsgError(), 2, null,
-                'Wallee_Payment');
+                'Wallee');
             die();
         }        
         Wallee_Cron::insertNewPendingCron();

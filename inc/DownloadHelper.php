@@ -4,7 +4,7 @@ if (! defined('_PS_VERSION_')) {
 }
 
 /**
- * This class provides function to download documents from Wallee 
+ * This class provides function to download documents from wallee 
  */
 class Wallee_DownloadHelper {
 

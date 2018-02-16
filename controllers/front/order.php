@@ -5,7 +5,7 @@ if (! defined('_PS_VERSION_')) {
 
 
 
-class Wallee_PaymentOrderModuleFrontController extends Wallee_FrontPaymentController
+class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
 {
 	public $ssl = true;
 
@@ -24,7 +24,7 @@ class Wallee_PaymentOrderModuleFrontController extends Wallee_FrontPaymentContro
 		    die();
 		}
 	
-		$spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID, null, null, $cart->id_shop);
+		$spaceId = Configuration::get(Wallee::CK_SPACE_ID, null, null, $cart->id_shop);
 		$methodConfiguration = new Wallee_Model_MethodConfiguration($methodId, $cart->id_shop);
 		if (! $methodConfiguration->isActive() || $methodConfiguration->getSpaceId() != $spaceId) {
 		    $this->context->cookie->wallee_error = $this->module->l("This payment method is no longer available, please try another one.");
@@ -34,7 +34,7 @@ class Wallee_PaymentOrderModuleFrontController extends Wallee_FrontPaymentContro
 		
 		$cmsId = Configuration::get('PS_CONDITIONS_CMS_ID', null, null, $cart->id_shop);
 		$conditions = Configuration::get('PS_CONDITIONS', null, null, $cart->id_shop);
-		$showTos = Configuration::get(Wallee_Payment::CK_SHOW_TOS, null, null, $cart->id_shop);
+		$showTos = Configuration::get(Wallee::CK_SHOW_TOS, null, null, $cart->id_shop);
 		
 		if($cmsId && $conditions && $showTos){
 		    $agreed = Tools::getValue('cgv');

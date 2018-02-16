@@ -5,7 +5,7 @@ if (! defined('_PS_VERSION_')) {
 
 
 
-class Wallee_PaymentDocumentsModuleFrontController extends Wallee_FrontPaymentController
+class WalleeDocumentsModuleFrontController extends Wallee_FrontPaymentController
 {
 	protected $display_header = false;
 	protected $display_footer = false;
@@ -34,12 +34,12 @@ class Wallee_PaymentDocumentsModuleFrontController extends Wallee_FrontPaymentCo
 	    if ($type = Tools::getValue('type')) {
 	        switch($type){
 	            case 'invoice':
-	                if ((bool) Configuration::get(Wallee_Payment::CK_INVOICE)) {
+	                if ((bool) Configuration::get(Wallee::CK_INVOICE)) {
 	                   $this->processWalleeInvoice($order);
 	                }
 	                break;
 	            case 'packingSlip':
-	                if((bool) Configuration::get(Wallee_Payment::CK_PACKING_SLIP)){
+	                if((bool) Configuration::get(Wallee::CK_PACKING_SLIP)){
 	                   $this->processWalleePackingSlip($order);
 	                }
 	                break;

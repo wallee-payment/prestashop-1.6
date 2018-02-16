@@ -22,7 +22,7 @@ class Wallee_FrontPaymentController extends ModuleFrontController {
         $authorized = false;
         foreach (Module::getPaymentModules() as $module){
             
-            if ($module['name'] == 'wallee_payment'){
+            if ($module['name'] == 'wallee'){
                 $authorized = true;
                 break;
             }
@@ -32,7 +32,7 @@ class Wallee_FrontPaymentController extends ModuleFrontController {
             return $this->context->link->getPageLink('order', true, NULL, "step=3");
         }
         
-        if(!$this->module instanceof Wallee_Payment){
+        if(!$this->module instanceof Wallee){
             $this->context->cookie->wallee_error = $this->module->l("There was a techincal issue, please try again.");
             return $this->context->link->getPageLink('order', true, NULL, "step=3");
         }
@@ -42,7 +42,7 @@ class Wallee_FrontPaymentController extends ModuleFrontController {
     
     protected function addFeeProductToCart(Wallee_Model_MethodConfiguration $methodConfiguration, Cart $cart){
         
-        $feeProductId = Configuration::get(Wallee_Payment::CK_FEE_ITEM);
+        $feeProductId = Configuration::get(Wallee::CK_FEE_ITEM);
         
         if ($feeProductId != null) {
             $defaultAttributeId = Product::getDefaultAttribute($feeProductId);
@@ -52,7 +52,7 @@ class Wallee_FrontPaymentController extends ModuleFrontController {
             
             $feeValues = Wallee_Helper::getWalleeFeeValues($cart, $methodConfiguration);           
             
-            if ($feeValues['wallee_fee_total'] > 0) {
+            if ($feeValues['fee_total'] > 0) {
                 $cart->updateQty(1, $feeProductId, $defaultAttributeId);
                 $specificPrice = new SpecificPrice();
                 $specificPrice->id_product = (int) $feeProductId;

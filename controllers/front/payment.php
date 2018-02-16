@@ -4,7 +4,7 @@ if (! defined('_PS_VERSION_')) {
 }
 
 
-class Wallee_PaymentPaymentModuleFrontController extends Wallee_FrontPaymentController
+class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
 {
 
     public $display_column_left = false;
@@ -30,11 +30,11 @@ class Wallee_PaymentPaymentModuleFrontController extends Wallee_FrontPaymentCont
             die();
         }
                    
-        $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID, null, null, $cart->id_shop);
+        $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null, null, $cart->id_shop);
         $methodConfiguration = new Wallee_Model_MethodConfiguration($methodId, $cart->id_shop);
         
         if (! $methodConfiguration->isActive() || $methodConfiguration->getSpaceId() != $spaceId) {
-            $this->context->cookie->wallee_error = $this->module->l("This payment method is no longer available, please try another one.").'test';
+            $this->context->cookie->wallee_error = $this->module->l("This payment method is no longer available, please try another one.");
             Tools::redirect($this->context->link->getPageLink('order', true, NULL, "step=3"));
         }
 
@@ -42,8 +42,8 @@ class Wallee_PaymentPaymentModuleFrontController extends Wallee_FrontPaymentCont
         
         $this->assignSummaryInformations($cart);
         $cartHash = Wallee_Helper::calculateCartHash($cart);
-        $showCart = Configuration::get(Wallee_Payment::CK_SHOW_CART, null, null, $cart->id_shop);
-        $showTos = Configuration::get(Wallee_Payment::CK_SHOW_TOS, null, null, $cart->id_shop);
+        $showCart = Configuration::get(Wallee::CK_SHOW_CART, null, null, $cart->id_shop);
+        $showTos = Configuration::get(Wallee::CK_SHOW_TOS, null, null, $cart->id_shop);
         
         $jsUrl = null;
         try {
@@ -92,7 +92,7 @@ class Wallee_PaymentPaymentModuleFrontController extends Wallee_FrontPaymentCont
                 'this_path_bw' => $this->module->getPathUri(),
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' .
                      $this->module->name . '/',
-                'form_target_url' => $this->context->link->getModuleLink('wallee_payment', 'order', array(), true)
+                'form_target_url' => $this->context->link->getModuleLink('wallee', 'order', array(), true)
             ));
         $this->addJquery();
         $this->addJS($jsUrl, false);

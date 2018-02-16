@@ -8,22 +8,22 @@
 				<thead>
 					<tr class="nodrag nodrop">
 						<th class="fixed-width-xs text-center">
-							<span class="title_box">{l s='ID' mod='wallee_payment'}</span>
+							<span class="title_box">{l s='ID' mod='wallee'}</span>
 						</th>
 						<th class="fixed-width-s text-center">
-							<span class="title_box">{l s='State' mod='wallee_payment'}</span>
+							<span class="title_box">{l s='State' mod='wallee'}</span>
 						</th>
 						<th class="fixed-width-m text-center">
-							<span class="title_box">{l s='Scheduled' mod='wallee_payment'}</span>
+							<span class="title_box">{l s='Scheduled' mod='wallee'}</span>
 						</th>
 						<th class="fixed-width-m text-center">
-							<span class="title_box">{l s='Started' mod='wallee_payment'}</span>
+							<span class="title_box">{l s='Started' mod='wallee'}</span>
 						</th>
 						<th class="fixed-width-m text-center">
-							<span class="title_box">{l s='Finished' mod='wallee_payment'}</span>
+							<span class="title_box">{l s='Finished' mod='wallee'}</span>
 						</th>
 						<th class="fixed-width-l center">
-							<span class="title_box">{l s='Message' mod='wallee_payment'}</span>
+							<span class="title_box">{l s='Message' mod='wallee'}</span>
 						</th>
 					</tr>
 				
@@ -50,7 +50,7 @@
 				{else}
 					<tr>
 						<td class="text-center" colspan="6">
-							{l s='No cron available yet.'}
+							{l s='No cron available yet.' mod='wallee'}
 						</td>
 					</tr>
 				{/if}

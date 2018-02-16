@@ -1,9 +1,9 @@
 {capture name=path}
-    <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='walle_payment'}">{l s='Checkout' mod='walle_payment'}</a><span class="navigation-pipe">{$navigationPipe}</span>{$name}
+    <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='wallee'}">{l s='Checkout' mod='wallee'}</a><span class="navigation-pipe">{$navigationPipe}</span>{$name}
 {/capture}
 
 <h1 class="page-heading">
-    {l s='Order summary' mod='walle_payment'}
+    {l s='Order summary' mod='wallee'}
 </h1>
 
 {assign var='current_step' value='payment'}
@@ -11,7 +11,7 @@
 
 {if $productNumber <= 0}
     <p class="alert alert-warning">
-        {l s='Your shopping cart is empty.' mod='walle_payment'}
+        {l s='Your shopping cart is empty.' mod='wallee'}
     </p>
 {else}
 	{if $showCart}
@@ -48,10 +48,10 @@
 		{/if}
         <p class="cart_navigation clearfix" id="cart_navigation">
             <a class="button-exclusive btn btn-default" href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" tabindex="-1">
-                <i class="icon-chevron-left"></i>{l s='Other payment methods' mod='wallee_payment'}
+                <i class="icon-chevron-left"></i>{l s='Other payment methods' mod='wallee'}
             </a>
             <button class="button btn btn-default button-medium" id="wallee-submit" disabled>
-                <span>{l s='I confirm my order' mod='wallee_payment'}<i class="icon-chevron-right right"></i></span>
+                <span>{l s='I confirm my order' mod='wallee'}<i class="icon-chevron-right right"></i></span>
             </button>
         </p>
     </form>
@@ -62,7 +62,7 @@
 	});</script>
 	
 	{if $showTOS && $conditions && cmsId}
-		{addJsDefL name=wallee_msg_tos_error}{l s='You must agree to the terms of service before continuing.'  mod='wallee_payment' js=1}{/addJsDefL}
+		{addJsDefL name=wallee_msg_tos_error}{l s='You must agree to the terms of service before continuing.'  mod='wallee' js=1}{/addJsDefL}
 	{/if}
-	{addJsDefL name=wallee_msg_json_error}{l s='The server experienced an unexpected error, you may try again or try to use a different payment method.'  mod='wallee_payment' js=1}{/addJsDefL}
+	{addJsDefL name=wallee_msg_json_error}{l s='The server experienced an unexpected error, you may try again or try to use a different payment method.'  mod='wallee' js=1}{/addJsDefL}
 {/if}

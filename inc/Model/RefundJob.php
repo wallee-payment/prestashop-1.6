@@ -47,7 +47,7 @@ class Wallee_Model_RefundJob extends ObjectModel
      * @see ObjectModel::$definition
      */
     public static $definition = array(
-        'table' => 'wallee_refund_job',
+        'table' => 'wle_refund_job',
         'primary' => 'id_refund_job',
         'fields' => array(
             'refund_id' => array(
@@ -253,7 +253,7 @@ class Wallee_Model_RefundJob extends ObjectModel
     public static function isRefundRunningForTransaction($spaceId, $transactionId)
     {
         $result = DB::getInstance()->getValue(
-            'SELECT id_refund_job FROM ' . _DB_PREFIX_ . 'wallee_refund_job WHERE space_id = "' .
+            'SELECT id_refund_job FROM ' . _DB_PREFIX_ . 'wle_refund_job WHERE space_id = "' .
                  pSQL($spaceId) . '" AND transaction_id="' . pSQL($transactionId) .
                  '" AND state != "' . pSQL(self::STATE_FAILURE) . '" AND state !="' .
                  psql(self::STATE_SUCCESS) . '"', false);
@@ -282,7 +282,7 @@ class Wallee_Model_RefundJob extends ObjectModel
         $time = new DateTime();
         $time->sub(new DateInterval('PT10M'));
         $result = DB::getInstance()->query(
-            'SELECT id_refund_job FROM ' . _DB_PREFIX_ . 'wallee_refund_job WHERE state = "' .
+            'SELECT id_refund_job FROM ' . _DB_PREFIX_ . 'wle_refund_job WHERE state = "' .
                  pSQL(self::STATE_CREATED) . '" AND date_upd < "' .
                  pSQL($time->format('Y-m-d H:i:s')) . '"', false);
         $ids = array();
@@ -296,7 +296,7 @@ class Wallee_Model_RefundJob extends ObjectModel
     {
         $time = new DateTime();
         $result = DB::getInstance()->query(
-            'SELECT id_refund_job FROM ' . _DB_PREFIX_ . 'wallee_refund_job WHERE state = "' .
+            'SELECT id_refund_job FROM ' . _DB_PREFIX_ . 'wle_refund_job WHERE state = "' .
             pSQL(self::STATE_APPLY) . '" AND date_upd < "' .
             pSQL($time->format('Y-m-d H:i:s')) . '"', false);
         $ids = array();

@@ -4,7 +4,7 @@ if (! defined('_PS_VERSION_')) {
 }
 
 /**
- * This service provides functions to deal with Wallee transactions.
+ * This service provides functions to deal with wallee transactions.
  */
 class Wallee_Service_Transaction extends Wallee_Service_Abstract
 {
@@ -91,7 +91,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
     }
 
     /**
-     * Returns the URL to Wallee's JavaScript library that is necessary to display the payment form.
+     * Returns the URL to wallee's JavaScript library that is necessary to display the payment form.
      *
      * @param Cart $cart
      * @return string
@@ -322,10 +322,10 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         for ($i = 0; $i < 5; $i ++) {
             try {
                 $needsCreation = false;
-                $walleeIds = Wallee_Helper::getOrderMeta($dataSource, 'walleeIds');
-                $spaceId = $walleeIds['spaceId'];
-                $transaction = $this->getTransactionService()->read($walleeIds['spaceId'],
-                    $walleeIds['transactionId']);
+                $ids = Wallee_Helper::getOrderMeta($dataSource, 'mappingIds');
+                $spaceId = $ids['spaceId'];
+                $transaction = $this->getTransactionService()->read($ids['spaceId'],
+                    $ids['transactionId']);
                 
                 if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING) {
                     $transaction = $this->createTransactionByOrder($spaceId, $dataSource, $orders);
@@ -342,7 +342,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                 } else {
                     $result = $this->getTransactionService()->update($spaceId, $pendingTransaction);
                 }
-                Wallee_Helper::updateOrderMeta($dataSource, 'walleeIds',
+                Wallee_Helper::updateOrderMeta($dataSource, 'mappingIds',
                     array(
                         'spaceId' => $result->getLinkedSpaceId(),
                         'transactionId' => $result->getId()
@@ -372,11 +372,11 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $createTransaction->setAutoConfirmationEnabled(false);
         $createTransaction->setDeviceSessionIdentifier(Context::getContext()->cookie->wallee_device_id);        
         $createTransaction->setSpaceViewId(
-            Configuration::get(Wallee_Payment::CK_SPACE_VIEW_ID, null, $dataSource->id_shop_group,
+            Configuration::get(Wallee::CK_SPACE_VIEW_ID, null, $dataSource->id_shop_group,
                 $dataSource->id_shop));
         $this->assembleOrderTransactionData($dataSource, $orders, $createTransaction);
         $transaction = $this->getTransactionService()->create($spaceId, $createTransaction);
-        Wallee_Helper::updateOrderMeta($dataSource, 'walleeIds',
+        Wallee_Helper::updateOrderMeta($dataSource, 'mappingIds',
             array(
                 'spaceId' => $transaction->getLinkedSpaceId(),
                 'transactionId' => $transaction->getId()
@@ -411,7 +411,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
             $this->fixLength($this->removeNonAscii($dataSource->reference), 100));
         
         $transaction->setSuccessUrl(
-            Context::getContext()->link->getModuleLink('wallee_payment', 'return',
+            Context::getContext()->link->getModuleLink('wallee', 'return',
                 array(
                     'order_id' => $dataSource->id,
                     'secret' => Wallee_Helper::computeOrderSecret($dataSource),
@@ -419,7 +419,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                 ), true));
         
         $transaction->setFailedUrl(
-            Context::getContext()->link->getModuleLink('wallee_payment', 'return',
+            Context::getContext()->link->getModuleLink('wallee', 'return',
                 array(
                     'order_id' => $dataSource->id,
                     'secret' => Wallee_Helper::computeOrderSecret($dataSource),
@@ -440,8 +440,8 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $currentCartId = $cart->id;
         if (! isset(self::$transactionCache[$currentCartId]) ||
              self::$transactionCache[$currentCartId] == null) {
-            $walleeIds = Wallee_Helper::getCartMeta($cart, 'walleeIds');
-            if (empty($walleeIds)) {
+            $ids = Wallee_Helper::getCartMeta($cart, 'mappingIds');
+            if (empty($ids)) {
                 $transaction = $this->createTransactionFromCart($cart);
             } else {
                 $transaction = $this->loadAndUpdateTransactionFromCart($cart);
@@ -459,7 +459,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
      */
     protected function createTransactionFromCart(Cart $cart)
     {
-        $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID, null, $cart->id_shop_group,
+        $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null, $cart->id_shop_group,
             $cart->id_shop);
         $createTransaction = new \Wallee\Sdk\Model\TransactionCreate();
         $createTransaction->setCustomersPresence(
@@ -467,10 +467,10 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $createTransaction->setAutoConfirmationEnabled(false);
         $createTransaction->setDeviceSessionIdentifier(Context::getContext()->cookie->wallee_device_id);
         $createTransaction->setSpaceViewId(
-            Configuration::get(Wallee_Payment::CK_SPACE_VIEW_ID, null, null, $cart->id_shop));
+            Configuration::get(Wallee::CK_SPACE_VIEW_ID, null, null, $cart->id_shop));
         $this->assembleCartTransactionData($cart, $createTransaction);
         $transaction = $this->getTransactionService()->create($spaceId, $createTransaction);
-        Wallee_Helper::updateCartMeta($cart, 'walleeIds',
+        Wallee_Helper::updateCartMeta($cart, 'mappingIds',
             array(
                 'spaceId' => $transaction->getLinkedSpaceId(),
                 'transactionId' => $transaction->getId()
@@ -491,9 +491,9 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $last = new Exception('Unexpected Error');
         for ($i = 0; $i < 5; $i ++) {
             try {
-                $walleeIds = Wallee_Helper::getCartMeta($cart, 'walleeIds');
-                $transaction = $this->getTransaction($walleeIds['spaceId'],
-                    $walleeIds['transactionId']);
+                $ids = Wallee_Helper::getCartMeta($cart, 'mappingIds');
+                $transaction = $this->getTransaction($ids['spaceId'],
+                    $ids['transactionId']);
                 if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING) {
                     return $this->createTransactionFromCart($cart);
                 }
@@ -501,7 +501,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                 $pendingTransaction->setId($transaction->getId());
                 $pendingTransaction->setVersion($transaction->getVersion());
                 $this->assembleCartTransactionData($cart, $pendingTransaction);
-                return $this->getTransactionService()->update($walleeIds['spaceId'],
+                return $this->getTransactionService()->update($ids['spaceId'],
                     $pendingTransaction);
             } catch (\Wallee\Sdk\VersioningException $e) {
                 $last = $e;

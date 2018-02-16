@@ -20,6 +20,7 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
         $currencyCode = Wallee_Helper::convertCurrencyIdToCode($cart->id_currency);
         $items = array();
         $summary = $cart->getSummaryDetails();
+        $taxAddress = new Address((int) $cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
         foreach ($summary['products'] as $productItem) {
             $item = new \Wallee\Sdk\Model\LineItemCreate();
             $item->setAmountIncludingTax($this->roundAmount(floatval($productItem['total_wt']), $currencyCode));
@@ -28,21 +29,26 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
             $item->setShippingRequired($productItem['is_virtual'] != '1');
             if (! empty($productItem['reference'])) {
                 $item->setSku($productItem['reference']);
-            }
-            if ($productItem['rate'] > 0) {
+            }            
+            $taxManager = TaxManagerFactory::getManager($taxAddress, Product::getIdTaxRulesGroupByIdProduct($productItem['id_product']));
+            $productTaxCalculator = $taxManager->getTaxCalculator();  
+            $psTaxes = $productTaxCalculator->getTaxesAmount($productItem['total']);
+            $taxes = array();
+            foreach($psTaxes as $id => $amount){
+                $psTax = new Tax($id);
                 $tax = new \Wallee\Sdk\Model\TaxCreate();
-                $tax->setTitle($productItem['tax_name']);
-                $tax->setRate(round($productItem['rate'],8));
-                $item->setTaxes(array(
-                    $tax
-                ));
+                $tax->setTitle($psTax->name[$cart->id_lang]);
+                $tax->setRate(round($psTax->rate, 8));
+                $taxes[] = $tax;
             }
+            $item->setTaxes(
+                $taxes
+            );
             $item->setType(\Wallee\Sdk\Model\LineItemType::PRODUCT);
-            if ($productItem['id_product'] == Configuration::get(Wallee_Payment::CK_FEE_ITEM)) {
+            if ($productItem['id_product'] == Configuration::get(Wallee::CK_FEE_ITEM)) {
                 $item->setType(\Wallee\Sdk\Model\LineItemType::FEE);
                 $item->setShippingRequired(false);
-            }
-            
+            }            
             $item->setUniqueId(
                 'cart-' . $cart->id . '-item-' . $productItem['id_product'] . '-' .
                      $productItem['id_product_attribute']);
@@ -55,31 +61,45 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
         if ($shippingCosts > 0) {
             $item = new \Wallee\Sdk\Model\LineItemCreate();
             $item->setAmountIncludingTax($this->roundAmount($shippingCosts, $currencyCode));
-            $name = Wallee_Helper::translatePS('Shipping');
-            $taxRate = 0;
-            $taxName = Wallee_Helper::translatePS('Tax');
-            if ($shippingCostExcl > 0) {
-                $taxRate = ($shippingCosts - $shippingCostExcl) / $shippingCostExcl * 100;
-            }
-            if (isset($summary['carrier']) && $summary['carrier'] instanceof Carrier) {
-                $name = $summary['carrier']->name;
-                if (isset($summary['delivery']) && $summary['delivery'] instanceof Address) {
-                    $taxCalculator = $summary['carrier']->getTaxCalculator($summary['delivery']);
-                    $taxRate = $taxCalculator->getTotalRate();
-                    $taxName = $taxCalculator->getTaxesName();
-                }
-            }
-            $item->setName($name);
             $item->setQuantity(1);
             $item->setShippingRequired(false);
             $item->setSku('shipping');
-            if ($taxRate > 0) {
-                $tax = new \Wallee\Sdk\Model\TaxCreate();
-                $tax->setTitle($taxName);
-                $tax->setRate(round($taxRate, 8));
-                $item->setTaxes(array(
-                    $tax
-                ));
+            
+            $name = Wallee_Helper::translatePS('Shipping');
+            $taxCalculatorFound = false;
+            if (isset($summary['carrier']) && $summary['carrier'] instanceof Carrier) {
+                $name = $summary['carrier']->name;
+                
+                $shippingTaxCalculator = $summary['carrier']->getTaxCalculator($taxAddress);
+                $psTaxes = $shippingTaxCalculator->getTaxesAmount($shippingCostExcl);
+                $taxes = array();
+                foreach($psTaxes as $id => $amount){
+                    $psTax = new Tax($id);
+                    $tax = new \Wallee\Sdk\Model\TaxCreate();
+                    $tax->setTitle($psTax->name[$cart->id_lang]);
+                    $tax->setRate(round($psTax->rate, 8));
+                    $taxes[] = $tax;
+                }
+                $item->setTaxes(
+                    $taxes
+                );
+                $taxCalculatorFound = true;
+            }
+            $item->setName($name);
+            if(!$taxCalculatorFound){
+                $taxRate = 0;
+                $taxName = Wallee_Helper::translatePS('Tax');
+                if ($shippingCostExcl > 0) {
+                    $taxRate = ($shippingCosts - $shippingCostExcl) / $shippingCostExcl * 100;
+                }
+                if ($taxRate > 0) {
+                    $tax = new \Wallee\Sdk\Model\TaxCreate();
+                    $tax->setTitle($taxName);
+                    $tax->setRate(round($taxRate, 8));
+                    $item->setTaxes(array(
+                        $tax
+                    ));
+                }
             }
             $item->setType(\Wallee\Sdk\Model\LineItemType::SHIPPING);
             $item->setUniqueId('cart-' . $cart->id . '-shipping');
@@ -92,22 +112,44 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
         if ($wrappingCosts > 0) {
             $item = new \Wallee\Sdk\Model\LineItemCreate();
             $item->setAmountIncludingTax($this->roundAmount($wrappingCosts, $currencyCode));
-            $taxRate = 0;
-            $taxName = Wallee_Helper::translatePS('Tax');
-            if ($wrappingCostExcl > 0) {
-                $taxRate = ($wrappingCosts - $wrappingCostExcl) / $wrappingCostExcl * 100;
-            }
+            
             $item->setName(Wallee_Helper::translatePS('Wrapping Fee'));
             $item->setQuantity(1);
             $item->setShippingRequired(false);
-            $item->setSku('wrapping');
-            if ($taxRate > 0) {
-                $tax = new \Wallee\Sdk\Model\TaxCreate();
-                $tax->setTitle($taxName);
-                $tax->setRate(round($taxRate, 8));
-                $item->setTaxes(array(
-                    $tax
-                ));
+            $item->setSku('wrapping');         
+            
+            if (Configuration::get('PS_ATCP_SHIPWRAP')) {
+                if ($wrappingCostExcl > 0) {
+                    $taxRate = 0;
+                    $taxName = Wallee_Helper::translatePS('Tax');
+                    $taxRate = ($wrappingCosts - $wrappingCostExcl) / $wrappingCostExcl * 100;
+                }
+                if ($taxRate > 0) {
+                    $tax = new \Wallee\Sdk\Model\TaxCreate();
+                    $tax->setTitle($taxName);
+                    $tax->setRate(round($taxRate, 8));
+                    $item->setTaxes(array(
+                        $tax
+                    ));
+                }
+            }
+            else {
+                $wrappingTaxManager = TaxManagerFactory::getManager($taxAddress, (int) Configuration::get('PS_GIFT_WRAPPING_TAX_RULES_GROUP'));
+                $wrappingTaxCalculator = $wrappingTaxManager->getTaxCalculator();
+                $psTaxes = $wrappingTaxCalculator->getTaxesAmount($wrappingCostExcl,
+                    $wrappingCosts, _PS_PRICE_COMPUTE_PRECISION_, Configuration::get('PS_PRICE_ROUND_MODE'));
+                $taxes = array();
+                foreach($psTaxes as $id => $amount){
+                    $psTax = new Tax($id);
+                    $tax = new \Wallee\Sdk\Model\TaxCreate();
+                    
+                    $tax->setTitle($psTax->name[$cart->id_lang]);
+                    $tax->setRate(round($psTax->rate, 8));
+                    $taxes[] = $tax;
+                }
+                $item->setTaxes(
+                    $taxes
+                );  
             }
             $item->setType(\Wallee\Sdk\Model\LineItemType::FEE);
             $item->setUniqueId('cart-' . $cart->id . '-wrapping');
@@ -173,13 +215,16 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
         $items = array();
         
         foreach ($orders as $order) {
+            /*@var Order $order */            
             $currencyCode = Wallee_Helper::convertCurrencyIdToCode($order->id_currency);
             foreach ($order->getProducts() as $orderItem) {
-                $uniqueId = 'order-' . $order->id . '-item-' . $orderItem['product_id'] . '-' .               $orderItem['product_attribute_id'];
-                
+                $uniqueId = 'order-' . $order->id . '-item-' . $orderItem['product_id'] . '-' . $orderItem['product_attribute_id'];
+                        
                  $itemCosts = floatval($orderItem['total_wt']);
+                 $itemCostsE = floatval($orderItem['total_price']);
                  if(isset($orderItem['total_customization_wt'])){
                      $itemCosts = floatval($orderItem['total_customization_wt']);
+                     $itemCostsE = floatval($orderItem['total_customization']);
                  }
                 $sku = $orderItem['reference'];
                 if (empty($sku)) {
@@ -189,44 +234,38 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                 $item->setAmountIncludingTax($this->roundAmount($itemCosts, $currencyCode));
                 $item->setName($orderItem['product_name']);
                 $item->setQuantity($orderItem['product_quantity']);
-                $item->setShippingRequired($orderItem['is_virtual'] == '1');
+                $item->setShippingRequired($orderItem['is_virtual'] != '1');
                 $item->setSku($sku);
-                $taxCalculator = $orderItem['tax_calculator'];
-                if ($taxCalculator->getTotalRate() > 0) {
-                    $tax = new \Wallee\Sdk\Model\TaxCreate();
-                    $tax->setTitle($taxCalculator->getTaxesName());
-                    $tax->setRate(round($taxCalculator->getTotalRate(), 8));
+                $productTaxCalculator = $orderItem['tax_calculator'];
+                if ($itemCosts != $itemCostsE) {
+                    $psTaxes = $productTaxCalculator->getTaxesAmount($itemCostsE);
+                    $taxes = array();
+                    foreach($psTaxes as $id => $amount){
+                        $psTax = new Tax($id);
+                        $tax = new \Wallee\Sdk\Model\TaxCreate();
+                        $tax->setTitle($psTax->name[$order->id_lang]);
+                        $tax->setRate(round($psTax->rate, 8));
+                        $taxes[] = $tax;
+                    }
                     $item->setTaxes(
-                        array(
-                            $tax
-                        ));
+                        $taxes
+                    );  
                 }
                 $item->setType(\Wallee\Sdk\Model\LineItemType::PRODUCT);
-                if ($orderItem['product_id'] == Configuration::get(Wallee_Payment::CK_FEE_ITEM)) {
+                if ($orderItem['product_id'] == Configuration::get(Wallee::CK_FEE_ITEM)) {
                     $item->setType(\Wallee\Sdk\Model\LineItemType::FEE);
                     $item->setShippingRequired(false);
                 }
                 $item->setUniqueId($uniqueId);
                 $items[] = $this->cleanLineItem($item);
             }
-            
+            $taxAddress = new Address((int) $order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
             // Add shipping costs
             $shippingCosts = floatval($order->total_shipping);
             $shippingCostExcl = floatval($order->total_shipping_tax_excl);
             if ($shippingCosts > 0) {
                 $uniqueId = 'order-' . $order->id . '-shipping';
-                $taxRate = 0;
-                $taxName = Wallee_Helper::translatePS('Tax');
-                if ($shippingCostExcl > 0) {
-                    $taxRate = ($shippingCosts - $shippingCostExcl) / $shippingCostExcl * 100;
-                }
-                $carrier = new Carrier($order->id_carrier);
-                $address = new Address($order->id_address_delivery);
-                if ($carrier->id && $address->id) {
-                    $taxCalculator = $carrier->getTaxCalculator($address);
-                    $taxRate = $taxCalculator->getTotalRate();
-                    $taxName = $taxCalculator->getTaxesName();
-                }
+                
                 $item = new \Wallee\Sdk\Model\LineItemCreate();
                 $item->setAmountIncludingTax($this->roundAmount($shippingCosts, $currencyCode));
                 $name = Wallee_Helper::translatePS('Shipping');
@@ -234,15 +273,40 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                 $item->setName($name);
                 $item->setQuantity(1);
                 $item->setShippingRequired(false);
-                $item->setSku('shipping');
-                if ($taxRate > 0) {
-                    $tax = new \Wallee\Sdk\Model\TaxCreate();
-                    $tax->setTitle($taxName);
-                    $tax->setRate(round($taxRate, 8));
+                $item->setSku('shipping');                
+              
+                $carrier = new Carrier($order->id_carrier);
+                if ($carrier->id && $taxAddress->id) {
+                    $shippingTaxCalculator = $carrier->getTaxCalculator($taxAddress);
+                    $psTaxes = $shippingTaxCalculator->getTaxesAmount($itemCostsE);
+                    $taxes = array();
+                    foreach($psTaxes as $id => $amount){
+                        $psTax = new Tax($id);
+                        $tax = new \Wallee\Sdk\Model\TaxCreate();
+                        $tax->setTitle($psTax->name[$order->id_lang]);
+                        $tax->setRate(round($psTax->rate, 8));
+                        $taxes[] = $tax;
+                    }
                     $item->setTaxes(
-                        array(
-                            $tax
-                        ));
+                        $taxes
+                    );  
+                }
+                else{
+                    $taxRate = 0;
+                    $taxName = Wallee_Helper::translatePS('Tax');
+                    if ($shippingCostExcl > 0) {
+                        $taxRate = ($shippingCosts - $shippingCostExcl) / $shippingCostExcl * 100;
+                    }
+                   
+                    if ($taxRate > 0) {
+                        $tax = new \Wallee\Sdk\Model\TaxCreate();
+                        $tax->setTitle($taxName);
+                        $tax->setRate(round($taxRate, 8));
+                        $item->setTaxes(
+                            array(
+                                $tax
+                            ));
+                    }
                 }
                 $item->setType(\Wallee\Sdk\Model\LineItemType::SHIPPING);
                 $item->setShippingRequired(false);
@@ -255,25 +319,33 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
             $wrappingCostExcl = floatval($order->total_wrapping_tax_excl);
             if ($wrappingCosts > 0) {
                 $uniqueId = 'order-' . $order->id . '-wrapping';
-                $taxRate = 0;
-                $taxName = Wallee_Helper::translatePS('Tax');
-                if ($wrappingCostExcl > 0) {
-                    $taxRate = ($wrappingCosts - $wrappingCostExcl) / $wrappingCostExcl * 100;
-                }
+               
                 $item = new \Wallee\Sdk\Model\LineItemCreate();
                 $item->setAmountIncludingTax($this->roundAmount($wrappingCosts, $currencyCode));
                 $item->setName(Wallee_Helper::translatePS('Wrapping Fee'));
                 $item->setQuantity(1);
                 $item->setSku('wrapping');
-                if ($taxRate > 0) {
-                    $tax = new \Wallee\Sdk\Model\TaxCreate();
-                    $tax->setTitle($taxName);
-                    $tax->setRate(round($taxRate, 8));
-                    $item->setTaxes(
-                        array(
-                            $tax
-                        ));
+                $wrappingTaxCalculator = null;
+                if (Configuration::get('PS_ATCP_SHIPWRAP')) {
+                    $wrappingTaxCalculator = Adapter_ServiceLocator::get('AverageTaxOfProductsTaxCalculator')->setIdOrder($order->id);
                 }
+                else {
+                    $wrappingTaxManager = TaxManagerFactory::getManager($taxAddress, (int) Configuration::get('PS_GIFT_WRAPPING_TAX_RULES_GROUP'));
+                    $wrappingTaxCalculator = $wrappingTaxManager->getTaxCalculator();
+                }
+                $psTaxes = $wrappingTaxCalculator->getTaxesAmount($wrappingCostExcl,
+                    $wrappingCosts, _PS_PRICE_COMPUTE_PRECISION_, $order->round_mode);
+                $taxes = array();
+                foreach($psTaxes as $id => $amount){
+                    $psTax = new Tax($id);
+                    $tax = new \Wallee\Sdk\Model\TaxCreate();
+                    $tax->setTitle($psTax->name[$order->id_lang]);
+                    $tax->setRate(round($psTax->rate, 8));
+                    $taxes[] = $tax;
+                }
+                $item->setTaxes(
+                    $taxes
+                );  
                 $item->setType(\Wallee\Sdk\Model\LineItemType::FEE);
                 $item->setShippingRequired(false);
                 $item->setUniqueId($uniqueId);

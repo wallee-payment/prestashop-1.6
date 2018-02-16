@@ -4,13 +4,13 @@ if (! defined('_PS_VERSION_')) {
 }
 
 /**
- * This service provides functions to deal with Wallee transaction voids.
+ * This service provides functions to deal with wallee transaction voids.
  */
 class Wallee_Service_TransactionVoid extends Wallee_Service_Abstract
 {
 
     /**
-     * The refund API service.
+     * The transaction void API service.
      *
      * @var \Wallee\Sdk\Service\TransactionVoidService
      */

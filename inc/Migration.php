@@ -6,7 +6,7 @@ if (!defined('_PS_VERSION_')) {
 
 class Wallee_Migration
 {   
-    const CK_DB_VERSION = 'WALLEE_PAYMENT_DB_VERSION';
+    const CK_DB_VERSION = 'WLE_DB_VERSION';
 
     private static $db_migrations = array(
         '1.0.0' => 'initialize_1_0_0'
@@ -19,7 +19,7 @@ class Wallee_Migration
         catch(Exception $e){
             PrestaShopLogger::addLog(
                 $e->getMessage(), 2, null,
-                'Wallee_Payment');
+                'Wallee');
             return false;
         }
         return true;
@@ -27,7 +27,7 @@ class Wallee_Migration
 
     private static function migrateDb()
     {
-        $currentVersion = Configuration::getGlobalValue(Wallee_Migration::CK_DB_VERSION);
+        $currentVersion = Configuration::getGlobalValue(self::CK_DB_VERSION);
         if($currentVersion === false){
             $currentVersion = '0.0.0';
         }
@@ -37,7 +37,7 @@ class Wallee_Migration
                     __CLASS__,
                     $functionName
                 ));
-                Configuration::updateGlobalValue(Wallee_Migration::CK_DB_VERSION, $version);
+                Configuration::updateGlobalValue(self::CK_DB_VERSION, $version);
                 $currentVersion = $version;
             }
         }
@@ -45,7 +45,7 @@ class Wallee_Migration
 
     public static function initialize_1_0_0()
     {
-        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wallee_method_configuration(
+        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_method_configuration(
 				`id_method_configuration` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `id_shop` int(10) unsigned NOT NULL,
 				`state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -80,7 +80,7 @@ class Wallee_Migration
         }
         
        
-        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wallee_transaction_info(
+        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_transaction_info(
 				`id_transaction_info` int(10) unsigned NOT NULL AUTO_INCREMENT,
 				`transaction_id` bigint(20) unsigned NOT NULL,
 				`state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -108,7 +108,7 @@ class Wallee_Migration
             throw new Exception(DB::getMsgError());
         }
         
-        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wallee_token_info(
+        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_token_info(
 				`id_token_info` int(10) unsigned NOT NULL AUTO_INCREMENT,
 				`token_id` bigint(20) unsigned NOT NULL,
 				`state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -131,7 +131,7 @@ class Wallee_Migration
             throw new Exception(DB::getMsgError());
         }        
         
-        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wallee_cart_meta(
+        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_cart_meta(
 				`cart_id` int(10) unsigned NOT NULL,
                 `meta_key` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
                 `meta_value` longtext COLLATE utf8_unicode_ci NULL,
@@ -143,7 +143,7 @@ class Wallee_Migration
             throw new Exception(DB::getMsgError());
         }
         
-        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wallee_order_meta(
+        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_order_meta(
 				`order_id` int(10) unsigned NOT NULL,
                 `meta_key` varchar(128) COLLATE utf8_unicode_ci NOT NULL,
                 `meta_value` longtext COLLATE utf8_unicode_ci NULL,
@@ -155,7 +155,7 @@ class Wallee_Migration
             throw new Exception(DB::getMsgError());
         }
                 
-        $result = Db::getInstance()->execute( "CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wallee_void_job(
+        $result = Db::getInstance()->execute( "CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_void_job(
 				`id_void_job` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `void_id` bigint(20) unsigned,
 				`state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -176,7 +176,7 @@ class Wallee_Migration
             throw new Exception(DB::getMsgError());
         }
         
-        $result = Db::getInstance()->execute( "CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wallee_completion_job(
+        $result = Db::getInstance()->execute( "CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_completion_job(
 				`id_completion_job` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `completion_id` bigint(20) unsigned,
 				`state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -196,7 +196,7 @@ class Wallee_Migration
         if ($result === false) {
             throw new Exception(DB::getMsgError());
         }
-        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wallee_refund_job(
+        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_refund_job(
                 `id_refund_job` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `refund_id` bigint(20) unsigned,
                 `external_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -205,7 +205,6 @@ class Wallee_Migration
 				`space_id` bigint(20) unsigned NOT NULL,
 				`order_id` bigint(20) unsigned NOT NULL,
                 `amount` decimal(19,8) NOT NULL,
-                `wallee_refund` longtext COLLATE utf8_unicode_ci,
                 `refund_parameters` longtext COLLATE utf8_unicode_ci,
 				`failure_reason` longtext COLLATE utf8_unicode_ci,
                 `apply_tries` bigint(10) NOT NULL DEFAULT '0',
@@ -223,7 +222,7 @@ class Wallee_Migration
             throw new Exception(DB::getMsgError());
           }
           
-          $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wallee_cron_job(
+          $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_cron_job(
                 `id_cron_job` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `constraint_key` int(10),
                 `state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,

@@ -14,9 +14,9 @@
 				<div id="list_wallee_manual_messages_notif" class="list_notif">
 					<a href="{$manualUrl|escape:'html':'UTF-8'}" target="_blank">
 						<p>{if $manualTotal > 1}
-							{l s='There are %s manual tasks that need your attention.' sprintf=$manualTotal mod='wallee_payment'}
+							{l s='There are %s manual tasks that need your attention.' sprintf=$manualTotal mod='wallee'}
 						{else}
-							{l s='There is a manual task that needs your attention.' mod='wallee_payment'}
+							{l s='There is a manual task that needs your attention.' mod='wallee'}
 						{/if}
 						</p>
 					</a>

@@ -87,13 +87,13 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract {
 
 	
 	/**
-	 * Installs the necessary webhooks in Wallee.
+	 * Installs the necessary webhooks in wallee.
 	 */
 	public function install()
 	{
 	    $spaceIds = array();
 	    foreach (Shop::getShops(true, null, true) as $shopId) {
-	        $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID, null, null, $shopId);
+	        $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null, null, $shopId);
 	        if ($spaceId && ! in_array($spaceId, $spaceIds)) {
 	            $webhookUrl = $this->getWebhookUrl($spaceId);
 	            if ($webhookUrl == null) {
@@ -214,7 +214,7 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract {
 	 */
 	protected function getUrl(){
 	    $link = Context::getContext()->link;
-	    return $link->getModuleLink('wallee_payment', 'webhook', array(), true, 1, 1);
+	    return $link->getModuleLink('wallee', 'webhook', array(), true, 1, 1);
 	}
 
 	/**

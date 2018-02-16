@@ -4,14 +4,13 @@ if (! defined('_PS_VERSION_')) {
 }
 
 /**
- * Wallee Prestashop
+ * wallee Prestashop
  *
- * This Prestashop module enables to process payments with Wallee (https://wallee.com/).
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
- * @package Wallee_Payment
+ * @package Wallee
  * @author customweb GmbH (http://www.customweb.com/)
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
- * @link https://github.com/wallee-payment/prestashop
  */
 
 define('WALLEE_VERSION', '1.0.0');
@@ -19,36 +18,36 @@ define('WALLEE_VERSION', '1.0.0');
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee_autoloader.php');
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee-sdk' . DIRECTORY_SEPARATOR . 'autoload.php');
 
-class Wallee_Payment extends PaymentModule
+class Wallee extends PaymentModule
 {
 
-    const CK_BASE_URL = 'WALLEE_PAYMENT_BASE_GATEWAY_URL';
+    const CK_BASE_URL = 'WLE_BASE_GATEWAY_URL';
 
-    const CK_USER_ID = 'WALLEE_PAYMENT_USER_ID';
+    const CK_USER_ID = 'WLE_USER_ID';
 
-    const CK_APP_KEY = 'WALLEE_PAYMENT_APP_KEY';
+    const CK_APP_KEY = 'WLE_APP_KEY';
 
-    const CK_SPACE_ID = 'WALLEE_PAYMENT_SPACE_ID';
+    const CK_SPACE_ID = 'WLE_SPACE_ID';
 
-    const CK_SPACE_VIEW_ID = 'WALLEE_PAYMENT_SPACE_VIEW_ID';
+    const CK_SPACE_VIEW_ID = 'WLE_SPACE_VIEW_ID';
 
-    const CK_MAIL = 'WALLEE_PAYMENT_SHOP_EMAIL';
+    const CK_MAIL = 'WLE_SHOP_EMAIL';
 
-    const CK_INVOICE = 'WALLEE_PAYMENT_INVOICE_DOWNLOAD';
+    const CK_INVOICE = 'WLE_INVOICE_DOWNLOAD';
 
-    const CK_PACKING_SLIP = 'WALLEE_PAYMENT_PACKING_SLIP_DOWNLOAD';
+    const CK_PACKING_SLIP = 'WLE_PACKING_SLIP_DOWNLOAD';
 
-    const CK_FEE_ITEM = 'WALLEE_PAYMENT_FEE_ITEM';
+    const CK_FEE_ITEM = 'WLE_FEE_ITEM';
 
-    const CK_SHOW_CART = 'WALLEE_PAYMENT_SHOW_CART';
+    const CK_SHOW_CART = 'WLE_SHOW_CART';
 
-    const CK_SHOW_TOS = 'WALLEE_PAYMENT_SHOW_TOS';
+    const CK_SHOW_TOS = 'WLE_SHOW_TOS';
 
-    const CK_REMOVE_TOS = 'WALLEE_PAYMENT_REMOVE_TOS';
+    const CK_REMOVE_TOS = 'WLE_REMOVE_TOS';
 
-    const CK_CRONJOB_TIMESTAMP = 'WALLEE_PAYMENT_CRONJOB_TIMESTAMP';
+    const CK_CRONJOB_TIMESTAMP = 'WLE_CRONJOB_TIMESTAMP';
 
-    const CK_CRONJOB_RUNNING = 'WALLEE_PAYMENT_CRONJOB_RUNNING';
+    const CK_CRONJOB_RUNNING = 'WLE_CRONJOB_RUNNING';
 
     const CRON_MIN_INTERVAL_SEC = 300;
 
@@ -75,24 +74,23 @@ class Wallee_Payment extends PaymentModule
      */
     public function __construct()
     {
-        $this->name = 'wallee_payment';
+        $this->name = 'wallee';
         $this->tab = 'payments_gateways';
         $this->version = WALLEE_VERSION;
         $this->author = 'Customweb GmbH';
-        $this->module_key = 'bd2bfda4b61f90c8f852ff252d8baaef';
         $this->bootstrap = true;
         
         parent::__construct();
         
-        $this->displayName = 'wallee payment';
+        $this->displayName = 'wallee';
         $this->description = $this->l(
             'This PrestaShop module enables to process payments with wallee.');
         $this->confirmUninstall = $this->l(
-            'Are you sure you want to uninstall the wallee payment module?');
+            'Are you sure you want to uninstall the wallee module?');
         
         // Remove Fee Item
         if (isset($this->context->cart)) {
-            $feeProductId = Configuration::get(Wallee_Payment::CK_FEE_ITEM);
+            $feeProductId = Configuration::get(self::CK_FEE_ITEM);
             if ($feeProductId != null) {
                 $defaultAttributeId = Product::getDefaultAttribute($feeProductId);
                 SpecificPrice::deleteByIdCart($this->context->cart->id, $feeProductId,
@@ -101,13 +99,13 @@ class Wallee_Payment extends PaymentModule
             }
         }
         if (! empty($this->context->cookie->wallee_error)) {
-            $walleeErrors = $this->context->cookie->wallee_error;
-            if (is_string($walleeErrors)) {
-                $this->context->controller->errors[] = $walleeErrors;
+            $errors = $this->context->cookie->wallee_error;
+            if (is_string($errors)) {
+                $this->context->controller->errors[] = $errors;
             }
-            elseif (is_array($walleeErrors)) {
-                foreach ($walleeErrors as $walleeError) {
-                    $this->context->controller->errors[] = $walleeError;
+            elseif (is_array($errors)) {
+                foreach ($errors as $error) {
+                    $this->context->controller->errors[] = $error;
                 }
             }
             unset($_SERVER['HTTP_REFERER']); // To disable the back button in the error message
@@ -179,19 +177,19 @@ class Wallee_Payment extends PaymentModule
         $controllers = array(
             'AdminWalleeMethodSettings' => array(
                 'parentId' => Tab::getIdFromClassName('AdminParentModules'),
-                'name' => $this->l('Wallee Payment Methods')
+                'name' => $this->l('wallee Payment Methods')
             ),
             'AdminWalleeDocuments' => array(
                 'parentId' => - 1, // No Tab in navigation
-                'name' => $this->l('Wallee Documents')
+                'name' => $this->l('wallee Documents')
             ),
             'AdminWalleeOrder' => array(
                 'parentId' => - 1, // No Tab in navigation
-                'name' => $this->l('Wallee Order Management')
+                'name' => $this->l('wallee Order Management')
             ),
             'AdminWalleeCronJobs' => array(
                 'parentId' => Tab::getIdFromClassName('AdminTools'),
-                'name' => $this->l('Wallee CronJobs')
+                'name' => $this->l('wallee CronJobs')
             )
         );
         foreach ($controllers as $className => $data) {
@@ -203,21 +201,6 @@ class Wallee_Payment extends PaymentModule
             }
         }
         return true;
-    }
-
-    protected function installConfiguration()
-    {
-        return Configuration::updateValue(self::CK_MAIL, true) &&
-             Configuration::updateValue(self::CK_INVOICE, true) &&
-             Configuration::updateValue(self::CK_PACKING_SLIP, true) &&
-             Configuration::updateValue(self::CK_SHOW_CART, true) &&
-             Configuration::updateValue(self::CK_SHOW_TOS, false) &&
-             Configuration::updateValue(self::CK_REMOVE_TOS, false);
-    }
-
-    protected function registerOrderStates()
-    {
-        Wallee_OrderStatus::registerOrderStatus();
     }
 
     protected function addTab($className, $name, $parentId)
@@ -233,6 +216,22 @@ class Wallee_Payment extends PaymentModule
         return $tab->save();
     }
 
+    protected function installConfiguration()
+    {
+        return true;
+        return Configuration::updateValue(self::CK_MAIL, true) &&
+             Configuration::updateValue(self::CK_INVOICE, true) &&
+             Configuration::updateValue(self::CK_PACKING_SLIP, true) &&
+             Configuration::updateValue(self::CK_SHOW_CART, true) &&
+             Configuration::updateValue(self::CK_SHOW_TOS, false) &&
+             Configuration::updateValue(self::CK_REMOVE_TOS, false);
+    }
+
+    protected function registerOrderStates()
+    {
+        Wallee_OrderStatus::registerOrderStatus();
+    }
+
     public function uninstall()
     {
         return parent::uninstall() && $this->uninstallControllers() &&
@@ -241,17 +240,18 @@ class Wallee_Payment extends PaymentModule
 
     protected function uninstallConfigurationValues()
     {
-         return Configuration::deleteByName(Wallee_Payment::CK_USER_ID) &&
-             Configuration::deleteByName(Wallee_Payment::CK_APP_KEY) &&
-             Configuration::deleteByName(Wallee_Payment::CK_SPACE_ID) &&
-             Configuration::deleteByName(Wallee_Payment::CK_SPACE_VIEW_ID) &&
-             Configuration::deleteByName(Wallee_Payment::CK_MAIL) &&
-             Configuration::deleteByName(Wallee_Payment::CK_INVOICE) &&
-             Configuration::deleteByName(Wallee_Payment::CK_PACKING_SLIP) &&
-             Configuration::deleteByName(Wallee_Payment::CK_FEE_ITEM) &&
-             Configuration::deleteByName(Wallee_Payment::CK_SHOW_CART) &&
-             Configuration::deleteByName(Wallee_Payment::CK_SHOW_TOS) &&
-             Configuration::deleteByName(Wallee_Payment::CK_REMOVE_TOS) &&
+        return true;
+         return Configuration::deleteByName(self::CK_USER_ID) &&
+             Configuration::deleteByName(self::CK_APP_KEY) &&
+             Configuration::deleteByName(self::CK_SPACE_ID) &&
+             Configuration::deleteByName(self::CK_SPACE_VIEW_ID) &&
+             Configuration::deleteByName(self::CK_MAIL) &&
+             Configuration::deleteByName(self::CK_INVOICE) &&
+             Configuration::deleteByName(self::CK_PACKING_SLIP) &&
+             Configuration::deleteByName(self::CK_FEE_ITEM) &&
+             Configuration::deleteByName(self::CK_SHOW_CART) &&
+             Configuration::deleteByName(self::CK_SHOW_TOS) &&
+             Configuration::deleteByName(self::CK_REMOVE_TOS) &&
              Configuration::deleteByName(Wallee_Service_ManualTask::CONFIG_KEY);
     }
 
@@ -259,7 +259,10 @@ class Wallee_Payment extends PaymentModule
     {
         $result = true;
         $controllers = array(
-            'AdminWalleeMethodSettings'
+            'AdminWalleeMethodSettings',
+            'AdminWalleeDocuments',
+            'AdminWalleeOrder',
+            'AdminWalleeCronJobs'
         );
         foreach ($controllers as $class_name) {
             $id = Tab::getIdFromClassName($class_name);
@@ -294,31 +297,31 @@ class Wallee_Payment extends PaymentModule
             $refresh = true;
             if ($this->context->shop->isFeatureActive()) {
                 if ($this->context->shop->getContext() == Shop::CONTEXT_ALL) {
-                    Configuration::updateGlobalValue(Wallee_Payment::CK_USER_ID,
-                        Tools::getValue(Wallee_Payment::CK_USER_ID));
-                    Configuration::updateGlobalValue(Wallee_Payment::CK_APP_KEY,
-                        Tools::getValue(Wallee_Payment::CK_APP_KEY));
+                    Configuration::updateGlobalValue(self::CK_USER_ID,
+                        Tools::getValue(self::CK_USER_ID));
+                    Configuration::updateGlobalValue(self::CK_APP_KEY,
+                        Tools::getValue(self::CK_APP_KEY));
                     $output .= $this->displayConfirmation($this->l('Settings updated'));
                 }
                 elseif ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                    Configuration::updateValue(Wallee_Payment::CK_SPACE_ID,
-                        Tools::getValue(Wallee_Payment::CK_SPACE_ID));
-                    Configuration::updateValue(Wallee_Payment::CK_SPACE_VIEW_ID,
-                        Tools::getValue(Wallee_Payment::CK_SPACE_VIEW_ID));
-                    Configuration::updateValue(Wallee_Payment::CK_MAIL,
-                        Tools::getValue(Wallee_Payment::CK_MAIL));
-                    Configuration::updateValue(Wallee_Payment::CK_FEE_ITEM,
-                        Tools::getValue(Wallee_Payment::CK_FEE_ITEM));
-                    Configuration::updateValue(Wallee_Payment::CK_INVOICE,
-                        Tools::getValue(Wallee_Payment::CK_INVOICE));
-                    Configuration::updateValue(Wallee_Payment::CK_PACKING_SLIP,
-                        Tools::getValue(Wallee_Payment::CK_PACKING_SLIP));
-                    Configuration::updateValue(Wallee_Payment::CK_SHOW_CART,
-                        Tools::getValue(Wallee_Payment::CK_SHOW_CART));
-                    Configuration::updateValue(Wallee_Payment::CK_SHOW_TOS,
-                        Tools::getValue(Wallee_Payment::CK_SHOW_TOS));
-                    Configuration::updateValue(Wallee_Payment::CK_REMOVE_TOS,
-                        Tools::getValue(Wallee_Payment::CK_REMOVE_TOS));
+                    Configuration::updateValue(self::CK_SPACE_ID,
+                        Tools::getValue(self::CK_SPACE_ID));
+                    Configuration::updateValue(self::CK_SPACE_VIEW_ID,
+                        Tools::getValue(self::CK_SPACE_VIEW_ID));
+                    Configuration::updateValue(self::CK_MAIL,
+                        Tools::getValue(self::CK_MAIL));
+                    Configuration::updateValue(self::CK_FEE_ITEM,
+                        Tools::getValue(self::CK_FEE_ITEM));
+                    Configuration::updateValue(self::CK_INVOICE,
+                        Tools::getValue(self::CK_INVOICE));
+                    Configuration::updateValue(self::CK_PACKING_SLIP,
+                        Tools::getValue(self::CK_PACKING_SLIP));
+                    Configuration::updateValue(self::CK_SHOW_CART,
+                        Tools::getValue(self::CK_SHOW_CART));
+                    Configuration::updateValue(self::CK_SHOW_TOS,
+                        Tools::getValue(self::CK_SHOW_TOS));
+                    Configuration::updateValue(self::CK_REMOVE_TOS,
+                        Tools::getValue(self::CK_REMOVE_TOS));
                     $output .= $this->displayConfirmation($this->l('Settings updated'));
                 }
                 else {
@@ -328,28 +331,28 @@ class Wallee_Payment extends PaymentModule
                 }
             }
             else {
-                Configuration::updateGlobalValue(Wallee_Payment::CK_USER_ID,
-                    Tools::getValue(Wallee_Payment::CK_USER_ID));
-                Configuration::updateGlobalValue(Wallee_Payment::CK_APP_KEY,
-                    Tools::getValue(Wallee_Payment::CK_APP_KEY));
-                Configuration::updateValue(Wallee_Payment::CK_SPACE_ID,
-                    Tools::getValue(Wallee_Payment::CK_SPACE_ID));
-                Configuration::updateValue(Wallee_Payment::CK_SPACE_VIEW_ID,
-                    Tools::getValue(Wallee_Payment::CK_SPACE_VIEW_ID));
-                Configuration::updateValue(Wallee_Payment::CK_MAIL,
-                    Tools::getValue(Wallee_Payment::CK_MAIL));
-                Configuration::updateValue(Wallee_Payment::CK_FEE_ITEM,
-                    Tools::getValue(Wallee_Payment::CK_FEE_ITEM));
-                Configuration::updateValue(Wallee_Payment::CK_INVOICE,
-                    Tools::getValue(Wallee_Payment::CK_INVOICE));
-                Configuration::updateValue(Wallee_Payment::CK_PACKING_SLIP,
-                    Tools::getValue(Wallee_Payment::CK_PACKING_SLIP));
-                Configuration::updateValue(Wallee_Payment::CK_SHOW_CART,
-                    Tools::getValue(Wallee_Payment::CK_SHOW_CART));
-                Configuration::updateValue(Wallee_Payment::CK_SHOW_TOS,
-                    Tools::getValue(Wallee_Payment::CK_SHOW_TOS));
-                Configuration::updateValue(Wallee_Payment::CK_REMOVE_TOS,
-                    Tools::getValue(Wallee_Payment::CK_REMOVE_TOS));
+                Configuration::updateGlobalValue(self::CK_USER_ID,
+                    Tools::getValue(self::CK_USER_ID));
+                Configuration::updateGlobalValue(self::CK_APP_KEY,
+                    Tools::getValue(self::CK_APP_KEY));
+                Configuration::updateValue(self::CK_SPACE_ID,
+                    Tools::getValue(self::CK_SPACE_ID));
+                Configuration::updateValue(self::CK_SPACE_VIEW_ID,
+                    Tools::getValue(self::CK_SPACE_VIEW_ID));
+                Configuration::updateValue(self::CK_MAIL,
+                    Tools::getValue(self::CK_MAIL));
+                Configuration::updateValue(self::CK_FEE_ITEM,
+                    Tools::getValue(self::CK_FEE_ITEM));
+                Configuration::updateValue(self::CK_INVOICE,
+                    Tools::getValue(self::CK_INVOICE));
+                Configuration::updateValue(self::CK_PACKING_SLIP,
+                    Tools::getValue(self::CK_PACKING_SLIP));
+                Configuration::updateValue(self::CK_SHOW_CART,
+                    Tools::getValue(self::CK_SHOW_CART));
+                Configuration::updateValue(self::CK_SHOW_TOS,
+                    Tools::getValue(self::CK_SHOW_TOS));
+                Configuration::updateValue(self::CK_REMOVE_TOS,
+                    Tools::getValue(self::CK_REMOVE_TOS));
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
             }
             if ($refresh) {
@@ -363,17 +366,17 @@ class Wallee_Payment extends PaymentModule
             $refresh = true;
             if ($this->context->shop->isFeatureActive()) {
                 if ($this->context->shop->getContext() == Shop::CONTEXT_ALL) {
-                    Configuration::updateGlobalValue(Wallee_Payment::CK_USER_ID,
-                        Tools::getValue(Wallee_Payment::CK_USER_ID));
-                    Configuration::updateGlobalValue(Wallee_Payment::CK_APP_KEY,
-                        Tools::getValue(Wallee_Payment::CK_APP_KEY));
+                    Configuration::updateGlobalValue(self::CK_USER_ID,
+                        Tools::getValue(self::CK_USER_ID));
+                    Configuration::updateGlobalValue(self::CK_APP_KEY,
+                        Tools::getValue(self::CK_APP_KEY));
                     $output .= $this->displayConfirmation($this->l('Settings updated'));
                 }
                 elseif ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                    Configuration::updateValue(Wallee_Payment::CK_SPACE_ID,
-                        Tools::getValue(Wallee_Payment::CK_SPACE_ID));
-                    Configuration::updateValue(Wallee_Payment::CK_SPACE_VIEW_ID,
-                        Tools::getValue(Wallee_Payment::CK_SPACE_VIEW_ID));
+                    Configuration::updateValue(self::CK_SPACE_ID,
+                        Tools::getValue(self::CK_SPACE_ID));
+                    Configuration::updateValue(self::CK_SPACE_VIEW_ID,
+                        Tools::getValue(self::CK_SPACE_VIEW_ID));
                     $output .= $this->displayConfirmation($this->l('Settings updated'));
                 }
                 else {
@@ -383,14 +386,14 @@ class Wallee_Payment extends PaymentModule
                 }
             }
             else {
-                Configuration::updateGlobalValue(Wallee_Payment::CK_USER_ID,
-                    Tools::getValue(Wallee_Payment::CK_USER_ID));
-                Configuration::updateGlobalValue(Wallee_Payment::CK_APP_KEY,
-                    Tools::getValue(Wallee_Payment::CK_APP_KEY));
-                Configuration::updateValue(Wallee_Payment::CK_SPACE_ID,
-                    Tools::getValue(Wallee_Payment::CK_SPACE_ID));
-                Configuration::updateValue(Wallee_Payment::CK_SPACE_VIEW_ID,
-                    Tools::getValue(Wallee_Payment::CK_SPACE_VIEW_ID));
+                Configuration::updateGlobalValue(self::CK_USER_ID,
+                    Tools::getValue(self::CK_USER_ID));
+                Configuration::updateGlobalValue(self::CK_APP_KEY,
+                    Tools::getValue(self::CK_APP_KEY));
+                Configuration::updateValue(self::CK_SPACE_ID,
+                    Tools::getValue(self::CK_SPACE_ID));
+                Configuration::updateValue(self::CK_SPACE_VIEW_ID,
+                    Tools::getValue(self::CK_SPACE_VIEW_ID));
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
             }
             if ($refresh) {
@@ -403,8 +406,8 @@ class Wallee_Payment extends PaymentModule
         if (Tools::isSubmit('submit' . $this->name . '_email')) {
             if ($this->context->shop->isFeatureActive()) {
                 if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                    Configuration::updateValue(Wallee_Payment::CK_MAIL,
-                        Tools::getValue(Wallee_Payment::CK_MAIL));
+                    Configuration::updateValue(self::CK_MAIL,
+                        Tools::getValue(self::CK_MAIL));
                     
                     $output .= $this->displayConfirmation($this->l('Settings updated'));
                 }
@@ -415,16 +418,16 @@ class Wallee_Payment extends PaymentModule
                 }
             }
             else {
-                Configuration::updateValue(Wallee_Payment::CK_MAIL,
-                    Tools::getValue(Wallee_Payment::CK_MAIL));
+                Configuration::updateValue(self::CK_MAIL,
+                    Tools::getValue(self::CK_MAIL));
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
             }
         }
         if (Tools::isSubmit('submit' . $this->name . '_fee_item')) {
             if ($this->context->shop->isFeatureActive()) {
                 if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                    Configuration::updateValue(Wallee_Payment::CK_FEE_ITEM,
-                        Tools::getValue(Wallee_Payment::CK_FEE_ITEM));
+                    Configuration::updateValue(self::CK_FEE_ITEM,
+                        Tools::getValue(self::CK_FEE_ITEM));
                     
                     $output .= $this->displayConfirmation($this->l('Settings updated'));
                 }
@@ -435,18 +438,18 @@ class Wallee_Payment extends PaymentModule
                 }
             }
             else {
-                Configuration::updateValue(Wallee_Payment::CK_FEE_ITEM,
-                    Tools::getValue(Wallee_Payment::CK_FEE_ITEM));
+                Configuration::updateValue(self::CK_FEE_ITEM,
+                    Tools::getValue(self::CK_FEE_ITEM));
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
             }
         }
         if (Tools::isSubmit('submit' . $this->name . '_download')) {
             if ($this->context->shop->isFeatureActive()) {
                 if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                    Configuration::updateValue(Wallee_Payment::CK_INVOICE,
-                        Tools::getValue(Wallee_Payment::CK_INVOICE));
-                    Configuration::updateValue(Wallee_Payment::CK_PACKING_SLIP,
-                        Tools::getValue(Wallee_Payment::CK_PACKING_SLIP));
+                    Configuration::updateValue(self::CK_INVOICE,
+                        Tools::getValue(self::CK_INVOICE));
+                    Configuration::updateValue(self::CK_PACKING_SLIP,
+                        Tools::getValue(self::CK_PACKING_SLIP));
                     $output .= $this->displayConfirmation($this->l('Settings updated'));
                 }
                 else {
@@ -456,22 +459,22 @@ class Wallee_Payment extends PaymentModule
                 }
             }
             else {
-                Configuration::updateValue(Wallee_Payment::CK_INVOICE,
-                    Tools::getValue(Wallee_Payment::CK_INVOICE));
-                Configuration::updateValue(Wallee_Payment::CK_PACKING_SLIP,
-                    Tools::getValue(Wallee_Payment::CK_PACKING_SLIP));
+                Configuration::updateValue(self::CK_INVOICE,
+                    Tools::getValue(self::CK_INVOICE));
+                Configuration::updateValue(self::CK_PACKING_SLIP,
+                    Tools::getValue(self::CK_PACKING_SLIP));
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
             }
         }
         if (Tools::isSubmit('submit' . $this->name . '_checkout')) {
             if ($this->context->shop->isFeatureActive()) {
                 if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                    Configuration::updateValue(Wallee_Payment::CK_SHOW_CART,
-                        Tools::getValue(Wallee_Payment::CK_SHOW_CART));
-                    Configuration::updateValue(Wallee_Payment::CK_SHOW_TOS,
-                        Tools::getValue(Wallee_Payment::CK_SHOW_TOS));
-                    Configuration::updateValue(Wallee_Payment::CK_REMOVE_TOS,
-                        Tools::getValue(Wallee_Payment::CK_REMOVE_TOS));
+                    Configuration::updateValue(self::CK_SHOW_CART,
+                        Tools::getValue(self::CK_SHOW_CART));
+                    Configuration::updateValue(self::CK_SHOW_TOS,
+                        Tools::getValue(self::CK_SHOW_TOS));
+                    Configuration::updateValue(self::CK_REMOVE_TOS,
+                        Tools::getValue(self::CK_REMOVE_TOS));
                     $output .= $this->displayConfirmation($this->l('Settings updated'));
                 }
                 else {
@@ -481,12 +484,12 @@ class Wallee_Payment extends PaymentModule
                 }
             }
             else {
-                Configuration::updateGlobalValue(Wallee_Payment::CK_SHOW_CART,
-                    Tools::getValue(Wallee_Payment::CK_SHOW_CART));
-                Configuration::updateGlobalValue(Wallee_Payment::CK_SHOW_TOS,
-                    Tools::getValue(Wallee_Payment::CK_SHOW_TOS));
-                Configuration::updateValue(Wallee_Payment::CK_REMOVE_TOS,
-                    Tools::getValue(Wallee_Payment::CK_REMOVE_TOS));
+                Configuration::updateGlobalValue(self::CK_SHOW_CART,
+                    Tools::getValue(self::CK_SHOW_CART));
+                Configuration::updateGlobalValue(self::CK_SHOW_TOS,
+                    Tools::getValue(self::CK_SHOW_TOS));
+                Configuration::updateValue(self::CK_REMOVE_TOS,
+                    Tools::getValue(self::CK_REMOVE_TOS));
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
             }
         }
@@ -526,7 +529,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'text',
                 'label' => $this->l('User Id'),
-                'name' => Wallee_Payment::CK_USER_ID,
+                'name' => self::CK_USER_ID,
                 'required' => true,
                 'col' => 3,
                 'lang' => false
@@ -534,7 +537,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'wallee_password',
                 'label' => $this->l('Application Key'),
-                'name' => Wallee_Payment::CK_APP_KEY,
+                'name' => self::CK_APP_KEY,
                 'required' => true,
                 'col' => 3,
                 'lang' => false
@@ -562,7 +565,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'text',
                 'label' => $this->l('Space Id'),
-                'name' => Wallee_Payment::CK_SPACE_ID,
+                'name' => self::CK_SPACE_ID,
                 'required' => true,
                 'col' => 3,
                 'lang' => false
@@ -570,7 +573,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'text',
                 'label' => $this->l('SpaceView Id'),
-                'name' => Wallee_Payment::CK_SPACE_VIEW_ID,
+                'name' => self::CK_SPACE_VIEW_ID,
                 'col' => 3,
                 'lang' => false
             )
@@ -627,7 +630,7 @@ class Wallee_Payment extends PaymentModule
         // General Settings
         $fieldsForm[]['form'] = array(
             'legend' => array(
-                'title' => $this->l('Wallee General Settings')
+                'title' => $this->l('wallee General Settings')
             ),
             'input' => $generalInputs,
             'buttons' => $buttons
@@ -658,26 +661,26 @@ class Wallee_Payment extends PaymentModule
         $values = array();
         if ($this->context->shop->isFeatureActive()) {
             if ($this->context->shop->getContext() == Shop::CONTEXT_ALL) {
-                $values[Wallee_Payment::CK_USER_ID] = Configuration::getGlobalValue(
-                    Wallee_Payment::CK_USER_ID);
-                $values[Wallee_Payment::CK_APP_KEY] = Configuration::getGlobalValue(
-                    Wallee_Payment::CK_APP_KEY);
+                $values[self::CK_USER_ID] = Configuration::getGlobalValue(
+                    self::CK_USER_ID);
+                $values[self::CK_APP_KEY] = Configuration::getGlobalValue(
+                    self::CK_APP_KEY);
             }
             elseif ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                $values[Wallee_Payment::CK_SPACE_ID] = Configuration::get(
-                    Wallee_Payment::CK_SPACE_ID);
-                $values[Wallee_Payment::CK_SPACE_VIEW_ID] = Configuration::get(
-                    Wallee_Payment::CK_SPACE_VIEW_ID);
+                $values[self::CK_SPACE_ID] = Configuration::get(
+                    self::CK_SPACE_ID);
+                $values[self::CK_SPACE_VIEW_ID] = Configuration::get(
+                    self::CK_SPACE_VIEW_ID);
             }
         }
         else {
-            $values[Wallee_Payment::CK_USER_ID] = Configuration::getGlobalValue(
-                Wallee_Payment::CK_USER_ID);
-            $values[Wallee_Payment::CK_APP_KEY] = Configuration::getGlobalValue(
-                Wallee_Payment::CK_APP_KEY);
-            $values[Wallee_Payment::CK_SPACE_ID] = Configuration::get(Wallee_Payment::CK_SPACE_ID);
-            $values[Wallee_Payment::CK_SPACE_VIEW_ID] = Configuration::get(
-                Wallee_Payment::CK_SPACE_VIEW_ID);
+            $values[self::CK_USER_ID] = Configuration::getGlobalValue(
+                self::CK_USER_ID);
+            $values[self::CK_APP_KEY] = Configuration::getGlobalValue(
+                self::CK_APP_KEY);
+            $values[self::CK_SPACE_ID] = Configuration::get(self::CK_SPACE_ID);
+            $values[self::CK_SPACE_VIEW_ID] = Configuration::get(
+                self::CK_SPACE_VIEW_ID);
         }
         return $values;
     }
@@ -688,7 +691,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'switch',
                 'label' => $this->l('Show Cart Summary'),
-                'name' => Wallee_Payment::CK_SHOW_CART,
+                'name' => self::CK_SHOW_CART,
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -709,7 +712,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'switch',
                 'label' => $this->l('Show Terms of Service'),
-                'name' => Wallee_Payment::CK_SHOW_TOS,
+                'name' => self::CK_SHOW_TOS,
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -730,7 +733,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'switch',
                 'label' => $this->l('Remove default Terms of Service'),
-                'name' => Wallee_Payment::CK_REMOVE_TOS,
+                'name' => self::CK_REMOVE_TOS,
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -779,21 +782,21 @@ class Wallee_Payment extends PaymentModule
         $values = array();
         if ($this->context->shop->isFeatureActive()) {
             if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                $values[Wallee_Payment::CK_SHOW_CART] = (bool) Configuration::get(
-                    Wallee_Payment::CK_SHOW_CART);
-                $values[Wallee_Payment::CK_SHOW_TOS] = (bool) Configuration::get(
-                    Wallee_Payment::CK_SHOW_TOS);
-                $values[Wallee_Payment::CK_REMOVE_TOS] = (bool) Configuration::get(
-                    Wallee_Payment::CK_REMOVE_TOS);
+                $values[self::CK_SHOW_CART] = (bool) Configuration::get(
+                    self::CK_SHOW_CART);
+                $values[self::CK_SHOW_TOS] = (bool) Configuration::get(
+                    self::CK_SHOW_TOS);
+                $values[self::CK_REMOVE_TOS] = (bool) Configuration::get(
+                    self::CK_REMOVE_TOS);
             }
         }
         else {
-            $values[Wallee_Payment::CK_SHOW_CART] = (bool) Configuration::getGlobalValue(
-                Wallee_Payment::CK_SHOW_CART);
-            $values[Wallee_Payment::CK_SHOW_TOS] = (bool) Configuration::getGlobalValue(
-                Wallee_Payment::CK_SHOW_TOS);
-            $values[Wallee_Payment::CK_REMOVE_TOS] = (bool) Configuration::get(
-                Wallee_Payment::CK_REMOVE_TOS);
+            $values[self::CK_SHOW_CART] = (bool) Configuration::getGlobalValue(
+                self::CK_SHOW_CART);
+            $values[self::CK_SHOW_TOS] = (bool) Configuration::getGlobalValue(
+                self::CK_SHOW_TOS);
+            $values[self::CK_REMOVE_TOS] = (bool) Configuration::get(
+                self::CK_REMOVE_TOS);
         }
         return $values;
     }
@@ -804,7 +807,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'switch',
                 'label' => $this->l('Send Order Emails'),
-                'name' => Wallee_Payment::CK_MAIL,
+                'name' => self::CK_MAIL,
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -852,12 +855,12 @@ class Wallee_Payment extends PaymentModule
         $values = array();
         if ($this->context->shop->isFeatureActive()) {
             if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                $values[Wallee_Payment::CK_MAIL] = (bool) Configuration::get(
-                    Wallee_Payment::CK_MAIL);
+                $values[self::CK_MAIL] = (bool) Configuration::get(
+                    self::CK_MAIL);
             }
         }
         else {
-            $values[Wallee_Payment::CK_MAIL] = (bool) Configuration::get(Wallee_Payment::CK_MAIL);
+            $values[self::CK_MAIL] = (bool) Configuration::get(self::CK_MAIL);
         }
         return $values;
     }
@@ -881,7 +884,7 @@ class Wallee_Payment extends PaymentModule
                 'label' => $this->l('Payment Fee Product'),
                 'desc' => $this->l(
                     'Select the product that should be inserted into the cart as a payment fee.'),
-                'name' => Wallee_Payment::CK_FEE_ITEM,
+                'name' => self::CK_FEE_ITEM,
                 'options' => array(
                     'query' => $products,
                     'id' => 'id_product',
@@ -920,13 +923,13 @@ class Wallee_Payment extends PaymentModule
         $values = array();
         if ($this->context->shop->isFeatureActive()) {
             if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                $values[Wallee_Payment::CK_FEE_ITEM] = (int) Configuration::get(
-                    Wallee_Payment::CK_FEE_ITEM);
+                $values[self::CK_FEE_ITEM] = (int) Configuration::get(
+                    self::CK_FEE_ITEM);
             }
         }
         else {
-            $values[Wallee_Payment::CK_FEE_ITEM] = (bool) Configuration::get(
-                Wallee_Payment::CK_FEE_ITEM);
+            $values[self::CK_FEE_ITEM] = (bool) Configuration::get(
+                self::CK_FEE_ITEM);
         }
         return $values;
     }
@@ -937,7 +940,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'switch',
                 'label' => $this->l('Invoice Download'),
-                'name' => Wallee_Payment::CK_INVOICE,
+                'name' => self::CK_INVOICE,
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -957,7 +960,7 @@ class Wallee_Payment extends PaymentModule
             array(
                 'type' => 'switch',
                 'label' => $this->l('Packing Slip Download'),
-                'name' => Wallee_Payment::CK_PACKING_SLIP,
+                'name' => self::CK_PACKING_SLIP,
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -1005,17 +1008,17 @@ class Wallee_Payment extends PaymentModule
         $values = array();
         if ($this->context->shop->isFeatureActive()) {
             if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                $values[Wallee_Payment::CK_INVOICE] = (bool) Configuration::get(
-                    Wallee_Payment::CK_INVOICE);
-                $values[Wallee_Payment::CK_PACKING_SLIP] = (bool) Configuration::get(
-                    Wallee_Payment::CK_PACKING_SLIP);
+                $values[self::CK_INVOICE] = (bool) Configuration::get(
+                    self::CK_INVOICE);
+                $values[self::CK_PACKING_SLIP] = (bool) Configuration::get(
+                    self::CK_PACKING_SLIP);
             }
         }
         else {
-            $values[Wallee_Payment::CK_INVOICE] = (bool) Configuration::get(
-                Wallee_Payment::CK_INVOICE);
-            $values[Wallee_Payment::CK_PACKING_SLIP] = (bool) Configuration::get(
-                Wallee_Payment::CK_PACKING_SLIP);
+            $values[self::CK_INVOICE] = (bool) Configuration::get(
+                self::CK_INVOICE);
+            $values[self::CK_PACKING_SLIP] = (bool) Configuration::get(
+                self::CK_PACKING_SLIP);
         }
         return $values;
     }
@@ -1092,8 +1095,8 @@ class Wallee_Payment extends PaymentModule
             'wallee_label_description',
             'wallee_label_description_group',
             'wallee_languages',
-            'wallee_payment_connectors',
-            'wallee_payment_methods'
+            'wallee_connectors',
+            'wallee_methods'
         );
         foreach ($toDelete as $delete) {
             Cache::clean($delete);
@@ -1227,7 +1230,7 @@ class Wallee_Payment extends PaymentModule
         $spaceId = Configuration::get(self::CK_SPACE_ID, null, null, $shopId);
         $spaceViewId = Configuration::get(self::CK_SPACE_VIEW_ID, null, null, $shopId);
         $parameters = array();
-        $parameters['link'] = $this->context->link->getModuleLink('wallee_payment', 'payment',
+        $parameters['link'] = $this->context->link->getModuleLink('wallee', 'payment',
             array(
                 'methodId' => $methodConfiguration->getId()
             ), true);
@@ -1246,7 +1249,7 @@ class Wallee_Payment extends PaymentModule
             $parameters['description'] = $description;
         }
         $feeValues = Wallee_Helper::getWalleeFeeValues($cart, $methodConfiguration);
-        if ($feeValues['wallee_fee_total'] > 0) {
+        if ($feeValues['fee_total'] > 0) {
             $parameters['feeValues'] = $feeValues;
         }
         else {
@@ -1275,7 +1278,7 @@ class Wallee_Payment extends PaymentModule
         
         $currentToken = Wallee_Cron::getCurrentSecurityTokenForPendingCron();
         if ($currentToken) {
-            $url = $this->context->link->getModuleLink('wallee_payment', 'cron',
+            $url = $this->context->link->getModuleLink('wallee', 'cron',
                 array(
                     'security_token' => $currentToken
                 ), true);
@@ -1382,9 +1385,9 @@ class Wallee_Payment extends PaymentModule
             
             if ($methodConfiguration == null || $methodConfiguration->getId() == null ||
                  $methodConfiguration->getState() != Wallee_Model_MethodConfiguration::STATE_ACTIVE || $methodConfiguration->getSpaceId() !=
-                 Configuration::get(Wallee_Payment::CK_SPACE_ID, null, null, $cart->id_shop)) {
+                 Configuration::get(self::CK_SPACE_ID, null, null, $cart->id_shop)) {
                 $error = Tools::displayError(
-                    'Wallee payment called with wrong payment method configuration. Method: ' .
+                    'wallee method configuration called with wrong payment method configuration. Method: ' .
                      $payment_method);
                 PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', intval($this->id));
                 throw new Exception("There was a techincal issue, please try again.");
@@ -1397,7 +1400,7 @@ class Wallee_Payment extends PaymentModule
                 $title = $translatedTitel;
             }
             
-            Wallee_Payment::startRecordingMailMessages();
+            Wallee::startRecordingMailMessages();
             parent::validateOrder((int) $cart->id, $id_order_state, (float) $amount_paid, $title,
                 $message, $extra_vars, $currency_special, $dont_touch_amount, $secure_key, $shop);
             
@@ -1411,11 +1414,11 @@ class Wallee_Payment extends PaymentModule
                 Wallee_Helper::updateOrderMeta($order, 'walleeMainOrderId', $dataOrder->id);
                 $order->save();
             }
-            $emailMessages = Wallee_Payment::stopRecordingMailMessages();
+            $emailMessages = Wallee::stopRecordingMailMessages();
             
             // Update cart <-> wallee mapping <-> order mapping
-            $walleeIds = Wallee_Helper::getCartMeta($originalCart, 'walleeIds');
-            Wallee_Helper::updateOrderMeta($dataOrder, 'walleeIds', $walleeIds);
+            $ids = Wallee_Helper::getCartMeta($originalCart, 'mappingIds');
+            Wallee_Helper::updateOrderMeta($dataOrder, 'mappingIds', $ids);
             if (Configuration::get(self::CK_MAIL, null, null, $cart->id_shop)) {
                 Wallee_Helper::storeOrderEmails($dataOrder, $emailMessages);
             }
@@ -1434,7 +1437,7 @@ class Wallee_Payment extends PaymentModule
             $this->context->controller->addCSS(
                 __PS_BASE_URI__ . 'modules/' . $this->name . '/css/frontend/checkout.css');
             $cart = $this->context->cart;
-            if (Configuration::get(Wallee_Payment::CK_REMOVE_TOS, null, null, $cart->id_shop)) {
+            if (Configuration::get(self::CK_REMOVE_TOS, null, null, $cart->id_shop)) {
                 $this->context->cookie->checkedTOS = 1;
                 $this->context->controller->addJS(
                     __PS_BASE_URI__ . 'modules/' . $this->name . '/js/frontend/tos-handling.js');
@@ -1458,7 +1461,7 @@ class Wallee_Payment extends PaymentModule
                 \Wallee\Sdk\Model\TransactionState::DECLINE
             )) && (bool) Configuration::get(self::CK_INVOICE)) {
             
-            $documentVars['walleeInvoice'] = $this->context->link->getModuleLink('wallee_payment',
+            $documentVars['walleeInvoice'] = $this->context->link->getModuleLink('wallee',
                 'documents',
                 array(
                     'type' => 'invoice',
@@ -1468,7 +1471,7 @@ class Wallee_Payment extends PaymentModule
         if ($transactionInfo->getState() == \Wallee\Sdk\Model\TransactionState::FULFILL &&
              (bool) Configuration::get(self::CK_PACKING_SLIP)) {
             $documentVars['walleePackingSlip'] = $this->context->link->getModuleLink(
-                'wallee_payment', 'documents',
+                'wallee', 'documents',
                 array(
                     'type' => 'packingSlip',
                     'id_order' => $order->id

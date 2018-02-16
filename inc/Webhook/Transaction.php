@@ -65,7 +65,7 @@ class Wallee_Webhook_Transaction extends Wallee_Webhook_OrderRelatedAbstract {
 	        return;
 	    }
 	    //Do not send emails for this status update
-	    Wallee_Payment::startRecordingMailMessages();
+	    Wallee::startRecordingMailMessages();
 	    Wallee_Helper::updateOrderMeta($sourceOrder, 'authorized', true);
 	    $authorizedStatus = Wallee_OrderStatus::getAuthorizedOrderStatus();
 	    $orders = $sourceOrder->getBrother();
@@ -74,15 +74,17 @@ class Wallee_Webhook_Transaction extends Wallee_Webhook_OrderRelatedAbstract {
 	        $order->setCurrentState($authorizedStatus->id);
 	        $order->save();
 	    }
-	    Wallee_Payment::stopRecordingMailMessages();
-	    //Send stored messages
-	    $messages = Wallee_Helper::getOrderEmails($sourceOrder);
-	    if (count($messages) > 0) {
-	        if(method_exists('Mail', 'sendMailMessageWithoutHook')) {
-                foreach ($messages as $message) {
-                    Mail::sendMailMessageWithoutHook($message, false);
-                }
-	        }
+	    Wallee::stopRecordingMailMessages();
+	    if(Configuration::get(Wallee::CK_MAIL, null, null, $sourceOrder->id_shop)){
+	       //Send stored messages
+    	    $messages = Wallee_Helper::getOrderEmails($sourceOrder);
+    	    if (count($messages) > 0) {
+    	        if(method_exists('Mail', 'sendMailMessageWithoutHook')) {
+                    foreach ($messages as $message) {
+                        Mail::sendMailMessageWithoutHook($message, false);
+                    }
+    	        }
+    	    }
 	    }
 	    Wallee_Helper::deleteOrderEmails($order);
 	    //Cleanup carts
@@ -95,7 +97,7 @@ class Wallee_Webhook_Transaction extends Wallee_Webhook_OrderRelatedAbstract {
 	}
 
 	protected function waiting(\Wallee\Sdk\Model\Transaction $transaction, Order $sourceOrder){
-	    Wallee_Payment::startRecordingMailMessages();
+	    Wallee::startRecordingMailMessages();
 	    $waitingStatus = Wallee_OrderStatus::getWaitingOrderStatus();
 	    if (! Wallee_Helper::getOrderMeta($sourceOrder, 'manual_check')){	        
 	        $orders = $sourceOrder->getBrother();
@@ -105,11 +107,15 @@ class Wallee_Webhook_Transaction extends Wallee_Webhook_OrderRelatedAbstract {
 	            $order->save();
 	        }	        
 	    }
-	    Wallee_Payment::stopRecordingMailMessages();
+	    Wallee::stopRecordingMailMessages();
 	    Wallee_Service_Transaction::instance()->updateTransactionInfo($transaction, $sourceOrder);
 	}
 
 	protected function decline(\Wallee\Sdk\Model\Transaction $transaction, Order $sourceOrder){
+	    if(!Configuration::get(Wallee::CK_MAIL, null, null, $sourceOrder->id_shop)){
+	        //Do not send email
+	        Wallee::startRecordingMailMessages();
+	    }
 	    $canceledStatusId = Configuration::get('PS_OS_CANCELED');
 	    $orders = $sourceOrder->getBrother();
 	    $orders[] = $sourceOrder;
@@ -117,12 +123,13 @@ class Wallee_Webhook_Transaction extends Wallee_Webhook_OrderRelatedAbstract {
 	        $order->setCurrentState($canceledStatusId);
 	        $order->save();
 	    }
+	    Wallee::stopRecordingMailMessages();
 	    Wallee_Service_Transaction::instance()->updateTransactionInfo($transaction, $sourceOrder);
 	}
 
 	protected function failed(\Wallee\Sdk\Model\Transaction $transaction, Order $sourceOrder){
 	    //Do not send email
-	    Wallee_Payment::startRecordingMailMessages();
+	    Wallee::startRecordingMailMessages();
 	    $errorStatusId = Configuration::get('PS_OS_ERROR');
 	    $orders = $sourceOrder->getBrother();
 	    $orders[] = $sourceOrder;
@@ -130,15 +137,15 @@ class Wallee_Webhook_Transaction extends Wallee_Webhook_OrderRelatedAbstract {
 	        $order->setCurrentState($errorStatusId);
 	        $order->save();
 	    }
-	    Wallee_Payment::stopRecordingMailMessages();
+	    Wallee::stopRecordingMailMessages();
 	    Wallee_Helper::deleteOrderEmails($sourceOrder);
 	    Wallee_Service_Transaction::instance()->updateTransactionInfo($transaction, $sourceOrder);
 	}
 
 	protected function fulfill(\Wallee\Sdk\Model\Transaction $transaction, Order $sourceOrder){
-	    if(!Configuration::get(Wallee_Payment::CK_MAIL, null, null, $sourceOrder->id_shop)){
+	    if(!Configuration::get(Wallee::CK_MAIL, null, null, $sourceOrder->id_shop)){
 	        //Do not send email
-	        Wallee_Payment::startRecordingMailMessages();
+	        Wallee::startRecordingMailMessages();
 	    }
 	    $payedStatusId = Configuration::get('PS_OS_PAYMENT');
 	    $orders = $sourceOrder->getBrother();
@@ -147,14 +154,14 @@ class Wallee_Webhook_Transaction extends Wallee_Webhook_OrderRelatedAbstract {
 	        $order->setCurrentState($payedStatusId);
 	        $order->save();
 	    }
-	    Wallee_Payment::stopRecordingMailMessages();	    
+	    Wallee::stopRecordingMailMessages();	    
 	    Wallee_Service_Transaction::instance()->updateTransactionInfo($transaction, $sourceOrder);
 	}
 
 	protected function voided(\Wallee\Sdk\Model\Transaction $transaction, Order $sourceOrder){
-	    if(!Configuration::get(Wallee_Payment::CK_MAIL, null, null, $sourceOrder->id_shop)){
+	    if(!Configuration::get(Wallee::CK_MAIL, null, null, $sourceOrder->id_shop)){
 	        //Do not send email
-	        Wallee_Payment::startRecordingMailMessages();
+	        Wallee::startRecordingMailMessages();
 	    }
 	    $canceledStatusId = Configuration::get('PS_OS_CANCELED');
 	    $orders = $sourceOrder->getBrother();
@@ -163,7 +170,7 @@ class Wallee_Webhook_Transaction extends Wallee_Webhook_OrderRelatedAbstract {
 	        $order->setCurrentState($canceledStatusId);
 	        $order->save();
 	    }
-	    Wallee_Payment::stopRecordingMailMessages();
+	    Wallee::stopRecordingMailMessages();
 	    Wallee_Service_Transaction::instance()->updateTransactionInfo($transaction, $sourceOrder);
 	}
 }

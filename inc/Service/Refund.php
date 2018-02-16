@@ -4,7 +4,7 @@ if (! defined('_PS_VERSION_')) {
 }
 
 /**
- * This service provides functions to deal with Wallee refunds.
+ * This service provides functions to deal with wallee refunds.
  */
 class Wallee_Service_Refund extends Wallee_Service_Abstract
 {
@@ -258,13 +258,13 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
         $reductions = $strategy->createReductions($order, $parsedData);
         $reductions = $this->fixReductions($amount, $spaceId, $transactionId, $reductions);
                 
-        $walleeRefund = new \Wallee\Sdk\Model\RefundCreate();
-        $walleeRefund->setExternalId($externalRefundId);
-        $walleeRefund->setReductions($reductions);
-        $walleeRefund->setTransaction($transactionId);
-        $walleeRefund->setType($type);
+        $remoteRefund = new \Wallee\Sdk\Model\RefundCreate();
+        $remoteRefund->setExternalId($externalRefundId);
+        $remoteRefund->setReductions($reductions);
+        $remoteRefund->setTransaction($transactionId);
+        $remoteRefund->setType($type);
         
-        return $walleeRefund;
+        return $remoteRefund;
     }
 
     /**

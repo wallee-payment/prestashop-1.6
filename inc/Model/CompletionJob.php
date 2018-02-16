@@ -39,7 +39,7 @@ class Wallee_Model_CompletionJob extends ObjectModel
      * @see ObjectModel::$definition
      */
     public static $definition = array(
-        'table' => 'wallee_completion_job',
+        'table' => 'wle_completion_job',
         'primary' => 'id_completion_job',
         'fields' => array(
             'completion_id' => array(
@@ -189,7 +189,7 @@ class Wallee_Model_CompletionJob extends ObjectModel
     public static function isCompletionRunningForTransaction($spaceId, $transactionId)
     {
         $result = DB::getInstance()->getValue(
-            'SELECT id_completion_job FROM ' . _DB_PREFIX_ . 'wallee_completion_job WHERE space_id = "' .
+            'SELECT id_completion_job FROM ' . _DB_PREFIX_ . 'wle_completion_job WHERE space_id = "' .
                  pSQL($spaceId) . '" AND transaction_id="' . pSQL($transactionId) .
                  '" AND state != "' . pSQL(self::STATE_SUCCESS) . '" AND state != "' . pSQL(self::STATE_FAILURE) . '"', false);
         
@@ -217,7 +217,7 @@ class Wallee_Model_CompletionJob extends ObjectModel
         $time = new DateTime();
         $time->sub(new DateInterval('PT10M'));
         $result = DB::getInstance()->query(
-            'SELECT id_completion_job FROM ' . _DB_PREFIX_ . 'wallee_completion_job WHERE (state = "' .
+            'SELECT id_completion_job FROM ' . _DB_PREFIX_ . 'wle_completion_job WHERE (state = "' .
             pSQL(self::STATE_CREATED) . '" OR state = "'.pSQL(self::STATE_ITEMS_UPDATED).'") AND date_upd < "' .
             pSQL($time->format('Y-m-d H:i:s')) . '"', false);
         $ids = array();

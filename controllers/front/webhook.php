@@ -4,7 +4,7 @@ if (! defined('_PS_VERSION_')) {
 }
 
 
-class Wallee_PaymentWebhookModuleFrontController extends ModuleFrontController {
+class WalleeWebhookModuleFrontController extends ModuleFrontController {
     
     public $display_column_left = false;
     public $ssl = true;

@@ -13,7 +13,7 @@ class Wallee_SmartyFunctions
     
     
     /**
-     * Returns the URL to the refund detail view in Wallee.
+     * Returns the URL to the refund detail view in wallee.
      *
      * @return string
      */
@@ -33,7 +33,7 @@ class Wallee_SmartyFunctions
     }
     
     /**
-     * Returns the URL to the completion detail view in Wallee.
+     * Returns the URL to the completion detail view in wallee.
      *
      * @return string
      */
@@ -43,7 +43,7 @@ class Wallee_SmartyFunctions
     }
     
     /**
-     * Returns the URL to the void detail view in Wallee.
+     * Returns the URL to the void detail view in wallee.
      *
      * @return string
      */

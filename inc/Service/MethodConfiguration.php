@@ -65,7 +65,7 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
     }
 
     /**
-     * Synchronizes the payment method configurations from Wallee.
+     * Synchronizes the payment method configurations from wallee.
      */
     public function synchronize()
     {
@@ -79,7 +79,7 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
             Wallee_Helper::getApiClient());
         
         foreach (Shop::getShops(true, null, true) as $shopId) {
-            $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID, null, null, $shopId);
+            $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null, null, $shopId);
             
             if ($spaceId){
                 if(!array_key_exists($spaceId, $spaceIdCache)){
@@ -113,7 +113,7 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
                 $existingConfiguration->save();
             }
         }
-        Cache::clean('wallee_payment_methods');
+        Cache::clean('wallee_methods');
     }
 
     /**

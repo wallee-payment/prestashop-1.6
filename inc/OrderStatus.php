@@ -7,28 +7,28 @@ class Wallee_OrderStatus
 {
 
     private static $orderStatesConfig = array(
-        'WALLEE_REDIRECTED' => array(
+        'WLE_REDIRECTED' => array(
             'color' => 'RoyalBlue',
             'name' => 'Redirected',
             'invoice' => 0,
             'logable' => 0,
             'image' => 'redirected'
         ),
-        'WALLEE_AUTHORIZED' => array(
+        'WLE_AUTHORIZED' => array(
             'color' => 'mediumblue',
             'name' => 'Authorized',
             'invoice' => 0,
             'logable' => 1,
             'image' => 'authorized'
         ),
-        'WALLEE_WAITING' => array(
+        'WLE_WAITING' => array(
             'color' => 'navy',
             'name' => 'Waiting',
             'invoice' => 1,
             'logable' => 1,
             'image' => 'waiting'
         ),
-        'WALLEE_MANUAL' => array(
+        'WLE_MANUAL' => array(
             'color' => 'midnightblue',
             'name' => 'Manual Decision',
             'invoice' => 1,
@@ -41,22 +41,22 @@ class Wallee_OrderStatus
 
     public static function getRedirectOrderStatus()
     {
-        return self::getOrderStatus('WALLEE_REDIRECTED');
+        return self::getOrderStatus('WLE_REDIRECTED');
     }
     
     public static function getAuthorizedOrderStatus()
     {
-        return self::getOrderStatus('WALLEE_AUTHORIZED');
+        return self::getOrderStatus('WLE_AUTHORIZED');
     }
 
     public static function getWaitingOrderStatus()
     {
-        return self::getOrderStatus('WALLEE_WAITING');
+        return self::getOrderStatus('WLE_WAITING');
     }
 
     public static function getManualOrderStatus()
     {
-        return self::getOrderStatus('WALLEE_MANUAL');
+        return self::getOrderStatus('WLE_MANUAL');
     }
 
     public static function registerOrderStatus(){
@@ -104,7 +104,7 @@ class Wallee_OrderStatus
         $state->send_email = 0;
         $state->template = '';
         $state->unremovable = 1;
-        $state->module_name = 'wallee_payment';
+        $state->module_name = 'wallee';
         $state->add();
         $source = dirname(__DIR__) . DIRECTORY_SEPARATOR . 'logo'.DIRECTORY_SEPARATOR.$config['image'].'.gif';
         $destination = _PS_ROOT_DIR_.DIRECTORY_SEPARATOR.'img'.DIRECTORY_SEPARATOR.'os'.DIRECTORY_SEPARATOR.(int) $state->id.'.gif';

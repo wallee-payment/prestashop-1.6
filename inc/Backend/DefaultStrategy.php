@@ -613,7 +613,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
             if (! OrderSlip::create($order, $parsedData['productListSlip'],
                 $parsedData['shippingBack'], $parsedData['voucher'], $parsedData['choosen'])) {
                 throw new Exception(
-                    Wallee_Helper::translatePS('A credit slip cannot be generated. '));
+                    Wallee_Helper::translatePS('A credit slip cannot be generated.'));
             }
             Hook::exec('actionOrderSlipAdd',
                 array(
@@ -680,7 +680,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
              ($parsedData['refundType'] == self::REFUND_TYPE_CANCEL_PRODUCT &&
              $parsedData['generateCreditSlip'])) {
             // Send credit slip email, if configuration is set to send emails 
-            if(Configuration::get(Wallee_Payment::CK_MAIL, null, null, $order->id_shop)){
+            if(Configuration::get(Wallee::CK_MAIL, null, null, $order->id_shop)){
                 $params = array();
                 $params['{lastname}'] = $customer->lastname;
                 $params['{firstname}'] = $customer->firstname;

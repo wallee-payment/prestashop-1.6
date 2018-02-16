@@ -4,7 +4,7 @@
 		<i class="icon-list-ul"></i>
 		{$title|escape:'html':'UTF-8'}
 	</h3>
-	<div class="wallee_payments_container_tab row">
+	<div class="wallee_container_tab row">
 		<div class="col-lg-12">
 			{if isset($methodConfigurations) && count($methodConfigurations) > 0}
 				<table class="table">
@@ -18,7 +18,7 @@
 				<table class="table">
 					<tr>
 						<td>
-							{l s='No payment methods available.' mod='wallee_payment'}
+							{l s='No payment methods available.' mod='wallee'}
 						</td>
 					</tr>
 				</table>

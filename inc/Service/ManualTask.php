@@ -8,7 +8,7 @@ if (! defined('_PS_VERSION_')) {
  */
 class Wallee_Service_ManualTask extends Wallee_Service_Abstract {
 	
-    const CONFIG_KEY = 'WALLEE_PAYMENT_MANUAL_TASKS';
+    const CONFIG_KEY = 'WLE_MANUAL_TASKS';
 
 	
 	/**
@@ -39,7 +39,7 @@ class Wallee_Service_ManualTask extends Wallee_Service_Abstract {
 	    $spaceIds = array();
 	    $manualTaskService = new \Wallee\Sdk\Service\ManualTaskService(Wallee_Helper::getApiClient());
 	    foreach (Shop::getShops(true, null, true) as $shopId) {
-	        $spaceId = Configuration::get(Wallee_Payment::CK_SPACE_ID, null, null, $shopId);
+	        $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null, null, $shopId);
 	        if ($spaceId && ! in_array($spaceId, $spaceIds)) {
 	            $shopNumberOfManualTasks = $manualTaskService->count($spaceId, $this->createEntityFilter('state', \Wallee\Sdk\Model\ManualTaskState::OPEN));
                 Configuration::updateValue(self::CONFIG_KEY,$shopNumberOfManualTasks, false, null, $shopId);

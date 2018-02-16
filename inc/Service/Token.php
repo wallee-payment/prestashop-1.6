@@ -3,7 +3,7 @@ if (! defined('_PS_VERSION_')) {
     exit();
 }
 /**
- * This service provides functions to deal with Wallee tokens.
+ * This service provides functions to deal with wallee tokens.
  */
 class Wallee_Service_Token extends Wallee_Service_Abstract {
 	

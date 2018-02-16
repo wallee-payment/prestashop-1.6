@@ -37,7 +37,7 @@ class Wallee_Model_VoidJob extends ObjectModel
      * @see ObjectModel::$definition
      */
     public static $definition = array(
-        'table' => 'wallee_void_job',
+        'table' => 'wle_void_job',
         'primary' => 'id_void_job',
         'fields' => array(
             'void_id' => array(
@@ -186,7 +186,7 @@ class Wallee_Model_VoidJob extends ObjectModel
     public static function isVoidRunningForTransaction($spaceId, $transactionId)
     {
         $result = DB::getInstance()->getValue(
-            'SELECT id_void_job FROM ' . _DB_PREFIX_ . 'wallee_void_job WHERE space_id = "' .
+            'SELECT id_void_job FROM ' . _DB_PREFIX_ . 'wle_void_job WHERE space_id = "' .
                  pSQL($spaceId) . '" AND transaction_id="' . pSQL($transactionId) .
                  '" AND (state != "' . pSQL(self::STATE_FAILURE) . '" AND state != "' . pSQL(self::STATE_SUCCESS).'")', false);
         
@@ -215,7 +215,7 @@ class Wallee_Model_VoidJob extends ObjectModel
         $time = new DateTime();
         $time->sub(new DateInterval('PT10M'));
         $result = DB::getInstance()->query(
-            'SELECT id_void_job FROM ' . _DB_PREFIX_ . 'wallee_void_job WHERE state = "' .
+            'SELECT id_void_job FROM ' . _DB_PREFIX_ . 'wle_void_job WHERE state = "' .
                  pSQL(self::STATE_CREATED) . '" AND date_upd < "' .
                  pSQL($time->format('Y-m-d H:i:s')) . '"', false);
         $ids = array();

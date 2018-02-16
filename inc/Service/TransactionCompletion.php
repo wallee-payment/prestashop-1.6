@@ -4,13 +4,13 @@ if (! defined('_PS_VERSION_')) {
 }
 
 /**
- * This service provides functions to deal with Wallee transaction completions.
+ * This service provides functions to deal with wallee transaction completions.
  */
 class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
 {
 
     /**
-     * The refund API service.
+     * The transaction completion API service.
      *
      * @var \Wallee\Sdk\Service\TransactionCompletionService
      */
