@@ -80,7 +80,7 @@ class AdminWalleeOrderController extends ModuleAdminController
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'false',
-                        'message' => Wallee_Helper::cleanWalleeExceptionMessage($e->getMessage())
+                        'message' => Wallee_Helper::cleanExceptionMessage($e->getMessage())
                     ));
                 die();
             }
@@ -113,7 +113,7 @@ class AdminWalleeOrderController extends ModuleAdminController
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'false',
-                        'message' => Wallee_Helper::cleanWalleeExceptionMessage($e->getMessage())
+                        'message' => Wallee_Helper::cleanExceptionMessage($e->getMessage())
                     ));
                 die();
             }

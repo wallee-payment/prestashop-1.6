@@ -8,7 +8,6 @@ if (! defined('_PS_VERSION_')) {
  *
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
- * @package Wallee
  * @author customweb GmbH (http://www.customweb.com/)
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
@@ -79,6 +78,7 @@ class Wallee extends PaymentModule
         $this->version = WALLEE_VERSION;
         $this->author = 'Customweb GmbH';
         $this->bootstrap = true;
+        $this->need_instance = 0;
         
         parent::__construct();
         
@@ -89,7 +89,7 @@ class Wallee extends PaymentModule
             'Are you sure you want to uninstall the wallee module?');
         
         // Remove Fee Item
-        if (isset($this->context->cart)) {
+        if (isset($this->context->cart) && Validate::isLoadedObject($this->context->cart)) {
             $feeProductId = Configuration::get(self::CK_FEE_ITEM);
             if ($feeProductId != null) {
                 $defaultAttributeId = Product::getDefaultAttribute($feeProductId);
@@ -98,8 +98,8 @@ class Wallee extends PaymentModule
                 $this->context->cart->deleteProduct($feeProductId, $defaultAttributeId);
             }
         }
-        if (! empty($this->context->cookie->wallee_error)) {
-            $errors = $this->context->cookie->wallee_error;
+        if (! empty($this->context->cookie->wle_error)) {
+            $errors = $this->context->cookie->wle_error;
             if (is_string($errors)) {
                 $this->context->controller->errors[] = $errors;
             }
@@ -109,7 +109,7 @@ class Wallee extends PaymentModule
                 }
             }
             unset($_SERVER['HTTP_REFERER']); // To disable the back button in the error message
-            $this->context->cookie->wallee_error = null;
+            $this->context->cookie->wle_error = null;
         }
     }
 
@@ -156,12 +156,11 @@ class Wallee extends PaymentModule
     protected function installHooks()
     {
         return $this->registerHook('payment') && $this->registerHook('displayPaymentEU') &&
-             $this->registerHook('paymentReturn') && $this->registerHook('displayOrderConfirmation') &&
+             $this->registerHook('paymentReturn') && 
              $this->registerHook('displayHeader') && $this->registerHook('displayMobileHeader') &&
              $this->registerHook('displayTop') && $this->registerHook('displayBackOfficeHeader') &&
              $this->registerHook('actionMailSend') && $this->registerHook('walleeSettingsChanged') &&
              $this->registerHook('walleeCron') && $this->registerHook('displayOrderDetail') &&
-             $this->registerHook('actionValidateOrder') &&
              $this->registerHook('displayAdminOrderLeft') && $this->registerHook(
                 'displayAdminOrder') && $this->registerHook('actionAdminControllerSetMedia') &&
              $this->registerHook('actionAdminOrdersControllerBefore') &&
@@ -218,7 +217,6 @@ class Wallee extends PaymentModule
 
     protected function installConfiguration()
     {
-        return true;
         return Configuration::updateValue(self::CK_MAIL, true) &&
              Configuration::updateValue(self::CK_INVOICE, true) &&
              Configuration::updateValue(self::CK_PACKING_SLIP, true) &&
@@ -240,7 +238,6 @@ class Wallee extends PaymentModule
 
     protected function uninstallConfigurationValues()
     {
-        return true;
          return Configuration::deleteByName(self::CK_USER_ID) &&
              Configuration::deleteByName(self::CK_APP_KEY) &&
              Configuration::deleteByName(self::CK_SPACE_ID) &&
@@ -928,7 +925,7 @@ class Wallee extends PaymentModule
             }
         }
         else {
-            $values[self::CK_FEE_ITEM] = (bool) Configuration::get(
+            $values[self::CK_FEE_ITEM] = (int) Configuration::get(
                 self::CK_FEE_ITEM);
         }
         return $values;
@@ -1067,21 +1064,21 @@ class Wallee extends PaymentModule
             Wallee_Service_MethodConfiguration::instance()->synchronize();
         }
         catch (Exception $e) {
-            $errors[] = $e->getMessage();
+            PrestaShopLogger::addLog($e->getMessage(), 2, null, null, false);
             $errors[] = $this->l('Synchronization of the payment method configurations failed.');
         }
         try {
             Wallee_Service_Webhook::instance()->install();
         }
         catch (Exception $e) {
-            $errors[] = $e->getMessage();
+            PrestaShopLogger::addLog($e->getMessage(), 2, null, null, false);
             $errors[] = $this->l('Installation of the webhooks failed.');
         }
         try {
             Wallee_Service_ManualTask::instance()->update();
         }
         catch (Exception $e) {
-            $errors[] = $e->getMessage();
+            PrestaShopLogger::addLog($e->getMessage(), 2, null, null, false);
             $errors[] = $this->l('Update of Manual Tasks failed.');
         }
         $this->deleteCachedEntries();
@@ -1105,12 +1102,16 @@ class Wallee extends PaymentModule
 
     public function hookDisplayHeader($params)
     {
-        return $this->getDeviceIdentifierScript();
+        if($this->context->controller instanceof ParentOrderControllerCore){
+            return $this->getDeviceIdentifierScript();
+        }
     }
 
     public function hookDisplayMobileHeader($params)
     {
-        return $this->getDeviceIdentifierScript();
+        if($this->context->controller instanceof ParentOrderControllerCore){
+            return $this->getDeviceIdentifierScript();
+        }
     }
 
     public function hookDisplayTop($params)
@@ -1260,10 +1261,10 @@ class Wallee extends PaymentModule
 
     private function getDeviceIdentifierScript()
     {
-        $uniqueId = $this->context->cookie->wallee_device_id;
+        $uniqueId = $this->context->cookie->wle_device_id;
         if ($uniqueId == false) {
             $uniqueId = Wallee_Helper::generateUUID();
-            $this->context->cookie->wallee_device_id = $uniqueId;
+            $this->context->cookie->wle_device_id = $uniqueId;
         }
         $scriptUrl = Wallee_Helper::getBaseGatewayUrl() . '/s/' .
              Configuration::get(self::CK_SPACE_ID) . '/payment/device.js?sessionIdentifier=' .
@@ -1284,12 +1285,6 @@ class Wallee extends PaymentModule
                 ), true);
             return '<img src="' . $url . '" style="display:none" />';
         }
-    }
-
-    public function hookActionValidateOrder($params)
-    {
-        $cart = $params['cart'];
-        $order = $params['order'];
     }
 
     public function hookActionMailSend($data)
@@ -1521,7 +1516,7 @@ class Wallee extends PaymentModule
                              '&vieworder&conf=4&token=' . $backendController->token);
                 }
                 catch (Exception $e) {
-                    $backendController->errors[] = Wallee_Helper::cleanWalleeExceptionMessage(
+                    $backendController->errors[] = Wallee_Helper::cleanExceptionMessage(
                         $e->getMessage());
                 }
             }
@@ -1552,7 +1547,7 @@ class Wallee extends PaymentModule
                              '&vieworder&conf=4&token=' . $backendController->token);
                 }
                 catch (Exception $e) {
-                    $backendController->errors[] = Wallee_Helper::cleanWalleeExceptionMessage(
+                    $backendController->errors[] = Wallee_Helper::cleanExceptionMessage(
                         $e->getMessage());
                 }
             }
@@ -1590,7 +1585,7 @@ class Wallee extends PaymentModule
                              '&vieworder&conf=30&token=' . $backendController->token);
                 }
                 catch (Exception $e) {
-                    $backendController->errors[] = Wallee_Helper::cleanWalleeExceptionMessage(
+                    $backendController->errors[] = Wallee_Helper::cleanExceptionMessage(
                         $e->getMessage());
                 }
             }
@@ -1636,7 +1631,7 @@ class Wallee extends PaymentModule
                                  '&vieworder&conf=31&token=' . $backendController->token);
                     }
                     catch (Exception $e) {
-                        $backendController->errors[] = Wallee_Helper::cleanWalleeExceptionMessage(
+                        $backendController->errors[] = Wallee_Helper::cleanExceptionMessage(
                             $e->getMessage());
                     }
                 }
@@ -1972,7 +1967,7 @@ class Wallee extends PaymentModule
                                     Wallee_Helper::translatePS(
                                         'Could not update the line items at wallee. Reason: %s'),
                                     
-                                    Wallee_Helper::cleanWalleeExceptionMessage($e->getMessage())))
+                                    Wallee_Helper::cleanExceptionMessage($e->getMessage())))
                         )));
             }
             Wallee_Helper::commitDBTransaction();

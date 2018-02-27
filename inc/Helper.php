@@ -696,7 +696,7 @@ class Wallee_Helper
         return $info;
     }
     
-    public static function cleanWalleeExceptionMessage($message){
+    public static function cleanExceptionMessage($message){
         return preg_replace("/^\[[A-Fa-f\d\-]+\] /", "", $message);
     }
     

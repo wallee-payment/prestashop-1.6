@@ -87,7 +87,7 @@ class Wallee_Service_TransactionVoid extends Wallee_Service_Abstract
                 array(
                     'en-US' => sprintf(
                         Wallee_Helper::translatePS("Could not send the completion to wallee. Error: %s"),
-                        Wallee_Helper::cleanWalleeExceptionMessage($e->getMessage()))
+                        Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $voidJob->setState(Wallee_Model_VoidJob::STATE_FAILURE);
             $voidJob->save();

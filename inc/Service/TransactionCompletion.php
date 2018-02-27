@@ -100,7 +100,7 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
                 array(
                     'en-US' => sprintf(
                         Wallee_Helper::translatePS("Could not update the line items. Error: %s"),
-                        Wallee_Helper::cleanWalleeExceptionMessage($e->getMessage()))
+                        Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             
             $completionJob->setState(Wallee_Model_CompletionJob::STATE_FAILURE);
@@ -135,7 +135,7 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
                 array(
                     'en-US' => sprintf(
                         Wallee_Helper::translatePS("Could not send the completion to wallee. Error: %s"),
-                        Wallee_Helper::cleanWalleeExceptionMessage($e->getMessage()))
+                        Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $completionJob->setState(Wallee_Model_CompletionJob::STATE_FAILURE);
             $completionJob->save();

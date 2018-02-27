@@ -122,7 +122,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
                 array(
                     'en-US' => sprintf(
                         Wallee_Helper::translatePS("Could not send the refund to wallee. Error: %s"),
-                        Wallee_Helper::cleanWalleeExceptionMessage($e->getMessage()))
+                        Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $refundJob->setState(Wallee_Model_RefundJob::STATE_FAILURE);
             $refundJob->save();
@@ -287,7 +287,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
         $computePrecision = $configuration->get('_PS_PRICE_COMPUTE_PRECISION_');
         
         if (Tools::ps_round($refundTotal, $computePrecision) !=
-             Tools::ps_round($refundTotal, $computePrecision)) {
+            Tools::ps_round($reductionAmount, $computePrecision)) {
             $fixedReductions = array();
             $baseAmount = Wallee_Helper::getTotalAmountIncludingTax($baseLineItems);
             $rate = $refundTotal / $baseAmount;
@@ -305,81 +305,6 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
         else {
             return $reductions;
         }
-    }
-
-    /**
-     * Returns the line item reductions for the creditmemo's items.
-     *
-     * @param Order $order
-     * @param array $refund
-     *            Refund data to be determined
-     * @return \Wallee\Sdk\Model\LineItemReductionCreate[]
-     */
-    protected function getReductions(Order $order, array $refundData)
-    {
-        $amount = 0;
-        $reductions = array();
-        if (isset($refundData['partialRefundProduct'])) {
-            $quantities = $refundData['partialRefundProductQuantity'];
-            
-            foreach ($refundData['partialRefundProduct'] as $idOrderDetail => $amountDetail) {
-                if (! $quantities[$idOrderDetail]) {
-                    continue;
-                }
-                $quantity = (int) $quantities[$idOrderDetail];
-                $orderDetail = new OrderDetail((int) $idOrderDetail);
-                $uniqueId = 'order-' . $order->id . '-item-' . $orderDetail->product_id . '-' .
-                     $orderDetail->product_attribute_id;
-                
-                $reduction = new \Wallee\Sdk\Model\LineItemReductionCreate();
-                $reduction->setLineItemUniqueId($uniqueId);
-                
-                if (empty($amountDetail)) {
-                    $reduction->setQuantityReduction((int) $quantity);
-                    $reduction->setUnitPriceReduction(0);
-                }
-                else {
-                    // Merchant did most likely not refund complete amount
-                    $amount = (float) str_replace(',', '.', $amountDetail);
-                    $unitPrice = $amount / $quantity;
-                    $originalUnitPrice = (! $refundData['TaxMethod'] ? $orderDetail->unit_price_tax_excl : $orderDetail->unit_price_tax_incl);
-                    if (Tools::ps_round($originalUnitPrice, $computePrecision) !=
-                         Tools::ps_round($unitPrice, $computePrecision)) {
-                        $reduction->setQuantityReduction(0);
-                        $reduction->setUnitPriceReduction(
-                            round($amount / $orderDetail->product_quantity, 8));
-                    }
-                    else {
-                        $reduction->setQuantityReduction((int) $quantity);
-                        $reduction->setUnitPriceReduction(0);
-                    }
-                }
-                $reductions[] = $reduction;
-            }
-            $shippingCostAmount = (float) str_replace(',', '.',
-                $refundData['partialRefundShippingCost']);
-            
-            if ($shippingCostAmount > 0) {
-                $uniqueId = 'order-' . $order->id . '-shipping';
-                if (! $refundData['TaxMethod']) {
-                    $tax = new Tax();
-                    $tax->rate = $order->carrier_tax_rate;
-                    $taxCalculator = new TaxCalculator(array(
-                        $tax
-                    ));
-                    $totalShippingCost = $taxCalculator->addTaxes($shippingCostAmount);
-                }
-                else {
-                    $totalShippingCost = $shippingCostAmount;
-                }
-                $reduction = new \Wallee\Sdk\Model\LineItemReductionCreate();
-                $reduction->setLineItemUniqueId($uniqueId);
-                $reduction->setQuantityReduction(0);
-                $reduction->setUnitPriceReduction(round($totalShippingCost, 8));
-                $reductions[] = $reduction;
-            }
-        }
-        return $reductions;
     }
 
     /**

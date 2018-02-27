@@ -306,14 +306,16 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
     public function createReductions(Order $order, array $parsedData)
     {
         if ( $parsedData['refundType'] == self::REFUND_TYPE_PARTIAL_REFUND) {
-            return $this->createReductionsPartialRefundType($order, $parsedData);
+            return  $this->createReductionsPartialRefundType($order, $parsedData);
         }
-        if ( $parsedData['refundType'] == self::REFUND_TYPE_CANCEL_PRODUCT) {
+        elseif ( $parsedData['refundType'] == self::REFUND_TYPE_CANCEL_PRODUCT) {
             return $this->createReductionsCancelProductType($order, $parsedData);
         }
-        
-        throw new Exception(Wallee_Helper::translatePS('The refund type is not supported.'));
+        else{
+             throw new Exception(Wallee_Helper::translatePS('The refund type is not supported.'));
+        }
     }
+       
 
     private function createReductionsPartialRefundType(Order $order, array $parsedData)
     {
@@ -375,18 +377,20 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
             $reduction->setUnitPriceReduction(round($totalShippingCost, 8));
             $reductions[] = $reduction;
         }
-        
         if($parsedData['voucher'] > 0){
             //It is only possible to refund all vouchers at once
-            foreach ($order->getCartRules() as $cartRule) {
-                $uniqueId = 'order-' . $order->id . '-discount-' . $cartRule['id_cart_rule'];
-                $reduction = new \Wallee\Sdk\Model\LineItemReductionCreate();
-                $reduction->setLineItemUniqueId($uniqueId);
-                $reduction->setQuantityReduction(1);
-                $reduction->setUnitPriceReduction(0);
-                $reductions[] = $reduction;
+            $usedTaxes = $this->getUsedTaxes($order);
+            foreach ($order->getCartRules() as $orderCartRule) {
+                $uniqueIds = $this->getUsedDiscountUniqueIds('order-' . $order->id . '-discount-' . $orderCartRule['id_order_cart_rule'], new CartRule($orderCartRule['id_cart_rule']), $orderCartRule['value_tax_excl'], $order, $usedTaxes);
+                foreach($uniqueIds as $uniqueId){
+                    $reduction = new \Wallee\Sdk\Model\LineItemReductionCreate();
+                    $reduction->setLineItemUniqueId($uniqueId);
+                    $reduction->setQuantityReduction(1);
+                    $reduction->setUnitPriceReduction(0);
+                    $reductions[] = $reduction;
+                }
             }
-        }        
+        }
         return $reductions;
     }
 
@@ -420,17 +424,119 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
         
         if($parsedData['voucher'] > 0){
             //It is only possible to refund all vouchers at once
-            foreach ($order->getCartRules() as $cartRule) {
-                $uniqueId = 'order-' . $order->id . '-discount-' . $cartRule['id_cart_rule'];
-                $reduction = new \Wallee\Sdk\Model\LineItemReductionCreate();
-                $reduction->setLineItemUniqueId($uniqueId);
-                $reduction->setQuantityReduction(1);
-                $reduction->setUnitPriceReduction(0);
-                $reductions[] = $reduction;
+            $usedTaxes = $this->getUsedTaxes($order);
+            foreach ($order->getCartRules() as $orderCartRule) {
+                $uniqueIds = $this->getUsedDiscountUniqueIds('order-' . $order->id . '-discount-' . $orderCartRule['id_order_cart_rule'], new CartRule($orderCartRule['id_cart_rule']), $orderCartRule['value_tax_excl'], $order, $usedTaxes);
+                foreach($uniqueIds as $uniqueId){
+                    $reduction = new \Wallee\Sdk\Model\LineItemReductionCreate();
+                    $reduction->setLineItemUniqueId($uniqueId);
+                    $reduction->setQuantityReduction(1);
+                    $reduction->setUnitPriceReduction(0);
+                    $reductions[] = $reduction;
+                }
             }
         }
-        
         return $reductions;
+    }
+    
+    private function getUsedDiscountUniqueIds($uniqueIdBase, CartRule $cartRule, $discountWithoutTax, Order $order, $usedTaxes){
+        $reductionPercent = $cartRule->reduction_percent;
+        $reductionAmount = $cartRule->reduction_amount;
+        $reductionProduct = $cartRule->reduction_product;
+        $currencyCode = Wallee_Helper::convertCurrencyIdToCode($order->id_currency);
+        //Discount Rate
+        if ($reductionPercent > 0) {
+            if ($reductionProduct > 0) {
+                return array($uniqueIdBase);
+            }
+            elseif ($reductionProduct == - 1) {
+                return array($uniqueIdBase);
+            }
+            else {
+                $selectedProducts = array();
+                if ($reductionProduct == - 2) {
+                    $selectedProducts = Wallee_CartRuleAccessor::checkProductRestrictionsStatic(
+                        $cartRule, new Cart($order->id_cart));
+                    // Selection of Product
+                }
+                $discountUniqueIds = array();
+                foreach ($usedTaxes as $id => $values) {
+                    $amount = 0;
+                    foreach ($values['products'] as $pId => $pd) {
+                        foreach ($pd as $paId => $amountValue) {
+                            if (empty($selectedProducts) || in_array($pId . '-' . $paId, $selectedProducts)) {
+                                $amount += $amountValue;
+                            }
+                        }
+                    }
+                    $totalAmount = Wallee_Helper::roundAmount(
+                        $amount * $reductionPercent / 100 * -1, $currencyCode);
+                    if ($totalAmount == 0) {
+                        continue;
+                    }
+                    $discountUniqueIds[] = $uniqueIdBase . '-' .
+                        $id;
+                }
+                return $discountUniqueIds;
+            }
+        }
+        // Discount Absolute
+        if ((float) $reductionAmount > 0) {
+            if ($reductionProduct > 0) {
+                return array($uniqueIdBase);
+            }
+            
+            elseif ($reductionProduct == 0) {
+                $ratio = $discountWithoutTax / $order->total_products;
+                $discountUniqueIds = array();
+                foreach ($usedTaxes as $id => $values) {
+                    $amount = 0;
+                    foreach ($values['products'] as $pId => $pd) {
+                        foreach ($pd as $paId => $amountValue) {
+                            $amount += $amountValue * $ratio;
+                        }
+                    }
+                    $totalAmount = Wallee_Helper::roundAmount($amount *-1, $currencyCode);
+                    if ($totalAmount == 0) {
+                        continue;
+                    }
+                    $discountUniqueIds[] = $uniqueIdBase . '-' .
+                        $id;
+                }
+                return $discountUniqueIds;
+            }
+        }
+    }
+    
+    private function getUsedTaxes(Order $order){
+        $usedTaxes = array();
+        foreach ($order->getProducts() as $orderItem) {
+            $itemCosts = floatval($orderItem['total_wt']);
+            $itemCostsE = floatval($orderItem['total_price']);
+            if (isset($orderItem['total_customization_wt'])) {
+                $itemCosts = floatval($orderItem['total_customization_wt']);
+                $itemCostsE = floatval($orderItem['total_customization']);
+            }
+            $productTaxCalculator = $orderItem['tax_calculator'];
+            if ($itemCosts != $itemCostsE) {
+                $psTaxes = $productTaxCalculator->getTaxesAmount($itemCostsE);
+                ksort($psTaxes);
+                $taxesKey = implode('-', array_keys($psTaxes));
+                if (! isset($usedTaxes[$taxesKey])) {
+                    $usedTaxes[$taxesKey] = array(
+                        'products' => array()
+                    );
+                }
+                $taxes = array();
+                foreach ($psTaxes as $id => $taxAmount) {
+                    if (! isset($usedTaxes[$taxesKey]['products'][$orderItem['product_id']])) {
+                        $usedTaxes[$taxesKey]['products'][$orderItem['product_id']] = array();
+                    }
+                    $usedTaxes[$taxesKey]['products'][$orderItem['product_id']][$orderItem['product_attribute_id']] = $itemCosts;
+                }
+            }
+        }
+        return $usedTaxes;
     }
 
     public function applyRefund(Order $order, array $parsedData)
@@ -772,7 +878,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
                 sprintf(
                     Wallee_Helper::translatePS(
                         'Could not update the line items at wallee. Reason: %s'),
-                    Wallee_Helper::cleanWalleeExceptionMessage($e->getMessage())));
+                    Wallee_Helper::cleanExceptionMessage($e->getMessage())));
         }
         Wallee_Helper::commitDBTransaction();
     }
@@ -914,7 +1020,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
                 sprintf(
                     Wallee_Helper::translatePS(
                         'Could not update the line items at wallee. Reason: %s'),
-                    Wallee_Helper::cleanWalleeExceptionMessage($e->getMessage())));
+                    Wallee_Helper::cleanExceptionMessage($e->getMessage())));
             }
         }
         else {

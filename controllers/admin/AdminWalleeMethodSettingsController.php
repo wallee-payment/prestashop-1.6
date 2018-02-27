@@ -305,7 +305,6 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                         ),
                         array(
                             'name' => $this->module->l('Products only(exc Tax)'),
-                            'type' => Wallee::TOTAL_MODE_PRODUCTS_EXC
                         )
                         
                     ),

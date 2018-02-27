@@ -264,8 +264,8 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
     {
         if ($transaction->getPaymentConnectorConfiguration() == null) {
             $moduleName = $order->modue;
-            if (strpos($moduleName, "wallee_") === 0) {
-                $id = substr($moduleName, strpos($moduleName, "_") + 1);
+            if ($moduleName == "wallee") {
+                $id = Wallee_Helper::getOrderMeta($order, 'walleeMethodId');
                 $methodConfiguration = new Wallee_Model_MethodConfiguration($id);
                 return $methodConfiguration->getImage();
             }
@@ -370,7 +370,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $createTransaction->setCustomersPresence(
             \Wallee\Sdk\Model\CustomersPresence::VIRTUAL_PRESENT);
         $createTransaction->setAutoConfirmationEnabled(false);
-        $createTransaction->setDeviceSessionIdentifier(Context::getContext()->cookie->wallee_device_id);        
+        $createTransaction->setDeviceSessionIdentifier(Context::getContext()->cookie->wle_device_id);        
         $createTransaction->setSpaceViewId(
             Configuration::get(Wallee::CK_SPACE_VIEW_ID, null, $dataSource->id_shop_group,
                 $dataSource->id_shop));
@@ -465,7 +465,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $createTransaction->setCustomersPresence(
             \Wallee\Sdk\Model\CustomersPresence::VIRTUAL_PRESENT);
         $createTransaction->setAutoConfirmationEnabled(false);
-        $createTransaction->setDeviceSessionIdentifier(Context::getContext()->cookie->wallee_device_id);
+        $createTransaction->setDeviceSessionIdentifier(Context::getContext()->cookie->wle_device_id);
         $createTransaction->setSpaceViewId(
             Configuration::get(Wallee::CK_SPACE_VIEW_ID, null, null, $cart->id_shop));
         $this->assembleCartTransactionData($cart, $createTransaction);

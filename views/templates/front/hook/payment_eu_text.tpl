@@ -1,4 +1,4 @@
-{name}
+{$name}
 {if !empty($description)}
 			<span class="payment-method-description">{$description}</span>
 {/if}

@@ -73,7 +73,7 @@ class WalleeReturnModuleFrontController extends Wallee_FrontPaymentController
         $failureReason = $transaction->getFailureReason();
         
         if ($failureReason !== null) {       
-            $this->context->cookie->wallee_error = Wallee_Helper::translate($failureReason);
+            $this->context->cookie->wle_error = Wallee_Helper::translate($failureReason);
         }
         $this->redirect_after = $this->context->link->getPageLink('order', true, NULL, "step=3");
 
