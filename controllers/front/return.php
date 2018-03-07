@@ -4,7 +4,7 @@ if (! defined('_PS_VERSION_')) {
 }
 
 
-class WalleeReturnModuleFrontController extends Wallee_FrontPaymentController
+class WalleeReturnModuleFrontController extends ModuleFrontController
 {
 
     public $ssl = true;

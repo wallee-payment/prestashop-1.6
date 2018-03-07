@@ -1,5 +1,5 @@
 # PrestaShop 1.6 wallee Integration
-This repository contains the PrestaShop wallee payment module that enables the shop to process payments with [wallee](https://wallee.com/).
+This repository contains the PrestaShop wallee payment module that enables the shop to process payments with [wallee](https://www.wallee.com).
 
 ##### To use this extension, a [wallee](https://www.wallee.com) account is required.
 
@@ -11,12 +11,12 @@ This repository contains the PrestaShop wallee payment module that enables the s
 
 ## Documentation
 
-* [Getting Started](https://github.com/wallee-payment/prestashop-1.6//wiki/Getting-Started)
+* [Getting Started](../../../wiki/Getting-Started)
 
 ## License
 
-Please see the [license file](./LICENSE) for more information.
+Please see the [license file](LICENSE) for more information.
 
 ## Other PrestaShop Versions
 
-Find the module for different PrestaShop versions [here](https://github.com/wallee-payment/prestashop).
+Find the module for different PrestaShop versions [here](../../../prestashop).

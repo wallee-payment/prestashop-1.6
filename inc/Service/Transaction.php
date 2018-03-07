@@ -304,19 +304,25 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         return self::$possiblePaymentMethodCache[$currentCartId];
     }
 
+    
+    public function checkTransactionPending(Cart $cart){
+        $ids = Wallee_Helper::getCartMeta($cart, 'mappingIds');
+        $transaction = $this->getTransaction($ids['spaceId'], $ids['transactionId']);
+        if($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING){
+            throw new Exception(Wallee_Helper::getModuleInstance()->l("The transaction timed out, please try again."));
+        }
+    }
+
     /**
      * Update the transaction with the given orders data.
      * The $dataSource is for the address and id information for the transaction.
      * The $orders are use to compile all lineItems, this array needs to include the $dataSource order
      *
-     * @param int $transactionId
-     * @param int $spaceId
      * @param Order $dataSource
      * @param Order[] $orders
      * @return \Wallee\Sdk\Model\Transaction
      */
-    public function updateTransaction(Order $dataSource, array $orders,
-        $confirm = false)
+    public function confirmTransaction(Order $dataSource, array $orders)
     {
         $last = new Exception('Unexpected Error');
         for ($i = 0; $i < 5; $i ++) {
@@ -328,20 +334,13 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                     $ids['transactionId']);
                 
                 if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING) {
-                    $transaction = $this->createTransactionByOrder($spaceId, $dataSource, $orders);
-                    if (! $confirm) {
-                        return $transaction;
-                    }
+                    throw new Exception(Wallee_Helper::getModuleInstance()->l("Invalid State"));
                 }
                 $pendingTransaction = new \Wallee\Sdk\Model\TransactionPending();
                 $pendingTransaction->setId($transaction->getId());
                 $pendingTransaction->setVersion($transaction->getVersion());
                 $this->assembleOrderTransactionData($dataSource, $orders, $pendingTransaction);
-                if ($confirm) {
-                    $result = $this->getTransactionService()->confirm($spaceId, $pendingTransaction);
-                } else {
-                    $result = $this->getTransactionService()->update($spaceId, $pendingTransaction);
-                }
+                $result = $this->getTransactionService()->confirm($spaceId, $pendingTransaction);
                 Wallee_Helper::updateOrderMeta($dataSource, 'mappingIds',
                     array(
                         'spaceId' => $result->getLinkedSpaceId(),
@@ -355,34 +354,6 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         throw $last;
     }
 
-    /**
-     * Creates a transaction for the given orders.
-     *
-     * @param int $spaceId
-     * @param Order $dataSource
-     * @param Order[] $orders
-     * @return \Wallee\Sdk\Model\TransactionCreate
-     */
-    protected function createTransactionByOrder($spaceId, Order $dataSource, array
-        $orders)
-    {
-        $createTransaction = new \Wallee\Sdk\Model\TransactionCreate();
-        $createTransaction->setCustomersPresence(
-            \Wallee\Sdk\Model\CustomersPresence::VIRTUAL_PRESENT);
-        $createTransaction->setAutoConfirmationEnabled(false);
-        $createTransaction->setDeviceSessionIdentifier(Context::getContext()->cookie->wle_device_id);        
-        $createTransaction->setSpaceViewId(
-            Configuration::get(Wallee::CK_SPACE_VIEW_ID, null, $dataSource->id_shop_group,
-                $dataSource->id_shop));
-        $this->assembleOrderTransactionData($dataSource, $orders, $createTransaction);
-        $transaction = $this->getTransactionService()->create($spaceId, $createTransaction);
-        Wallee_Helper::updateOrderMeta($dataSource, 'mappingIds',
-            array(
-                'spaceId' => $transaction->getLinkedSpaceId(),
-                'transactionId' => $transaction->getId()
-            ));
-        return $transaction;
-    }
 
     /**
      * Assemble the transaction data for the given orders.
@@ -522,9 +493,11 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $transaction->setCurrency(Wallee_Helper::convertCurrencyIdToCode($cart->id_currency));
         $transaction->setBillingAddress($this->getAddress($cart->id_address_invoice));
         $transaction->setShippingAddress($this->getAddress($cart->id_address_delivery));
-        $transaction->setCustomerEmailAddress(
-            $this->getEmailAddressForCustomerId($cart->id_customer));
-        $transaction->setCustomerId($cart->id_customer);
+        if($cart->id_customer != 0){
+            $transaction->setCustomerEmailAddress(
+                $this->getEmailAddressForCustomerId($cart->id_customer));
+            $transaction->setCustomerId($cart->id_customer);
+        }
         $transaction->setLanguage(Wallee_Helper::convertLanguageIdToIETF($cart->id_lang));
         $transaction->setShippingMethod(
             $this->fixLength($this->getShippingMethodNameForCarrierId($cart->id_carrier), 200));

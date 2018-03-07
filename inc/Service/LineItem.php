@@ -92,7 +92,7 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
             $item->setQuantity(1);
             $item->setShippingRequired(false);
             $item->setSku('shipping');
-            $name = Wallee_Helper::translatePS('Shipping');
+            $name = Wallee_Helper::getModuleInstance()->l('Shipping');
             $taxCalculatorFound = false;
             if (isset($summary['carrier']) && $summary['carrier'] instanceof Carrier) {
                 $name = $summary['carrier']->name;
@@ -112,7 +112,7 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
             $item->setName($name);
             if (! $taxCalculatorFound) {
                 $taxRate = 0;
-                $taxName = Wallee_Helper::translatePS('Tax');
+                $taxName = Wallee_Helper::getModuleInstance()->l('Tax');
                 if ($shippingCostExcl > 0) {
                     $taxRate = ($shippingCosts - $shippingCostExcl) / $shippingCostExcl * 100;
                 }
@@ -136,14 +136,14 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
         if ($wrappingCosts > 0) {
             $item = new \Wallee\Sdk\Model\LineItemCreate();
             $item->setAmountIncludingTax($this->roundAmount($wrappingCosts, $currencyCode));
-            $item->setName(Wallee_Helper::translatePS('Wrapping Fee'));
+            $item->setName(Wallee_Helper::getModuleInstance()->l('Wrapping Fee'));
             $item->setQuantity(1);
             $item->setShippingRequired(false);
             $item->setSku('wrapping');
             if (Configuration::get('PS_ATCP_SHIPWRAP')) {
                 if ($wrappingCostExcl > 0) {
                     $taxRate = 0;
-                    $taxName = Wallee_Helper::translatePS('Tax');
+                    $taxName = Wallee_Helper::getModuleInstance()->l('Tax');
                     $taxRate = ($wrappingCosts - $wrappingCostExcl) / $wrappingCostExcl * 100;
                 }
                 if ($taxRate > 0) {
@@ -295,7 +295,7 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                 
                 $item = new \Wallee\Sdk\Model\LineItemCreate();
                 $item->setAmountIncludingTax($this->roundAmount($shippingCosts, $currencyCode));
-                $name = Wallee_Helper::translatePS('Shipping');
+                $name = Wallee_Helper::getModuleInstance()->l('Shipping');
                 
                 $item->setName($name);
                 $item->setQuantity(1);
@@ -318,7 +318,7 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                 }
                 else {
                     $taxRate = 0;
-                    $taxName = Wallee_Helper::translatePS('Tax');
+                    $taxName = Wallee_Helper::getModuleInstance()->l('Tax');
                     if ($shippingCostExcl > 0) {
                         $taxRate = ($shippingCosts - $shippingCostExcl) / $shippingCostExcl * 100;
                     }
@@ -347,7 +347,7 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                 
                 $item = new \Wallee\Sdk\Model\LineItemCreate();
                 $item->setAmountIncludingTax($this->roundAmount($wrappingCosts, $currencyCode));
-                $item->setName(Wallee_Helper::translatePS('Wrapping Fee'));
+                $item->setName(Wallee_Helper::getModuleInstance()->l('Wrapping Fee'));
                 $item->setQuantity(1);
                 $item->setSku('wrapping');
                 $wrappingTaxCalculator = null;

@@ -1,7 +1,7 @@
 <div id="walleeTransactionInfo" class="panel">
 	<div class="panel-heading">
 		<i class="icon-rocket"></i>
-		{l s="wallee Transaction Information" mod="wallee"}
+		wallee {l s="Transaction Information" mod="wallee"}
 	</div>
 	<div class="wallee-transaction-data-column-container">
 		<div class="wallee-transaction-column">
@@ -28,7 +28,7 @@
 				<dt>{l s="Transaction" mod="wallee"}</dt>
 				<dd>
 					<a href="{$transactionUrl|escape:'html'}" target="_blank">
-						{l s="View in wallee" mod="wallee"}
+						{l s="View" mod="wallee"}
 					</a>
 				</dd>
 			</dl>
@@ -57,7 +57,7 @@
 		<div class="wallee-transaction-data-column-container panel">
 			<div class="panel-heading">
 				<i class="icon-check"></i>
-					{l s="wallee Completions" mod="wallee"}
+					wallee {l s="Completions" mod="wallee"}
 			</div>
 			<div class="table-responsive">
 				<table class="table" id="wallee_completion_table">
@@ -102,7 +102,7 @@
 								{if ($completion->getCompletionId() != 0)}
 									{assign var='completionUrl' value="{wallee_completion_url completion=$completion}"}
 									<a href="{$completionUrl|escape:'html'}" target="_blank">
-										{l s="View in wallee" mod="wallee"}
+										{l s="View" mod="wallee"}
 									</a>
 								{else}
 									{l s="Not available" mod="wallee"}
@@ -119,7 +119,7 @@
 		<div class="wallee-transaction-data-column-container panel">
 			<div class="panel-heading">
 				<i class="icon-remove"></i>
-					{l s="wallee Voids" mod="wallee"}
+					wallee {l s="Voids" mod="wallee"}
 			</div>
 			<div class="table-responsive">
 				<table class="table" id="wallee_void_table">
@@ -164,7 +164,7 @@
 								{if ($voidItem->getVoidId() != 0)}
 									{assign var='voidUrl' value="{wallee_void_url void=$voidItem}"}
 									<a href="{$voidUrl|escape:'html'}" target="_blank">
-										{l s="View in wallee" mod="wallee"}
+										{l s="View" mod="wallee"}
 									</a>
 								{else}
 									{l s="Not available" mod="wallee"}
@@ -181,7 +181,7 @@
 		<div class="wallee-transaction-data-column-container panel">
 			<div class="panel-heading">
 				<i class="icon-exchange"></i>
-					{l s="wallee Refunds" mod="wallee"}
+					wallee {l s="Refunds" mod="wallee"}
 			</div>
 			<div class="table-responsive">
 				<table class="table" id="wallee_refund_table">
@@ -246,7 +246,7 @@
 								{if ($refund->getRefundId() != 0)}
 									{assign var='refundURl' value="{wallee_refund_url refund=$refund}"}
 									<a href="{$refundURl|escape:'html'}" target="_blank">
-										{l s="View in wallee" mod="wallee"}
+										{l s="View" mod="wallee"}
 									</a>
 								{else}
 									{l s="Not available" mod="wallee"}

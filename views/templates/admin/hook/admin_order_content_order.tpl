@@ -1,5 +1,5 @@
 <div class="tab-pane" id="wallee_documents">
-<h4 class="visible-print">{l s='wallee Documents' mod='wallee'} <span class="badge">({$walleeDocuments|@count})</span></h4>
+<h4 class="visible-print">wallee {l s='Documents' mod='wallee'} <span class="badge">({$walleeDocuments|@count})</span></h4>
 
 	<div class="table-responsive">
 		<table class="table" id="wallee_documents_table">

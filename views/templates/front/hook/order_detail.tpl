@@ -2,13 +2,13 @@
 {if !empty($walleeInvoice)}
 	<p class="wallee-document">
 		<i class="icon-file-text-o"></i>
-		<a target="_blank" href="{$walleeInvoice|escape:'html':'UTF-8'}">{l s='Download your wallee invoice as a PDF file.'}</a>
+		<a target="_blank" href="{$walleeInvoice|escape:'html':'UTF-8'}">{l s='Download your %s invoice as a PDF file.' sprintf='wallee' mod='wallee'}</a>
 	</p>
 {/if}
 {if !empty($walleePackingSlip)}
 	<p class="wallee-document">
 		<i class="icon-truck"></i>
-		<a target="_blank" href="{$walleePackingSlip|escape:'html':'UTF-8'}">{l s='Download your wallee packing slip as a PDF file.'}</a>
+		<a target="_blank" href="{$walleePackingSlip|escape:'html':'UTF-8'}">{l s='Download your %s packing slip as a PDF file.' sprintf='wallee' mod='wallee'}</a>
 	</p>
 {/if}
 </div>

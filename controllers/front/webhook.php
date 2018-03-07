@@ -32,7 +32,7 @@ class WalleeWebhookModuleFrontController extends ModuleFrontController {
             if($parsed == false){
                 throw new Exception('Could not parse request body.');
             }
-            $request = new Wallee_Webhook_Request(json_decode($requestBody));
+            $request = new Wallee_Webhook_Request($parsed);
             $webhookEntity = $webhookService->getWebhookEntityForId($request->getListenerEntityId());
             if ($webhookEntity === null) {
                 throw new Exception(sprintf('Could not retrieve webhook model for listener entity id: %s', $request->getListenerEntityId()));                

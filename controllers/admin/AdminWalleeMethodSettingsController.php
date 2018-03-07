@@ -33,7 +33,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             }
             $methodId = Tools::getValue('method_id', NULL);
             if ($methodId === null || ! ctype_digit($methodId)) {
-                $this->displayWarning($this->module->l('No valid wallee method provided.'));
+                $this->displayWarning($this->module->l('No valid method provided.'));
                 return;
             }
             $method = Wallee_Model_MethodConfiguration::loadByIdWithChecks($methodId,
@@ -75,13 +75,13 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
     private function handleList()
     {
         $this->display = 'list';
-        $this->context->smarty->assign('title', $this->module->l('wallee Payment Methods'));
+        $this->context->smarty->assign('title', 'wallee '. $this->module->l('Payment Methods'));
         
         $shopContext = (! Shop::isFeatureActive() || Shop::getContext() == Shop::CONTEXT_SHOP);
         if (! $shopContext) {
             $this->displayWarning(
                 $this->module->l(
-                    'You have more than one shop and must select one to configure the wallee payment methods.'));
+                    'You have more than one shop and must select one to configure the payment methods.'));
             return;
         }
         $spaceId = Configuration::get(Wallee::CK_SPACE_ID);
@@ -143,7 +143,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             'PS_BO_ALLOW_EMPLOYEE_FORM_LANG') : 0;
         
         $helper->identifier = $this->identifier;
-        $helper->title = $this->module->l('wallee Payment Methods');
+        $helper->title = 'wallee '.$this->module->l('Payment Methods');
         
         $helper->module = $this->module;
         $helper->name_controller = 'AdminWalleeMethodSettings';
@@ -240,9 +240,8 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'type' => 'switch',
                 'label' => $this->module->l('Add tax'),
                 'name' => 'fee_add_tax',
-                'desc' => sprintf(
-                    $this->module->l(
-                        'Should the tax amount be added after the computation or should the tax be included in the computed fee.')),
+                'desc' => $this->module->l(
+                        'Should the tax amount be added after the computation or should the tax be included in the computed fee.'),
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -271,9 +270,8 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             array(
                 'type' => 'text',
                 'label' => $this->module->l('Fee Rate'),
-                'desc' => sprintf(
-                    $this->module->l(
-                        'The rate in percent')),
+                'desc' => $this->module->l(
+                        'The rate in percent'),
                 'name' => 'fee_rate',
                 'col' => 3
             ),
@@ -400,9 +398,8 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'type' => 'switch',
                 'label' => $this->module->l('Add tax'),
                 'name' => 'fee_add_tax',
-                'desc' => sprintf(
-                    $this->module->l(
-                        'Should the tax amount be added after the computation or should the tax be included in the computed fee.')),
+                'desc' => $this->module->l(
+                        'Should the tax amount be added after the computation or should the tax be included in the computed fee.'),
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -431,9 +428,8 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             array(
                 'type' => 'text',
                 'label' => $this->module->l('Fee Rate'),
-                'desc' => sprintf(
-                    $this->module->l(
-                        'The rate in percent')),
+                'desc' => $this->module->l(
+                        'The rate in percent'),
                 'name' => 'fee_rate',
                 'col' => 3
             ),

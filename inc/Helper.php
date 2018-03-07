@@ -3,6 +3,7 @@ if (! defined('_PS_VERSION_')) {
     exit();
 }
 
+
 class Wallee_Helper
 {
 
@@ -185,7 +186,7 @@ class Wallee_Helper
         if ($diff != 0) {
             $lineItem = new \Wallee\Sdk\Model\LineItemCreate();
             $lineItem->setAmountIncludingTax(self::roundAmount($diff, $currencyCode));
-            $lineItem->setName(self::translatePS('Rounding Adjustment'));
+            $lineItem->setName(self::getModuleInstance()->l('Rounding Adjustment'));
             $lineItem->setQuantity(1);
             $lineItem->setSku('rounding-adjustment');
             $lineItem->setType(
@@ -371,16 +372,11 @@ class Wallee_Helper
     
 
     /**
-     * Uses the prestashop translation service
-     *
-     * @param string $string
-     * @param string|false $specific
-     * @return string
+     * Get the Module instance
      */
-    public static function translatePS($string, $specific = false)
+    public static function getModuleInstance()
     {
-        $module = Module::getInstanceByName('wallee');
-        return $module->l($string, $specific);
+        return Module::getInstanceByName('wallee');
     }
 
     public static function updateOrderMeta(Order $order, $key, $value)
@@ -435,94 +431,6 @@ class Wallee_Helper
         self::clearOrderMeta($order, 'mails');
     }
 
-    public static function getWalleeFeeValues(Cart $cart,
-        Wallee_Model_MethodConfiguration $methodConfiguration)
-    {
-        $feeProductId = Configuration::get(Wallee::CK_FEE_ITEM);
-        if (empty($feeProductId)) {
-            return array(
-                'fee_total' => 0,
-                'fee_total_wt' => 0
-            );
-        }
-        
-        $configuration = Adapter_ServiceLocator::get('Core_Business_ConfigurationInterface');
-        
-        $currency = Currency::getCurrencyInstance($cart->id_currency);
-        
-        $fixed = $methodConfiguration->getFeeFixed();
-        
-        $feeFixedConverted = Tools::convertPrice($fixed,
-            Currency::getCurrencyInstance((int) $cart->id_currency));
-        
-        $rate = $methodConfiguration->getFeeRate();
-        $feeBaseType = $methodConfiguration->getFeeBase();
-        
-        switch ($feeBaseType) {
-            case Wallee::TOTAL_MODE_BOTH_INC:
-                $taxes = true;
-                $feeType = Cart::BOTH;
-                break;
-            case Wallee::TOTAL_MODE_BOTH_EXC:
-                $taxes = false;
-                $feeType = Cart::BOTH;
-                break;
-            case Wallee::TOTAL_MODE_WITHOUT_SHIPPING_INC:
-                $taxes = true;
-                $feeType = Cart::BOTH_WITHOUT_SHIPPING;
-                break;
-            case Wallee::TOTAL_MODE_WITHOUT_SHIPPING_EXC:
-                $taxes = false;
-                $feeType = Cart::BOTH_WITHOUT_SHIPPING;
-                break;
-            case Wallee::TOTAL_MODE_PRODUCTS_INC:
-                $taxes = true;
-                $feeType = Cart::ONLY_PRODUCTS;
-                break;
-            case Wallee::TOTAL_MODE_PRODUCTS_EXC:
-                $taxes = false;
-                $feeType = Cart::ONLY_PRODUCTS;
-                break;
-        }
-        
-        $feeBase = $cart->getOrderTotal($taxes, $feeType);
-        $feeRateAmount = $feeBase * $rate / 100;
-        
-        $feeTotal = $feeFixedConverted + $feeRateAmount;
-        
-        $product = new Product($feeProductId);
-        
-        $taxGroup = $product->getIdTaxRulesGroup();
-        $computePrecision = $configuration->get('_PS_PRICE_COMPUTE_PRECISION_');
-        
-        $result = array(
-            'fee_total' => Tools::ps_round($feeTotal, $computePrecision),
-            'fee_total_wt' => Tools::ps_round($feeTotal, $computePrecision)
-        );
-        
-        if ($taxGroup != 0) {
-            $addressFactory = Adapter_ServiceLocator::get('Adapter_AddressFactory');
-            $taxAddressType = $configuration->get('PS_TAX_ADDRESS_TYPE');
-            if ($taxAddressType == 'id_address_invoice') {
-                $idAddress = (int) $cart->id_address_invoice;
-            } else {
-                $idAddress = (int) $cart->id_address_delivery;
-            }
-            $address = $addressFactory->findOrCreate($idAddress, true);
-            $taxCalculator = TaxManagerFactory::getManager($address, $taxGroup)->getTaxCalculator();
-            if ($methodConfiguration->isFeeAddTax()) {
-                $result['fee_total_wt'] = Tools::ps_round(
-                    $taxCalculator->addTaxes($feeTotal), $computePrecision);
-                $result['fee_total'] = Tools::ps_round($feeTotal, $computePrecision);
-            } else {
-                $result['fee_total_wt'] = Tools::ps_round($feeTotal, $computePrecision);
-                $result['fee_total'] = Tools::ps_round(
-                    $taxCalculator->removeTaxes($feeTotal), $computePrecision);
-            }
-        }
-        return $result;
-    }
-
     /**
      * Returns the security hash of the given data.
      *
@@ -563,25 +471,25 @@ class Wallee_Helper
     public static function getTransactionState(Wallee_Model_TransactionInfo $info){
         switch ($info->getState()) {
             case \Wallee\Sdk\Model\TransactionState::AUTHORIZED:
-                return self::translatePS('Authorized');
+                return self::getModuleInstance()->l('Authorized');
             case \Wallee\Sdk\Model\TransactionState::COMPLETED:
-                return self::translatePS('Completed');
+                return self::getModuleInstance()->l('Completed');
             case \Wallee\Sdk\Model\TransactionState::CONFIRMED:
-                return self::translatePS('Confirmed');
+                return self::getModuleInstance()->l('Confirmed');
             case \Wallee\Sdk\Model\TransactionState::DECLINE:
-                return self::translatePS('Decline');
+                return self::getModuleInstance()->l('Decline');
             case \Wallee\Sdk\Model\TransactionState::FAILED:
-                return self::translatePS('Failed');
+                return self::getModuleInstance()->l('Failed');
             case \Wallee\Sdk\Model\TransactionState::FULFILL:
-                return self::translatePS('Fulfill');
+                return self::getModuleInstance()->l('Fulfill');
             case \Wallee\Sdk\Model\TransactionState::PENDING:
-                return self::translatePS('Pending');
+                return self::getModuleInstance()->l('Pending');
             case \Wallee\Sdk\Model\TransactionState::PROCESSING:
-                return self::translatePS('Processing');
+                return self::getModuleInstance()->l('Processing');
             case \Wallee\Sdk\Model\TransactionState::VOIDED:
-                return self::translatePS('Voided');
+                return self::getModuleInstance()->l('Voided');
             default:
-                return self::translatePS('Unknown State');
+                return self::getModuleInstance()->l('Unknown State');
         }
     }
     

@@ -38,40 +38,4 @@ class Wallee_FrontPaymentController extends ModuleFrontController {
         }
         return null;
     }
-    
-    
-    protected function addFeeProductToCart(Wallee_Model_MethodConfiguration $methodConfiguration, Cart $cart){
-        
-        $feeProductId = Configuration::get(Wallee::CK_FEE_ITEM);
-        
-        if ($feeProductId != null) {
-            $defaultAttributeId = Product::getDefaultAttribute($feeProductId);
-            
-            SpecificPrice::deleteByIdCart($cart->id, $feeProductId, $defaultAttributeId);
-            $cart->deleteProduct($feeProductId, $defaultAttributeId);    
-            
-            $feeValues = Wallee_Helper::getWalleeFeeValues($cart, $methodConfiguration);           
-            
-            if ($feeValues['fee_total'] > 0) {
-                $cart->updateQty(1, $feeProductId, $defaultAttributeId);
-                $specificPrice = new SpecificPrice();
-                $specificPrice->id_product = (int) $feeProductId;
-                $specificPrice->id_product_attribute = (int) $defaultAttributeId;
-                $specificPrice->id_cart = (int) $cart->id;
-                $specificPrice->id_shop = (int) $this->context->shop->id;
-                $specificPrice->id_currency = $cart->id_currency;
-                $specificPrice->id_country = 0;
-                $specificPrice->id_group = 0;
-                $specificPrice->id_customer = 0;
-                $specificPrice->from_quantity = 1;
-                $specificPrice->price = $feeValues['fee_total'];
-                $specificPrice->reduction_type = 'amount';
-                $specificPrice->reduction_tax = 1;
-                $specificPrice->reduction = 0;
-                $specificPrice->from = date("Y-m-d H:i:s", time() - 3600);
-                $specificPrice->to = date("Y-m-d H:i:s", time() + 48 * 3600);
-                $specificPrice->add();
-            }
-        }
-    }
 }

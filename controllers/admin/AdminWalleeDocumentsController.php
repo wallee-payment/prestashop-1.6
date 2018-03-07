@@ -18,10 +18,10 @@ class AdminWalleeDocumentsController extends ModuleAdminController
         parent::initProcess();
         $access = Profile::getProfileAccess($this->context->employee->id_profile,
             (int) Tab::getIdFromClassName('AdminOrders'));
-        if ($access['view'] === '1' && ($action = Tools::getValue('walleeAction'))) {
+        if ($access['view'] === '1' && ($action = Tools::getValue('action'))) {
             $this->action = $action;
         } else {
-            die(Tools::displayError(Wallee_Helper::translatePS('You do not have permission to view this.')));
+            die(Tools::displayError($this->module->l('You do not have permission to view this.')));
         }
     }
 
@@ -32,10 +32,10 @@ class AdminWalleeDocumentsController extends ModuleAdminController
                 $order = new Order(Tools::getValue('id_order'));
                 Wallee_DownloadHelper::downloadInvoice($order);
             } catch (Exception $e) {
-                die(Tools::displayError(Wallee_Helper::translatePS('Could not fetch the document from wallee.')));
+                die(Tools::displayError($this->module->l('Could not fetch the document.')));
             }
         } else {
-            die(Tools::displayError(Wallee_Helper::translatePS('The order Id is missing.')));
+            die(Tools::displayError($this->module->l('The order Id is missing.')));
         }
     }
 
@@ -46,10 +46,10 @@ class AdminWalleeDocumentsController extends ModuleAdminController
                 $order = new Order(Tools::getValue('id_order'));
                 Wallee_DownloadHelper::downloadPackingSlip($order);
             } catch (Exception $e) {
-                die(Tools::displayError(Wallee_Helper::translatePS('Could not fetch the document from wallee.')));
+                die(Tools::displayError($this->module->l('Could not fetch the document.')));
             }
         } else {
-            die(Tools::displayError(Wallee_Helper::translatePS('The order Id is missing.')));
+            die(Tools::displayError($this->module->l('The order Id is missing.')));
         }
     }
 }

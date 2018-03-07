@@ -14,13 +14,13 @@ class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
 		$cartHash = Tools::getValue('cartHash', null);
 		if ($methodId == null || $cartHash == null) {
 		    $this->context->cookie->wle_error = $this->module->l("There was a techincal issue, please try again.");
-		    echo json_encode(array('result' => 'failure', 'redirect' => $this->context->link->getPageLink('order', true, NULL, "step=3"), 'type' => 'hash'));
+		    echo json_encode(array('result' => 'failure', 'redirect' => $this->context->link->getPageLink('order', true, NULL, "step=3")));
 		    die();
 		}
 		$cart = $this->context->cart;	
 		$redirect = $this->checkAvailablility($cart);
 		if(!empty($redirect)){
-		    echo json_encode(array('result' => 'failure', 'redirect' => $redirect,  'type' => 'availability'));
+		    echo json_encode(array('result' => 'failure', 'redirect' => $redirect));
 		    die();
 		}
 	
@@ -48,7 +48,7 @@ class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
 		    $this->context->cookie->checkedTOS = 1;
 		}
 				
-		$this->addFeeProductToCart($methodConfiguration, $cart);
+		Wallee_FeeHelper::addFeeProductToCart($methodConfiguration, $cart);
 		if($cartHash != Wallee_Helper::calculateCartHash($cart)){
 		    $this->context->cookie->wle_error = $this->module->l("The cart was changed, please try again.");
 		    echo json_encode(array('result' => 'failure', 'reload' => 'true'));

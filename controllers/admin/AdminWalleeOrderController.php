@@ -17,21 +17,21 @@ class AdminWalleeOrderController extends ModuleAdminController
         parent::initProcess();
         $access = Profile::getProfileAccess($this->context->employee->id_profile,
             (int) Tab::getIdFromClassName('AdminOrders'));
-        if ($access['edit'] === '1' && ($action = Tools::getValue('walleeAction'))) {
+        if ($access['edit'] === '1' && ($action = Tools::getValue('action'))) {
             $this->action = $action;
         }
         else {
             echo Tools::jsonEncode(
                 array(
                     'success' => 'false',
-                    'message' => Wallee_Helper::translatePS(
+                    'message' => $this->module->l(
                         'You do not have permission to edit the order.')
                 ));
             die();
         }
     }
 
-    public function processUpdateOrder()
+    public function ajaxProcessUpdateOrder()
     {
         if (Tools::isSubmit('id_order')) {
             try {
@@ -56,13 +56,13 @@ class AdminWalleeOrderController extends ModuleAdminController
             echo Tools::jsonEncode(
                 array(
                     'success' => 'false',
-                    'message' => Wallee_Helper::translatePS('Incomplete Request.')
+                    'message' => $this->module->l('Incomplete Request.')
                 ));
             die();
         }
     }
 
-    public function processVoidOrder()
+    public function ajaxProcessVoidOrder()
     {
         if (Tools::isSubmit('id_order')) {
             try {
@@ -71,7 +71,7 @@ class AdminWalleeOrderController extends ModuleAdminController
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'true',
-                        'message' => Wallee_Helper::translatePS(
+                        'message' => $this->module->l(
                             'The order is updated automatically once the void is processed.')
                     ));
                 die();
@@ -89,13 +89,13 @@ class AdminWalleeOrderController extends ModuleAdminController
             echo Tools::jsonEncode(
                 array(
                     'success' => 'false',
-                    'message' => Wallee_Helper::translatePS('Incomplete Request.')
+                    'message' => $this->module->l('Incomplete Request.')
                 ));
             die();
         }
     }
     
-    public function processCompleteOrder()
+    public function ajaxProcessCompleteOrder()
     {
         if (Tools::isSubmit('id_order')) {
             try {
@@ -104,7 +104,7 @@ class AdminWalleeOrderController extends ModuleAdminController
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'true',
-                        'message' => Wallee_Helper::translatePS(
+                        'message' => $this->module->l(
                             'The order is updated automatically once the completion is processed.')
                     ));
                 die();
@@ -122,7 +122,7 @@ class AdminWalleeOrderController extends ModuleAdminController
             echo Tools::jsonEncode(
                 array(
                     'success' => 'false',
-                    'message' => Wallee_Helper::translatePS('Incomplete Request.')
+                    'message' => $this->module->l('Incomplete Request.')
                 ));
             die();
         }

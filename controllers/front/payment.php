@@ -38,7 +38,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
             Tools::redirect($this->context->link->getPageLink('order', true, NULL, "step=3"));
         }
 
-        $this->addFeeProductToCart($methodConfiguration, $cart);
+        Wallee_FeeHelper::addFeeProductToCart($methodConfiguration, $cart);
         
         $this->assignSummaryInformations($cart);
         $cartHash = Wallee_Helper::calculateCartHash($cart);

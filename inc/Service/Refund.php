@@ -51,7 +51,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             $transactionInfo = Wallee_Helper::getTransactionInfoForOrder($order);
             if ($transactionInfo === null) {
                 throw new Exception(
-                    Wallee_Helper::translatePS('Could not load corresponding wallee transaction'));
+                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction'));
             }
             
             Wallee_Helper::lockByTransactionId($transactionInfo->getSpaceId(),
@@ -64,12 +64,12 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             
             if (! in_array($transactionInfo->getState(), self::$refundableStates)) {
                 throw new Exception(
-                    Wallee_Helper::translatePS('The transaction is not in a state to be refunded.'));
+                    Wallee_Helper::getModuleInstance()->l('The transaction is not in a state to be refunded.'));
             }
             
             if (Wallee_Model_RefundJob::isRefundRunningForTransaction($spaceId, $transactionId)) {
                 throw new Exception(
-                    Wallee_Helper::translatePS(
+                    Wallee_Helper::getModuleInstance()->l(
                         'Please wait until the existing refund is processed.'));
             }
             $strategy = Wallee_Backend_StrategyProvider::getStrategy();
@@ -121,7 +121,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             $refundJob->setFailureReason(
                 array(
                     'en-US' => sprintf(
-                        Wallee_Helper::translatePS("Could not send the refund to wallee. Error: %s"),
+                        Wallee_Helper::getModuleInstance()->l("Could not send the refund to %s. Error: %s"), 'wallee',
                         Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $refundJob->setState(Wallee_Model_RefundJob::STATE_FAILURE);
@@ -169,7 +169,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
                 $refundJob->setFailureReason(
                     array(
                         'en-US' => sprintf(
-                            Wallee_Helper::translatePS("Could not apply refund in shop. Error: %s"),
+                            Wallee_Helper::getModuleInstance()->l("Could not apply refund in shop. Error: %s"),
                             $e->getMessage())
                     ));
             }
@@ -193,11 +193,11 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
         }
     }
 
-    public function updateRefunds($endTime)
+    public function updateRefunds($endTime = null)
     {
         $toSend = Wallee_Model_RefundJob::loadNotSentJobIds();
         foreach ($toSend as $id) {
-            if (time() + 15 > $endTime) {
+            if ($endTime!== null && time() + 15 > $endTime) {
                 return;
             }
             try {
@@ -205,14 +205,14 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             }
             catch (Exception $e) {
                 $message = sprintf(
-                    Wallee_Helper::translatePS('Error updating refund job with id %d: %s'), $id,
+                    Wallee_Helper::getModuleInstance()->l('Error updating refund job with id %d: %s'), $id,
                     $e->getMessage());
                 PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_RefundJob');
             }
         }
         $toApply = Wallee_Model_RefundJob::loadNotAppliedJobIds();
         foreach ($toApply as $id) {
-            if (time() + 15 > $endTime) {
+            if ($endTime!== null && time() + 15 > $endTime) {
                 return;
             }
             try {
@@ -220,7 +220,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             }
             catch (Exception $e) {
                 $message = sprintf(
-                    Wallee_Helper::translatePS('Error applying refund job with id %d: %s'), $id,
+                    Wallee_Helper::getModuleInstance()->l('Error applying refund job with id %d: %s'), $id,
                     $e->getMessage());
                 PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_RefundJob');
             }
@@ -283,7 +283,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
         $baseLineItems = $this->getBaseLineItems($spaceId, $transactionId);
         $reductionAmount = Wallee_Helper::getReductionAmount($baseLineItems, $reductions);
         
-        $configuration = Adapter_ServiceLocator::get('Core_Business_ConfigurationInterface');
+        $configuration = Wallee_VersionAdapter::getConfigurationInterface();
         $computePrecision = $configuration->get('_PS_PRICE_COMPUTE_PRECISION_');
         
         if (Tools::ps_round($refundTotal, $computePrecision) !=

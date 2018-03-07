@@ -5,7 +5,7 @@ if (! defined('_PS_VERSION_')) {
 
 
 
-class WalleeDocumentsModuleFrontController extends Wallee_FrontPaymentController
+class WalleeDocumentsModuleFrontController extends ModuleFrontController
 {
 	protected $display_header = false;
 	protected $display_footer = false;
@@ -25,11 +25,11 @@ class WalleeDocumentsModuleFrontController extends Wallee_FrontPaymentController
 	    }
 	    
 	    if (!isset($order) || !Validate::isLoadedObject($order)) {
-	        die(Tools::displayError(Wallee_Helper::translatePS('The document was not found.')));
+	        die(Tools::displayError($this->module->l('The document was not found.')));
 	    }
 	    
 	    if ((isset($this->context->customer->id) && $order->id_customer != $this->context->customer->id) || (Tools::isSubmit('secure_key') && $order->secure_key != Tools::getValue('secure_key'))) {
-	        die(Tools::displayError(Wallee_Helper::translatePS('The document was not found.')));
+	        die(Tools::displayError($this->module->l('The document was not found.')));
 	    }
 	    if ($type = Tools::getValue('type')) {
 	        switch($type){
@@ -45,7 +45,7 @@ class WalleeDocumentsModuleFrontController extends Wallee_FrontPaymentController
 	                break;
 	        }
 	    } 
-        die(Tools::displayError(Wallee_Helper::translatePS('The document was not found.')));
+	    die(Tools::displayError($this->module->l('The document was not found.')));
 	   
 	}
 	
@@ -54,7 +54,7 @@ class WalleeDocumentsModuleFrontController extends Wallee_FrontPaymentController
         try {
             Wallee_DownloadHelper::downloadInvoice($order);
         } catch (Exception $e) {
-            die(Tools::displayError('Could not fetch the document from wallee.'));
+            die(Tools::displayError($this->module->l('Could not fetch the document.')));
         }
 	    
 	}
@@ -64,9 +64,30 @@ class WalleeDocumentsModuleFrontController extends Wallee_FrontPaymentController
         try {
             Wallee_DownloadHelper::downloadPackingSlip($order);
         } catch (Exception $e) {
-            die(Tools::displayError('Could not fetch the document from wallee.'));
+            die(Tools::displayError($this->module->l('Could not fetch the document.')));
         }
 	    
+	}
+	
+	
+	public function setMedia()
+	{
+	    // We do not need styling here
+	}
+	
+	protected function displayMaintenancePage()
+	{
+	    // We never display the maintenance page.
+	}
+	
+	protected function displayRestrictedCountryPage()
+	{
+	    // We do not want to restrict the content by any country.
+	}
+	
+	protected function canonicalRedirection($canonical_url = '')
+	{
+	    // We do not need any canonical redirect
 	}
 	
 }
