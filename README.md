@@ -11,7 +11,7 @@ This repository contains the PrestaShop wallee payment module that enables the s
 
 ## Documentation
 
-* [Getting Started](../../../wiki/Getting-Started)
+* [Getting Started](../../wiki/Getting-Started)
 
 ## License
 
