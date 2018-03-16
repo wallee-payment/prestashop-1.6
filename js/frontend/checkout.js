@@ -64,45 +64,46 @@ jQuery(function($) {
 	process_validation : function(validation_result) {
 	    var self = this;
 	    if (validation_result.success) {
-		var form = $("#wallee-payment-form");		
-		$.ajax({
-			type:		'POST',
-			dataType: 	"json",
-			url: 		form.attr("action"),
-			data: 		form.serialize(),
-			success: 	function(response, textStatus, jqXHR) {
-				if ( response.result == 'success' ) {
-				    	self.iframe_handler.submit();
-				    	return;
-				}
-				else if ( response.result == 'failure' ) {
-				    if(response.reload == 'true' ){
-					location.reload();
+			var form = $("#wallee-payment-form");		
+			$.ajax({
+				type:		'POST',
+				dataType: 	"json",
+				url: 		form.attr("action"),
+				data: 		form.serialize(),
+				success: 	function(response, textStatus, jqXHR) {
+					if ( response.result == 'success' ) {
+					    	self.iframe_handler.submit();
+					    	return;
+					}
+					else if ( response.result == 'failure' ) {
+					    if(response.reload == 'true' ){
+						location.reload();
+						self.enable_pay_button();
+						return;
+					    }
+					    else if(response.redirect) {
+						location.replace(response.redirect);
+						return;
+					    }
+					}
+					self.remove_existing_errors();
+					self.show_new_errors(wallee_msg_json_error);
 					self.enable_pay_button();
-					return;
-				    }
-				    else if(response.redirect) {
-					location.replace(response.redirect);
-					return;
-				    }
-				}
-				self.remove_existing_errors();
-				self.show_new_errors(wallee_msg_json_error);
-				self.enable_pay_button();
-			},
-			error: 		function(jqXHR, textStatus, errorThrown){
-			    self.remove_existing_errors();
-			    self.show_new_errors(wallee_msg_json_error);
-			    self.enable_pay_button();
-			},
-		});
-	    } else {
-		if (validation_result.error_messages) {
-		    this.remove_existing_errors();
-		    this.show_new_errors(this.format_error_messages(validation_result.error_messages));
-		}
+				},
+				error: 		function(jqXHR, textStatus, errorThrown){
+				    self.remove_existing_errors();
+				    self.show_new_errors(wallee_msg_json_error);
+				    self.enable_pay_button();
+				},
+			});
+	    }
+	    else {
+			if (validation_result.errors) {
+			    this.remove_existing_errors();
+			    this.show_new_errors(this.format_error_messages(validation_result.errors));
+			}
 		
-		this.enable_pay_button();
+			this.enable_pay_button();
 	    }
 	},
 	

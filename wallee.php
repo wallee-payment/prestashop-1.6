@@ -12,7 +12,7 @@ if (! defined('_PS_VERSION_')) {
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
-define('WALLEE_VERSION', '1.0.0');
+define('WALLEE_VERSION', '1.0.1');
 
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee_autoloader.php');
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee-sdk' . DIRECTORY_SEPARATOR . 'autoload.php');

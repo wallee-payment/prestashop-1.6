@@ -57,8 +57,9 @@ class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
 		
 		$orderState = Wallee_OrderStatus::getRedirectOrderStatus();
 		try{
+		    $customer = new Customer(intval($cart->id_customer));
 		    $this->module->validateOrder($cart->id, $orderState->id, $cart->getOrderTotal(true, Cart::BOTH, null, null, false),
-		    'wallee_'.$methodId);
+		        'wallee_'.$methodId, null, array(), null, false, $customer->secure_key);
 		      echo json_encode(array('result' => 'success'));
 		      die();
 		}
