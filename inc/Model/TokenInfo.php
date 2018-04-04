@@ -157,7 +157,7 @@ class Wallee_Model_TokenInfo extends ObjectModel
         $tokenInfos->where('token_id', '=', $tokenId);
         $result = $tokenInfos->getFirst();
         if($result=== false){
-            $result = new Wallee_Model_MethodConfiguration();
+            $result = new Wallee_Model_TokenInfo();
         }
         return $result;
     }

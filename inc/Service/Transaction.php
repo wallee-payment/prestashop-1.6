@@ -327,14 +327,13 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $last = new Exception('Unexpected Error');
         for ($i = 0; $i < 5; $i ++) {
             try {
-                $needsCreation = false;
                 $ids = Wallee_Helper::getOrderMeta($dataSource, 'mappingIds');
                 $spaceId = $ids['spaceId'];
                 $transaction = $this->getTransactionService()->read($ids['spaceId'],
                     $ids['transactionId']);
                 
                 if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING) {
-                    throw new Exception(Wallee_Helper::getModuleInstance()->l("Invalid State"));
+                    throw new Exception(Wallee_Helper::getModuleInstance()->l("The checkout expired, please try again"));
                 }
                 $pendingTransaction = new \Wallee\Sdk\Model\TransactionPending();
                 $pendingTransaction->setId($transaction->getId());
@@ -539,6 +538,8 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $address->setStreet(
             $this->fixLength(trim($prestaAddress->address1 . "\n" . $prestaAddress->address2), 300));
         $address->setEmailAddress($this->getEmailAddressForCustomerId($prestaAddress->id_customer));
+        $address->setDateOfBirth($this->getDateOfBirthForCustomerId($prestaAddress->id_customer));
+        $address->setGender($this->getGenderForCustomerId($prestaAddress->id_customer));
         return $address;
     }
 
@@ -555,6 +556,49 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         return $customer->email;
     }
 
+    
+    /**
+     * Returns the current customer's date of birth
+     *
+     * @param
+     *            $id
+     * @return string
+     */
+    protected function getDateOfBirthForCustomerId($id)
+    {
+        $customer = new Customer($id);
+        if(!empty($customer->birthday) && $customer->birthday != '0000-00-00' && Validate::isBirthDate($customer->birthday)){
+            return DateTime::createFromFormat("Y-m-d", $customer->birthday);
+        }
+        return null;
+    }
+    
+    
+    /**
+     * Returns the current customer's gender.
+     *
+     * @param
+     *            $id
+     * @return string
+     */
+    protected function getGenderForCustomerId($id)
+    {
+        $customer = new Customer($id);
+        $gender = new Gender($customer->id_gender);
+        if(!Validate::isLoadedObject($gender)){
+            return null;
+        }
+        if($gender->type == '0'){
+            return \Wallee\Sdk\Model\Gender::MALE;
+        }
+        elseif($gender->type == '1'){
+            return \Wallee\Sdk\Model\Gender::FEMALE;
+        }
+        return null;
+        
+    }
+    
+    
     /**
      * Returns the shipping name
      *

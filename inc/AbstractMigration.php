@@ -23,7 +23,7 @@ abstract class Wallee_AbstractMigration
         return true;
     }
 
-    protected static function migrateDb()
+    public static function migrateDb()
     {
         $currentVersion = Configuration::getGlobalValue(self::CK_DB_VERSION);
         if($currentVersion === false){
@@ -34,7 +34,7 @@ abstract class Wallee_AbstractMigration
                 Wallee_Helper::startDBTransaction();
                 try{
                     call_user_func(array(
-                        __CLASS__,
+                        get_called_class(),
                         $functionName
                     ));
                     Configuration::updateGlobalValue(self::CK_DB_VERSION, $version);
@@ -227,6 +227,26 @@ abstract class Wallee_AbstractMigration
           if ($result === false) {
             throw new Exception(DB::getMsgError());
           }
+    }
+    
+    protected static function installOrderStatusConfig(){
+        
+        $authorizedStatus = Wallee_OrderStatus::getAuthorizedOrderStatus();
+        $waitingStatus = Wallee_OrderStatus::getWaitingOrderStatus();
+        $manualStatus = Wallee_OrderStatus::getManualOrderStatus();
+        
+        Configuration::updateGlobalValue(Wallee::CK_STATUS_FAILED, Configuration::get('PS_OS_ERROR'));
+        Configuration::updateGlobalValue(Wallee::CK_STATUS_AUTHORIZED, $authorizedStatus->id);
+        Configuration::updateGlobalValue(Wallee::CK_STATUS_VOIDED, Configuration::get('PS_OS_CANCELED'));
+        Configuration::updateGlobalValue(Wallee::CK_STATUS_COMPLETED, $waitingStatus->id);
+        Configuration::updateGlobalValue(Wallee::CK_STATUS_MANUAL, $manualStatus->id);
+        Configuration::updateGlobalValue(Wallee::CK_STATUS_DECLINED, Configuration::get('PS_OS_CANCELED'));
+        Configuration::updateGlobalValue(Wallee::CK_STATUS_FULFILL, Configuration::get('PS_OS_PAYMENT'));
+
+    }
+    
+    protected static function installOrderPaymentSaveHook(){
+        Wallee_Helper::getModuleInstance()->registerHook('actionObjectOrderPaymentAddBefore');
     }
 }
 

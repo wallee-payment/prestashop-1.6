@@ -9,28 +9,28 @@ class Wallee_OrderStatus
     private static $orderStatesConfig = array(
         'WLE_REDIRECTED' => array(
             'color' => '#4169e1',
-            'name' => 'Redirected',
+            'name' => 'wallee Redirected',
             'invoice' => 0,
             'logable' => 0,
             'image' => 'redirected'
         ),
         'WLE_AUTHORIZED' => array(
             'color' => '#0000cd',
-            'name' => 'Authorized',
+            'name' => 'wallee Authorized',
             'invoice' => 0,
             'logable' => 1,
             'image' => 'authorized'
         ),
         'WLE_WAITING' => array(
             'color' => '#000080',
-            'name' => 'Waiting',
+            'name' => 'wallee Waiting',
             'invoice' => 0,
             'logable' => 1,
             'image' => 'waiting'
         ),
         'WLE_MANUAL' => array(
             'color' => '#191970',
-            'name' => 'Manual Decision',
+            'name' => 'wallee Manual Decision',
             'invoice' => 0,
             'logable' => 1,
             'image' => 'manual'

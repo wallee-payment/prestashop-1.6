@@ -579,7 +579,7 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
     protected function cleanLineItem(\Wallee\Sdk\Model\LineItemCreate $lineItem)
     {
         $lineItem->setSku($this->fixLength($lineItem->getSku(), 200));
-        $lineItem->setName($this->fixLength($lineItem->getName(), 40));
+        $lineItem->setName($this->fixLength($lineItem->getName(), 150));
         return $lineItem;
     }
 }

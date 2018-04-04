@@ -66,10 +66,7 @@ class Wallee_Service_Token extends Wallee_Service_Abstract {
 		$info->setCustomerId($tokenVersion->getToken()->getCustomerId());
 		$info->setName($tokenVersion->getName());
 		
-		
-		$paymentMethod = Wallee_Model_MethodConfiguration::loadByConfiguration($space_id, 
-				$tokenVersion->getPaymentConnectorConfiguration()->getPaymentMethodConfiguration()->getId());
-		$info->setPaymentMethodId($paymentMethod->getId());
+		$info->setPaymentMethodId($tokenVersion->getPaymentConnectorConfiguration()->getPaymentMethodConfiguration()->getId());
 		$info->setConnectorId($tokenVersion->getPaymentConnectorConfiguration()->getConnector());
 		
 		$info->setSpaceId($spaceId);

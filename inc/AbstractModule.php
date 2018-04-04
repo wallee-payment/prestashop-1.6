@@ -29,6 +29,20 @@ abstract class Wallee_AbstractModule extends PaymentModule
     const CK_PACKING_SLIP = 'WLE_PACKING_SLIP_DOWNLOAD';
 
     const CK_FEE_ITEM = 'WLE_FEE_ITEM';
+    
+    const CK_STATUS_FAILED = 'WLE_STATUS_FAILED';
+    
+    const CK_STATUS_AUTHORIZED = 'WLE_STATUS_AUTHORIZED';
+    
+    const CK_STATUS_VOIDED = 'WLE_STATUS_VOIDED';
+    
+    const CK_STATUS_COMPLETED = 'WLE_STATUS_COMPLETED';
+    
+    const CK_STATUS_MANUAL = 'WLE_STATUS_MANUAL';
+    
+    const CK_STATUS_DECLINED = 'WLE_STATUS_DECLINED';
+    
+    const CK_STATUS_FULFILL = 'WLE_STATUS_FULFILL';
 
     const MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE = 1062;
 
@@ -43,7 +57,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
     const TOTAL_MODE_WITHOUT_SHIPPING_INC = 4;
 
     const TOTAL_MODE_WITHOUT_SHIPPING_EXC = 5;
-
+    
     private static $recordMailMessages = false;
 
     private static $recordedMailMessages = array();
@@ -107,10 +121,11 @@ abstract class Wallee_AbstractModule extends PaymentModule
             $this->_errors[] = Tools::displayError('Unable to install database tables.');
             return false;
         }
-        if (! $this->installConfiguration()) {
+        $this->registerOrderStates();
+        if (! $this->installConfigurationValues()) {
             $this->_errors[] = Tools::displayError('Unable to install configuration.');
         }
-        $this->registerOrderStates();
+       
         return true;
     }
 
@@ -148,9 +163,30 @@ abstract class Wallee_AbstractModule extends PaymentModule
              $this->registerHook('walleeSettingsChanged');
     }
 
-    abstract protected function installConfiguration();
+    protected function installConfigurationValues(){
+        return Configuration::updateGlobalValue(self::CK_MAIL, true) &&
+        Configuration::updateGlobalValue(self::CK_INVOICE, true) &&
+        Configuration::updateGlobalValue(self::CK_PACKING_SLIP, true);
+    }
 
-    abstract protected function uninstallConfigurationValues();
+    protected function uninstallConfigurationValues(){
+        return Configuration::deleteByName(self::CK_USER_ID) &&
+        Configuration::deleteByName(self::CK_APP_KEY) &&
+        Configuration::deleteByName(self::CK_SPACE_ID) &&
+        Configuration::deleteByName(self::CK_SPACE_VIEW_ID) &&
+        Configuration::deleteByName(self::CK_MAIL) &&
+        Configuration::deleteByName(self::CK_INVOICE) &&
+        Configuration::deleteByName(self::CK_PACKING_SLIP) &&
+        Configuration::deleteByName(self::CK_FEE_ITEM) &&
+        Configuration::deleteByName(Wallee_Service_ManualTask::CONFIG_KEY) &&
+        Configuration::deleteByName(self::CK_STATUS_FAILED) &&
+        Configuration::deleteByName(self::CK_STATUS_AUTHORIZED) &&
+        Configuration::deleteByName(self::CK_STATUS_VOIDED) &&
+        Configuration::deleteByName(self::CK_STATUS_COMPLETED) &&
+        Configuration::deleteByName(self::CK_STATUS_MANUAL) &&
+        Configuration::deleteByName(self::CK_STATUS_DECLINED) &&
+        Configuration::deleteByName(self::CK_STATUS_FULFILL);
+    }
 
     abstract protected function getBackendControllers();
 
@@ -273,7 +309,14 @@ abstract class Wallee_AbstractModule extends PaymentModule
             self::CK_MAIL,
             self::CK_INVOICE,
             self::CK_PACKING_SLIP,
-            self::CK_FEE_ITEM
+            self::CK_FEE_ITEM,
+            self::CK_STATUS_FAILED,
+            self::CK_STATUS_AUTHORIZED,
+            self::CK_STATUS_VOIDED,
+            self::CK_STATUS_COMPLETED,
+            self::CK_STATUS_MANUAL,
+            self::CK_STATUS_DECLINED,
+            self::CK_STATUS_FULFILL
         );
     }
 
@@ -327,21 +370,14 @@ abstract class Wallee_AbstractModule extends PaymentModule
     {
         $output = "";
         if (Tools::isSubmit('submit' . $this->name . '_email')) {
-            if ($this->context->shop->isFeatureActive()) {
-                if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                    Configuration::updateValue(self::CK_MAIL, Tools::getValue(self::CK_MAIL));
-                    
-                    $output .= $this->displayConfirmation($this->l('Settings updated'));
-                }
-                else {
-                    $output .= $this->displayError(
-                        $this->l(
-                            'You can not store the configuration for all Shops or a Shop Group.'));
-                }
-            }
-            else {
+            if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
                 Configuration::updateValue(self::CK_MAIL, Tools::getValue(self::CK_MAIL));
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
+            }
+            else {
+                $output .= $this->displayError(
+                    $this->l(
+                        'You can not store the configuration for all Shops or a Shop Group.'));
             }
         }
         return $output;
@@ -351,23 +387,17 @@ abstract class Wallee_AbstractModule extends PaymentModule
     {
         $output = "";
         if (Tools::isSubmit('submit' . $this->name . '_fee_item')) {
-            if ($this->context->shop->isFeatureActive()) {
-                if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
+            if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
                     Configuration::updateValue(self::CK_FEE_ITEM,
                         Tools::getValue(self::CK_FEE_ITEM));
-                    
-                    $output .= $this->displayConfirmation($this->l('Settings updated'));
-                }
-                else {
-                    $output .= $this->displayError(
-                        $this->l(
-                            'You can not store the configuration for all Shops or a Shop Group.'));
-                }
+                  $output .= $this->displayConfirmation($this->l('Settings updated'));
             }
             else {
-                Configuration::updateValue(self::CK_FEE_ITEM, Tools::getValue(self::CK_FEE_ITEM));
-                $output .= $this->displayConfirmation($this->l('Settings updated'));
+                $output .= $this->displayError(
+                    $this->l(
+                        'You can not store the configuration for all Shops or a Shop Group.'));
             }
+       
         }
         return $output;
     }
@@ -376,24 +406,39 @@ abstract class Wallee_AbstractModule extends PaymentModule
     {
         $output = "";
         if (Tools::isSubmit('submit' . $this->name . '_download')) {
-            if ($this->context->shop->isFeatureActive()) {
-                if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
+            if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
                     Configuration::updateValue(self::CK_INVOICE, Tools::getValue(self::CK_INVOICE));
                     Configuration::updateValue(self::CK_PACKING_SLIP,
                         Tools::getValue(self::CK_PACKING_SLIP));
                     $output .= $this->displayConfirmation($this->l('Settings updated'));
-                }
-                else {
+            }
+            else {
                     $output .= $this->displayError(
                         $this->l(
                             'You can not store the configuration for all Shops or a Shop Group.'));
-                }
             }
-            else {
-                Configuration::updateValue(self::CK_INVOICE, Tools::getValue(self::CK_INVOICE));
-                Configuration::updateValue(self::CK_PACKING_SLIP,
-                    Tools::getValue(self::CK_PACKING_SLIP));
+           
+        }
+        return $output;
+    }
+    
+    protected function handleSaveOrderStatus()
+    {
+        $output = "";
+        if (Tools::isSubmit('submit' . $this->name . '_order_status')) {
+            if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
+                Configuration::updateValue(self::CK_STATUS_FAILED, Tools::getValue(self::CK_STATUS_FAILED));
+                Configuration::updateValue(self::CK_STATUS_AUTHORIZED, Tools::getValue(self::CK_STATUS_AUTHORIZED));
+                Configuration::updateValue(self::CK_STATUS_VOIDED, Tools::getValue(self::CK_STATUS_VOIDED));
+                Configuration::updateValue(self::CK_STATUS_COMPLETED, Tools::getValue(self::CK_STATUS_COMPLETED));
+                Configuration::updateValue(self::CK_STATUS_MANUAL, Tools::getValue(self::CK_STATUS_MANUAL));
+                Configuration::updateValue(self::CK_STATUS_DECLINED, Tools::getValue(self::CK_STATUS_DECLINED));
+                Configuration::updateValue(self::CK_STATUS_FULFILL, Tools::getValue(self::CK_STATUS_FULFILL));
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
+            }else {
+                    $output .= $this->displayError(
+                        $this->l(
+                            'You can not store the configuration for all Shops or a Shop Group.'));
             }
         }
         return $output;
@@ -634,13 +679,8 @@ abstract class Wallee_AbstractModule extends PaymentModule
     protected function getEmailConfigValues()
     {
         $values = array();
-        if ($this->context->shop->isFeatureActive()) {
-            if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
+        if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
                 $values[self::CK_MAIL] = (bool) Configuration::get(self::CK_MAIL);
-            }
-        }
-        else {
-            $values[self::CK_MAIL] = (bool) Configuration::get(self::CK_MAIL);
         }
         return $values;
     }
@@ -697,13 +737,8 @@ abstract class Wallee_AbstractModule extends PaymentModule
     protected function getFeeItemConfigValues()
     {
         $values = array();
-        if ($this->context->shop->isFeatureActive()) {
-            if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
+        if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
                 $values[self::CK_FEE_ITEM] = (int) Configuration::get(self::CK_FEE_ITEM);
-            }
-        }
-        else {
-            $values[self::CK_FEE_ITEM] = (int) Configuration::get(self::CK_FEE_ITEM);
         }
         return $values;
     }
@@ -782,16 +817,142 @@ abstract class Wallee_AbstractModule extends PaymentModule
     protected function getDownloadConfigValues()
     {
         $values = array();
-        if ($this->context->shop->isFeatureActive()) {
-            if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
+        if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
                 $values[self::CK_INVOICE] = (bool) Configuration::get(self::CK_INVOICE);
                 $values[self::CK_PACKING_SLIP] = (bool) Configuration::get(self::CK_PACKING_SLIP);
-            }
         }
-        else {
-            $values[self::CK_INVOICE] = (bool) Configuration::get(self::CK_INVOICE);
-            $values[self::CK_PACKING_SLIP] = (bool) Configuration::get(self::CK_PACKING_SLIP);
-        }
+        
+        return $values;
+    }
+    
+    protected function getOrderStatusForm()
+    {
+        $orderStates = OrderState::getOrderStates($this->context->language->id);        
+        
+        
+        $orderStatusConfig = array(
+            array(
+                'type' => 'select',
+                'label' => $this->l('Failed Status'),
+                'desc' => $this->l(
+                    'Status the order enters when the transaction is in the wallee failed status.'),
+                'name' => self::CK_STATUS_FAILED,
+                'options' => array(
+                    'query' => $orderStates,
+                    'id' => 'id_order_state',
+                    'name' => 'name'
+                )
+            ),
+            array(
+                'type' => 'select',
+                'label' => $this->l('Authorized Status'),
+                'desc' => $this->l(
+                    'Status the order enters when the transaction is in the wallee authorized status.'),
+                'name' => self::CK_STATUS_AUTHORIZED,
+                'options' => array(
+                    'query' => $orderStates,
+                    'id' => 'id_order_state',
+                    'name' => 'name'
+                )
+            ),
+            array(
+                'type' => 'select',
+                'label' => $this->l('Voided Status'),
+                'desc' => $this->l(
+                    'Status the order enters when the transaction is in the wallee voided status'),
+                'name' => self::CK_STATUS_VOIDED,
+                'options' => array(
+                    'query' => $orderStates,
+                    'id' => 'id_order_state',
+                    'name' => 'name'
+                )
+            ),
+            array(
+                'type' => 'select',
+                'label' => $this->l('Waiting Status'),
+                'desc' => $this->l(
+                    'Status the order enters when the transaction is in the wallee completed status and the delivery indication is in a pending state.'),
+                'name' => self::CK_STATUS_COMPLETED,
+                'options' => array(
+                    'query' => $orderStates,
+                    'id' => 'id_order_state',
+                    'name' => 'name'
+                )
+            ),
+            array(
+                'type' => 'select',
+                'label' => $this->l('Manual  Status'),
+                'desc' => $this->l(
+                    'Status the order enters when the transaction is in the wallee completed status and the delivery indication requires a manual decision.'),
+                'name' => self::CK_STATUS_MANUAL,
+                'options' => array(
+                    'query' => $orderStates,
+                    'id' => 'id_order_state',
+                    'name' => 'name'
+                )
+            ),
+            array(
+                'type' => 'select',
+                'label' => $this->l('Decline  Status'),
+                'desc' => $this->l(
+                    'Status the order enters when the transaction is in the wallee declined status.'),
+                'name' => self::CK_STATUS_DECLINED,
+                'options' => array(
+                    'query' => $orderStates,
+                    'id' => 'id_order_state',
+                    'name' => 'name'
+                )
+            ),
+            array(
+                'type' => 'select',
+                'label' => $this->l('Fulfill  Status'),
+                'desc' => $this->l(
+                    'Status the order enters when the transaction is in the wallee fulfill status.'),
+                'name' => self::CK_STATUS_FULFILL,
+                'options' => array(
+                    'query' => $orderStates,
+                    'id' => 'id_order_state',
+                    'name' => 'name'
+                )
+            ),
+        );
+        
+        return array(
+            'legend' => array(
+                'title' => $this->l('Order Status Settings')
+            ),
+            'input' => $orderStatusConfig,
+            'buttons' => array(
+                array(
+                    'title' => $this->l('Save All'),
+                    'class' => 'pull-right',
+                    'type' => 'input',
+                    'icon' => 'process-icon-save',
+                    'name' => 'submit' . $this->name . '_all'
+                ),
+                array(
+                    'title' => $this->l('Save'),
+                    'class' => 'pull-right',
+                    'type' => 'input',
+                    'icon' => 'process-icon-save',
+                    'name' => 'submit' . $this->name . '_order_status'
+                )
+            )
+        );
+    }
+    
+    protected function getOrderStatusConfigValues()
+    {
+        $values = array();
+        if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
+                $values[self::CK_STATUS_FAILED] = (int) Configuration::get(self::CK_STATUS_FAILED);
+                $values[self::CK_STATUS_AUTHORIZED] = (int) Configuration::get(self::CK_STATUS_AUTHORIZED);
+                $values[self::CK_STATUS_VOIDED] = (int) Configuration::get(self::CK_STATUS_VOIDED);
+                $values[self::CK_STATUS_COMPLETED] = (int) Configuration::get(self::CK_STATUS_COMPLETED);
+                $values[self::CK_STATUS_MANUAL] = (int) Configuration::get(self::CK_STATUS_MANUAL);
+                $values[self::CK_STATUS_DECLINED] = (int) Configuration::get(self::CK_STATUS_DECLINED);
+                $values[self::CK_STATUS_FULFILL] = (int) Configuration::get(self::CK_STATUS_FULFILL);
+        }       
         return $values;
     }
 
@@ -1102,12 +1263,24 @@ abstract class Wallee_AbstractModule extends PaymentModule
     
     public function hookDisplayBackOfficeHeader($params)
     {
+        if (Module::isEnabled($this->name)) {
+            try{
+                Wallee_Migration::migrateDb();
+            }
+            catch(Exception $e){
+                $this->displayError(
+                    $this->l(sprintf('Error migrating the database for %s. Please check the log to resolve the issue.'),'wallee'));
+                PrestaShopLogger::addLog(
+                    $e->getMessage(), 3, null,
+                    'Wallee');
+            }
+        }
         if (isset($_POST['submitChangeCurrency'])) {
             $idOrder = Tools::getValue('id_order');
             $order = new Order((int) $idOrder);
             $backendController = Context::getContext()->controller;
             if (Validate::isLoadedObject($order) && $order->module == $this->name) {
-                $backendController->errors[] = Tools::displayError('You cannot change the currency.');
+                $backendController->errors[] = Tools::displayError('You cannot change the currency for this order.');
                 unset($_POST['submitChangeCurrency']);
                 return;
             }
@@ -1520,6 +1693,16 @@ abstract class Wallee_AbstractModule extends PaymentModule
                 return;
             }
             Wallee_Helper::startDBTransaction();
+        }
+    }
+    
+    public function hookActionObjectOrderPaymentAddBefore($params){
+        $orderPayment = $params['object'];
+        if($orderPayment instanceof OrderPayment){
+            if($orderPayment->payment_method == $this->displayName){
+                $order = Order::getByReference($orderPayment->order_reference)->getFirst();
+                $orderPayment->payment_method = $order->payment;
+            }            
         }
     }
     

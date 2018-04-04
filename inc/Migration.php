@@ -8,7 +8,8 @@ class Wallee_Migration extends Wallee_AbstractMigration{
     
     protected static function getMigrations(){
         return array(
-            '1.0.0' => 'initialize_1_0_0'
+            '1.0.0' => 'initialize_1_0_0',
+            '1.0.1' => 'orderstatus_1_0_1'
         );
     }
     
@@ -35,5 +36,11 @@ class Wallee_Migration extends Wallee_AbstractMigration{
         if ($result === false) {
             throw new Exception(DB::getMsgError());
         }
+    }
+    
+    public static function orderstatus_1_0_1()
+    {
+        static::installOrderStatusConfig();
+        static::installOrderPaymentSaveHook();
     }
 }

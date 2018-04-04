@@ -12,7 +12,7 @@ if (! defined('_PS_VERSION_')) {
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
-define('WALLEE_VERSION', '1.0.1');
+define('WALLEE_VERSION', '1.0.2');
 
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee_autoloader.php');
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee-sdk' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -68,11 +68,9 @@ class Wallee extends Wallee_AbstractModule
         );
     }
 
-    protected function installConfiguration()
+    protected function installConfigurationValues()
     {
-        return Configuration::updateValue(self::CK_MAIL, true) &&
-             Configuration::updateValue(self::CK_INVOICE, true) &&
-             Configuration::updateValue(self::CK_PACKING_SLIP, true) &&
+        return parent::installConfigurationValues() && 
              Configuration::updateValue(self::CK_SHOW_CART, true) &&
              Configuration::updateValue(self::CK_SHOW_TOS, false) &&
              Configuration::updateValue(self::CK_REMOVE_TOS, false);
@@ -80,18 +78,10 @@ class Wallee extends Wallee_AbstractModule
 
     protected function uninstallConfigurationValues()
     {
-         return Configuration::deleteByName(self::CK_USER_ID) &&
-             Configuration::deleteByName(self::CK_APP_KEY) &&
-             Configuration::deleteByName(self::CK_SPACE_ID) &&
-             Configuration::deleteByName(self::CK_SPACE_VIEW_ID) &&
-             Configuration::deleteByName(self::CK_MAIL) &&
-             Configuration::deleteByName(self::CK_INVOICE) &&
-             Configuration::deleteByName(self::CK_PACKING_SLIP) &&
-             Configuration::deleteByName(self::CK_FEE_ITEM) &&
+         return parent::uninstallConfigurationValues() &&
              Configuration::deleteByName(self::CK_SHOW_CART) &&
              Configuration::deleteByName(self::CK_SHOW_TOS) &&
-             Configuration::deleteByName(self::CK_REMOVE_TOS) &&
-             Configuration::deleteByName(Wallee_Service_ManualTask::CONFIG_KEY);
+             Configuration::deleteByName(self::CK_REMOVE_TOS);
     }
 
     public function getContent()
@@ -103,36 +93,26 @@ class Wallee extends Wallee_AbstractModule
         $output .= $this->handleSaveEmail();
         $output .= $this->handleSaveFeeItem();
         $output .= $this->handleSaveDownload();
+        $output .= $this->handleSaveOrderStatus();
         return $output . $this->displayForm();
     }
     
     protected function handleSaveCheckout(){
         $output = "";
         if (Tools::isSubmit('submit' . $this->name . '_checkout')) {
-            if ($this->context->shop->isFeatureActive()) {
-                if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                    Configuration::updateValue(self::CK_SHOW_CART,
-                        Tools::getValue(self::CK_SHOW_CART));
-                    Configuration::updateValue(self::CK_SHOW_TOS,
-                        Tools::getValue(self::CK_SHOW_TOS));
-                    Configuration::updateValue(self::CK_REMOVE_TOS,
-                        Tools::getValue(self::CK_REMOVE_TOS));
-                    $output .= $this->displayConfirmation($this->l('Settings updated'));
-                }
-                else {
-                    $output .= $this->displayError(
-                        $this->l(
-                            'You can not store the configuration for all Shops or a Shop Group.'));
-                }
-            }
-            else {
-                Configuration::updateGlobalValue(self::CK_SHOW_CART,
+            if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
+                Configuration::updateValue(self::CK_SHOW_CART,
                     Tools::getValue(self::CK_SHOW_CART));
-                Configuration::updateGlobalValue(self::CK_SHOW_TOS,
+                Configuration::updateValue(self::CK_SHOW_TOS,
                     Tools::getValue(self::CK_SHOW_TOS));
                 Configuration::updateValue(self::CK_REMOVE_TOS,
                     Tools::getValue(self::CK_REMOVE_TOS));
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
+            }
+            else {
+                $output .= $this->displayError(
+                    $this->l(
+                        'You can not store the configuration for all Shops or a Shop Group.'));
             }
         }
         return $output;
@@ -143,7 +123,8 @@ class Wallee extends Wallee_AbstractModule
             $this->getCheckoutForm(),
             $this->getEmailForm(),
             $this->getFeeForm(),
-            $this->getDocumentForm()
+            $this->getDocumentForm(),
+            $this->getOrderStatusForm()
         );
     }
     
@@ -154,7 +135,8 @@ class Wallee extends Wallee_AbstractModule
             $this->getCheckoutConfigValues(),
             $this->getEmailConfigValues(),
             $this->getFeeItemConfigValues(),
-            $this->getDownloadConfigValues()
+            $this->getDownloadConfigValues(),
+            $this->getOrderStatusConfigValues()
         );
     }
     
@@ -261,23 +243,13 @@ class Wallee extends Wallee_AbstractModule
     protected function getCheckoutConfigValues()
     {
         $values = array();
-        if ($this->context->shop->isFeatureActive()) {
-            if ($this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
+        if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
                 $values[self::CK_SHOW_CART] = (bool) Configuration::get(
                     self::CK_SHOW_CART);
                 $values[self::CK_SHOW_TOS] = (bool) Configuration::get(
                     self::CK_SHOW_TOS);
                 $values[self::CK_REMOVE_TOS] = (bool) Configuration::get(
                     self::CK_REMOVE_TOS);
-            }
-        }
-        else {
-            $values[self::CK_SHOW_CART] = (bool) Configuration::getGlobalValue(
-                self::CK_SHOW_CART);
-            $values[self::CK_SHOW_TOS] = (bool) Configuration::getGlobalValue(
-                self::CK_SHOW_TOS);
-            $values[self::CK_REMOVE_TOS] = (bool) Configuration::get(
-                self::CK_REMOVE_TOS);
         }
         return $values;
     }
