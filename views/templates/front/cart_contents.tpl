@@ -1,3 +1,11 @@
+{*
+ * wallee Prestashop
+ *
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
+ *
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
+ *}
 {assign var='total_discounts_num' value="{if $total_discounts != 0}1{else}0{/if}"}
 {assign var='use_show_taxes' value="{if $use_taxes && $show_taxes}2{else}0{/if}"}
 {assign var='total_wrapping_taxes_num' value="{if $total_wrapping != 0}1{else}0{/if}"}

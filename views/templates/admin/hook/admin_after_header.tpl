@@ -1,3 +1,11 @@
+{*
+ * wallee Prestashop
+ *
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
+ *
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
+ *}
 <div id="wallee_notifications" style="display:none";>
 	<li id="wallee_manual_notifs" class="dropdown" data-type="wallee_manual_messages">	
 		<a href="javascript:void(0);" class="dropdown-toggle notifs" data-toggle="dropdown">

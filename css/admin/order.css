@@ -1,3 +1,12 @@
+/**
+ * wallee Prestashop
+ *
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
+ *
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
+ */
+
 .wallee-loader {
 	border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #3eb0eb; /* Blue */

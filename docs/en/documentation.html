@@ -1,0 +1,212 @@
+
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+		<title>				Documentation		</title>
+		<link href="assets/base.css" rel="stylesheet" /> 
+	</head>
+	<body class="documentation">
+		
+		<div class="layout-wrapper layout-two-columns-right"">
+							<div class="layout-title">
+					<h1>Documentation</h1>
+				</div>
+										        		        			
+				<div class="layout-content">
+												<div class="col-body">
+							<div class="col-body-wrapper">
+																	<div class="body-container">
+																						<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="chapter">
+	<div class="chapter-title">
+		<h1 class="anchored">
+			<a id="_prerequisites" class="anchor"></a>
+			<span class="title-number">1</span>Prerequisites						<a href="#_prerequisites" class="anchor-link fa fa-link"></a>
+		</h1>
+	</div>
+
+	<div class="chapter-body">
+					<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>If you don&#8217;t already have one, create a <a href="https://app-wallee.com/user/signup">wallee</a> account, set up a space and sign up for a PrestaShop account.</p>
+</li>
+<li>
+<p>Then you need to create an application user that is allowed to access the space you want to link to the PrestaShop store. Navigate to your wallee account &gt; application user and create your application user. The user ID and the authentication key will be shown to you. Make sure to write this information down.</p>
+</li>
+<li>
+<p>Make sure that you grant the application users the necessary rights (Account Admin) in order to configure the webhooks, payment methods etc. out of your PrestaShop store.</p>
+</li>
+<li>
+<p>Setup at least one processor, one payment method and a connector configuration.</p>
+</li>
+<li>
+<p>Install the PrestaShop Mailhook module found <a href="https://github.com/wallee-payment/prestashop-mailhook/releases">here</a>.</p>
+</li>
+</ol>
+</div>					</div>
+</div>		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="chapter">
+	<div class="chapter-title">
+		<h1 class="anchored">
+			<a id="_installation" class="anchor"></a>
+			<span class="title-number">2</span>Installation						<a href="#_installation" class="anchor-link fa fa-link"></a>
+		</h1>
+	</div>
+
+	<div class="chapter-body">
+					<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Upload the module files to the store&#8217;s module directory using FTP/SSH.</p>
+</li>
+<li>
+<p>Make sure the module folder name is wallee.</p>
+</li>
+<li>
+<p>Install the module in the shop</p>
+</li>
+</ol>
+</div>					</div>
+</div>		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="chapter">
+	<div class="chapter-title">
+		<h1 class="anchored">
+			<a id="_configuration" class="anchor"></a>
+			<span class="title-number">3</span>Configuration						<a href="#_configuration" class="anchor-link fa fa-link"></a>
+		</h1>
+	</div>
+
+	<div class="chapter-body">
+					<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>The plugin&#8217;s configuration can be found in the <strong>Modules and Services</strong></p>
+</li>
+<li>
+<p>Click on <strong>Configure</strong> for the wallee payment module.</p>
+</li>
+<li>
+<p>Enter the credentials from before which means the wallee application user&#8217;s access information and the space id. If your store is configured for multishop you need to switch the shop context to configure the space id. The configuration will be done automatically. (save before switching)</p>
+</li>
+<li>
+<p>Save the values by clicking the <strong>Save</strong> button.</p>
+</li>
+<li>
+<p>Be aware that you configure the restrictions in <strong>Modules and Services &gt; Payment</strong>  otherwise it can not be used in the checkout.</p>
+</li>
+</ol>
+</div><div class="imageblock">
+<div class="content">
+<img src="resource/settings.png" alt="Settings"/>
+</div>
+</div>					</div>
+</div>		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="chapter">
+	<div class="chapter-title">
+		<h1 class="anchored">
+			<a id="_payment_method_configuration" class="anchor"></a>
+			<span class="title-number">4</span>Payment Method Configuration						<a href="#_payment_method_configuration" class="anchor-link fa fa-link"></a>
+		</h1>
+	</div>
+
+	<div class="chapter-body">
+					<div class="paragraph">
+<p>The base configuration of the payment methods is done in wallee. After following the steps of the basic configuration, the wallee payment method configuration will be synchronized automatically into the PrestaShop store.
+In Prestashop there are some styling choices available in the <strong>Modules and Services &gt; wallee Payment Methods</strong> section.</p>
+</div><div class="imageblock">
+<div class="content">
+<img src="resource/method.png" alt="Method Settings"/>
+</div>
+</div>					</div>
+</div>		</div>
+	</div>
+	<div class="panel panel-default">
+		<div class="panel-body">
+			<div class="chapter">
+	<div class="chapter-title">
+		<h1 class="anchored">
+			<a id="_payment_fee" class="anchor"></a>
+			<span class="title-number">5</span>Payment Fee						<a href="#_payment_fee" class="anchor-link fa fa-link"></a>
+		</h1>
+	</div>
+
+	<div class="chapter-body">
+					<div class="paragraph">
+<p>The module allows to configure a Payment Fee for the different wallee payment methods. This is done in multiple steps.</p>
+</div><div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create a PrestaShop product with price 0.00 and give it a meaning full name. e.g. "Payment Fee"</p>
+</li>
+<li>
+<p>In the module configuration select this newly created item as the payment fee product.</p>
+</li>
+<li>
+<p>Configure the fee for each method in the <strong>Modules and Services &gt; wallee Payment Methods</strong> section.</p>
+</li>
+</ol>
+</div>					</div>
+</div>		</div>
+	</div>
+																			</div>
+															</div>
+						</div>
+						<div class="col-right">
+		<div class="col-right-fixed">
+			<div class="col-right-wrapper">
+									<div class="table-of-contents">
+	<ul class="nav">
+					<li class="nav-level-1">
+	<a href="#_prerequisites">
+		<span class="item-number">1</span>
+		<span class="item-title">Prerequisites</span>
+			</a>
+
+    </li>					<li class="nav-level-1">
+	<a href="#_installation">
+		<span class="item-number">2</span>
+		<span class="item-title">Installation</span>
+			</a>
+
+    </li>					<li class="nav-level-1">
+	<a href="#_configuration">
+		<span class="item-number">3</span>
+		<span class="item-title">Configuration</span>
+			</a>
+
+    </li>					<li class="nav-level-1">
+	<a href="#_payment_method_configuration">
+		<span class="item-number">4</span>
+		<span class="item-title">Payment Method Configuration</span>
+			</a>
+
+    </li>					<li class="nav-level-1">
+	<a href="#_payment_fee">
+		<span class="item-number">5</span>
+		<span class="item-title">Payment Fee</span>
+			</a>
+
+    </li>			</ul>
+</div>							</div>
+		</div>
+	</div>
+				</div>
+			
+													
+		</div>		
+	</body>
+</html>

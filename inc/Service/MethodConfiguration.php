@@ -4,6 +4,15 @@ if (! defined('_PS_VERSION_')) {
 }
 
 /**
+ * wallee Prestashop
+ *
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
+ *
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
+ */
+
+/**
  * Wallee_Service_Method_Configuration Class.
  */
 class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract

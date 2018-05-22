@@ -3,6 +3,15 @@ if (! defined('_PS_VERSION_')) {
     exit();
 }
 
+/**
+ * wallee Prestashop
+ *
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
+ *
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
+ */
+
 class Wallee_Model_TokenInfo extends ObjectModel
 {
 
@@ -58,8 +67,7 @@ class Wallee_Model_TokenInfo extends ObjectModel
             ),
             'customer_id' => array(
                 'type' => self::TYPE_INT,
-                'validate' => 'isUnsignedId',
-                'required' => true
+                'validate' => 'isAnything',
             ),
             'payment_method_id' => array(
                 'type' => self::TYPE_INT,

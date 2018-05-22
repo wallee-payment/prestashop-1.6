@@ -1,3 +1,11 @@
+{*
+ * wallee Prestashop
+ *
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
+ *
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
+ *}
 {capture name=path}
     <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='wallee'}">{l s='Checkout' mod='wallee'}</a><span class="navigation-pipe">{$navigationPipe}</span>{$name}
 {/capture}

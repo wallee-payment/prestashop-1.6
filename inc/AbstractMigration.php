@@ -4,6 +4,15 @@ if (!defined('_PS_VERSION_')) {
     exit;
 }
 
+/**
+ * wallee Prestashop
+ *
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
+ *
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
+ */
+
 abstract class Wallee_AbstractMigration
 {   
     const CK_DB_VERSION = 'WLE_DB_VERSION';
@@ -49,7 +58,7 @@ abstract class Wallee_AbstractMigration
         }
     }
 
-    protected static function installBase()
+    protected static function installTableBase()
     {
         $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_method_configuration(
 				`id_method_configuration` int(10) unsigned NOT NULL AUTO_INCREMENT,
@@ -229,7 +238,7 @@ abstract class Wallee_AbstractMigration
           }
     }
     
-    protected static function installOrderStatusConfig(){
+    protected static function installOrderStatusConfigBase(){
         
         $authorizedStatus = Wallee_OrderStatus::getAuthorizedOrderStatus();
         $waitingStatus = Wallee_OrderStatus::getWaitingOrderStatus();
@@ -245,8 +254,16 @@ abstract class Wallee_AbstractMigration
 
     }
     
-    protected static function installOrderPaymentSaveHook(){
+    protected static function installOrderPaymentSaveHookBase(){
         Wallee_Helper::getModuleInstance()->registerHook('actionObjectOrderPaymentAddBefore');
+    }
+    
+    protected static function updateCustomerIdOnTokenInfoBase(){
+        $result = Db::getInstance()->execute(
+            "ALTER TABLE `" . _DB_PREFIX_ . "wle_token_info` CHANGE `customer_id` `customer_id` int(10) unsigned NULL DEFAULT NULL;");      
+        if ($result === false) {
+            throw new Exception(DB::getMsgError());
+        }       
     }
 }
 

@@ -3,13 +3,21 @@ if (! defined('_PS_VERSION_')) {
     exit();
 }
 
-class Wallee_OrderStatus
-{
+/**
+ * wallee Prestashop
+ *
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
+ *
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
+ */
+
+class Wallee_OrderStatus {
 
     private static $orderStatesConfig = array(
         'WLE_REDIRECTED' => array(
             'color' => '#4169e1',
-            'name' => 'wallee Redirected',
+            'name' => 'wallee Processing',
             'invoice' => 0,
             'logable' => 0,
             'image' => 'redirected'

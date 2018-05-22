@@ -3,6 +3,14 @@ if (! defined('_PS_VERSION_')) {
     exit();
 }
 
+/**
+ * wallee Prestashop
+ *
+ * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
+ *
+ * @author customweb GmbH (http://www.customweb.com/)
+ * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
+ */
 
 class AdminWalleeMethodSettingsController extends ModuleAdminController
 {
@@ -263,7 +271,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'desc' => sprintf(
                     $this->module->l(
                         'The fee has to be entered in the shops default currency. Current default currency: %s'),
-                    $defaultCurrency['sign']),
+                    $defaultCurrency['iso_code']),
                 'name' => 'fee_fixed',
                 'col' => 3
             ),
@@ -303,6 +311,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                         ),
                         array(
                             'name' => $this->module->l('Products only(exc Tax)'),
+                            'type' => Wallee::TOTAL_MODE_PRODUCTS_EXC
                         )
                         
                     ),
@@ -421,7 +430,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'desc' => sprintf(
                     $this->module->l(
                         'The fee has to be entered in the shops default currency. Current default currency: %s'),
-                    $defaultCurrency['sign']),
+                    $defaultCurrency['iso_code']),
                 'name' => 'fee_fixed',
                 'col' => 3
             ),
