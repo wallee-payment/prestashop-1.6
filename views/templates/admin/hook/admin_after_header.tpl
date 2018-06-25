@@ -10,9 +10,11 @@
 	<li id="wallee_manual_notifs" class="dropdown" data-type="wallee_manual_messages">	
 		<a href="javascript:void(0);" class="dropdown-toggle notifs" data-toggle="dropdown">
 			<i class="icon-bullhorn"></i>
-				<span id="wallee_manual_messages_notif_number_wrapper" class="notifs_badge">
-					<span id="wallee_manual_messages_notif_value">{$manualTotal}</span>
-				</span>
+				{if $manualTotal > 0}
+					<span id="wallee_manual_messages_notif_number_wrapper" class="notifs_badge">
+						<span id="wallee_manual_messages_notif_value">{$manualTotal}</span>
+					</span>
+				{/if}
 		</a>
 		<div class="dropdown-menu notifs_dropdown">
 			<section id="wallee_manual_messages_notif_number_wrapper" class="notifs_panel">
@@ -20,6 +22,7 @@
 					<h3>Manual Tasks</h3>
 				</div>
 				<div id="list_wallee_manual_messages_notif" class="list_notif">
+					{if $manualTotal > 0}
 					<a href="{$manualUrl|escape:'html':'UTF-8'}" target="_blank">
 						<p>{if $manualTotal > 1}
 							{l s='There are %s manual tasks that need your attention.' sprintf=$manualTotal mod='wallee'}
@@ -28,7 +31,11 @@
 						{/if}
 						</p>
 					</a>
-					
+					{else}
+						<p>
+						{l s='There are no manual tasks.' mod='wallee'}
+						</p>
+					{/if}
 				</div>
 			</section>
 		</div>

@@ -27,7 +27,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
         parent::initContent();
         $methodId = Tools::getValue('methodId', null);
         if ($methodId == null) {
-            $this->context->cookie->wle_error = $this->module->l("There was a technical issue, please try again.");
+            $this->context->cookie->wle_error = $this->module->l('There was a technical issue, please try again.');
             Tools::redirect('index.php?controller=order&step=3');
         }        
         $cart = $this->context->cart;
@@ -42,7 +42,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
         $methodConfiguration = new Wallee_Model_MethodConfiguration($methodId);
         
         if (! $methodConfiguration->isActive() || $methodConfiguration->getSpaceId() != $spaceId) {
-            $this->context->cookie->wle_error = $this->module->l("This payment method is no longer available, please try another one.");
+            $this->context->cookie->wle_error = $this->module->l('This payment method is no longer available, please try another one.');
             Tools::redirect($this->context->link->getPageLink('order', true, NULL, "step=3"));
         }
 
@@ -57,7 +57,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
         try {
             $jsUrl = Wallee_Service_Transaction::instance()->getJavascriptUrl($cart);
         } catch (Exception $e) {
-            $this->context->cookie->wle_error = $this->module->l("There was a technical issue, please try again.");
+            $this->context->cookie->wle_error = $this->module->l('There was a technical issue, please try again.');
             Tools::redirect('index.php?controller=order&step=3');
         }
         

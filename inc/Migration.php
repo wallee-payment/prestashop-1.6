@@ -19,7 +19,8 @@ class Wallee_Migration extends Wallee_AbstractMigration{
         return array(
             '1.0.0' => 'initializeTables',
             '1.0.1' => 'orderStatusUpdate',
-            '1.0.2' => 'tokenInfoImproved'
+            '1.0.2' => 'tokenInfoImproved',
+            '1.0.3' => 'updateImageBase'
         );
     }
     

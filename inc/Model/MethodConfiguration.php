@@ -38,6 +38,8 @@ class Wallee_Model_MethodConfiguration extends ObjectModel
     public $description;
 
     public $image;
+    
+    public $image_base;
 
     public $sort_order;
 
@@ -106,7 +108,12 @@ class Wallee_Model_MethodConfiguration extends ObjectModel
             'image' => array(
                 'type' => self::TYPE_STRING,
                 'validate' => 'isAnything',
-                'size' => 1024
+                'size' => 2047
+            ),
+            'image_base' => array(
+                'type' => self::TYPE_STRING,
+                'validate' => 'isAnything',
+                'size' => 2047
             ),
             'sort_order' => array(
                 'type' => self::TYPE_INT,
@@ -242,6 +249,17 @@ class Wallee_Model_MethodConfiguration extends ObjectModel
         $this->image = $image;
     }
 
+    
+    public function getImageBase()
+    {
+        return $this->image_base;
+    }
+    
+    public function setImageBase($imageBase)
+    {
+        $this->image_base = $imageBase;
+    }
+    
     public function getSortOrder()
     {
         return $this->sort_order;

@@ -265,5 +265,19 @@ abstract class Wallee_AbstractMigration
             throw new Exception(DB::getMsgError());
         }       
     }
+    
+    protected static function updateImageBase(){
+        $result = Db::getInstance()->execute(
+            "ALTER TABLE `" . _DB_PREFIX_ . "wle_method_configuration` ADD COLUMN `image_base` varchar(2047) COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER image;");
+        if ($result === false) {
+            throw new Exception(DB::getMsgError());
+        }
+        
+        $result = Db::getInstance()->execute(
+            "ALTER TABLE `" . _DB_PREFIX_ . "wle_transaction_info` ADD COLUMN `image_base` VARCHAR(2047)  COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER image;");        
+        if ($result === false) {
+            throw new Exception(DB::getMsgError());
+        }
+    }
 }
 

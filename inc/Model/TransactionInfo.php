@@ -32,6 +32,8 @@ class Wallee_Model_TransactionInfo extends ObjectModel
     public $authorization_amount;
 
     public $image;
+    
+    public $image_base;
 
     public $labels;
     
@@ -97,7 +99,12 @@ class Wallee_Model_TransactionInfo extends ObjectModel
             'image' => array(
                 'type' => self::TYPE_STRING,
                 'validate' => 'isAnything',
-                'size' => 512
+                'size' => 2047
+            ),
+            'image_base' => array(
+                'type' => self::TYPE_STRING,
+                'validate' => 'isAnything',
+                'size' => 2047
             ),
             'labels' => array(
                 'type' => self::TYPE_STRING,
@@ -207,6 +214,16 @@ class Wallee_Model_TransactionInfo extends ObjectModel
     
     public function setImage($image){
         $this->image = $image;
+    }
+    
+    public function getImageBase()
+    {
+        return $this->image_base;
+    }
+    
+    public function setImageBase($imageBase)
+    {
+        $this->image_base = $imageBase;
     }
     
     public function getLabels(){

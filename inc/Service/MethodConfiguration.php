@@ -35,6 +35,7 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
                 $entity->setTitle($configuration->getResolvedTitle());
                 $entity->setDescription($configuration->getResolvedDescription());
                 $entity->setImage($this->getResourcePath($configuration->getResolvedImageUrl()));
+                $entity->setImageBase($this->getResourceBase($configuration->getResolvedImageUrl()));
                 $entity->setSortOrder($configuration->getSortOrder());
                 $entity->save();
             }
@@ -68,7 +69,12 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
         $image = $this->getResourcePath($configuration->getResolvedImageUrl());
         if ($image != $entity->getImage()) {
             return true;
-        }       
+        }   
+        
+        $imageBase = $this->getResourceBase($configuration->getResolvedImageUrl());
+        if ($imageBase != $entity->getImageBase()) {
+            return true;
+        } 
         
         return false;
     }
@@ -94,11 +100,9 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
                 if(!array_key_exists($spaceId, $spaceIdCache)){
                     $spaceIdCache[$spaceId] = $paymentMethodConfigurationService->search($spaceId,
                         new \Wallee\Sdk\Model\EntityQuery());
-                }
-                
+                }                
                 $configurations = $spaceIdCache[$spaceId];
-                foreach ($configurations as $configuration) {
-                    
+                foreach ($configurations as $configuration) {                    
                     $method = Wallee_Model_MethodConfiguration::loadByConfigurationAndShop($spaceId, $configuration->getId(), $shopId);
                     if ($method->getId() !== null) {
                         $existingFound[] = $method->getId();
@@ -111,6 +115,7 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
                     $method->setTitle($configuration->getResolvedTitle());
                     $method->setDescription($configuration->getResolvedDescription());
                     $method->setImage($this->getResourcePath($configuration->getResolvedImageUrl()));
+                    $method->setImageBase($this->getResourceBase($configuration->getResolvedImageUrl()));
                     $method->setSortOrder($configuration->getSortOrder());
                     $method->save();
                 }

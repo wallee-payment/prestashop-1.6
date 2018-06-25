@@ -34,7 +34,7 @@ class Wallee_Service_TransactionVoid extends Wallee_Service_Abstract
             $transactionInfo = Wallee_Helper::getTransactionInfoForOrder($order);
             if ($transactionInfo === null) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction'));
+                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction.'));
             }
            
             Wallee_Helper::lockByTransactionId($transactionInfo->getSpaceId(), $transactionInfo->getTransactionId());
@@ -95,7 +95,7 @@ class Wallee_Service_TransactionVoid extends Wallee_Service_Abstract
             $voidJob->setFailureReason(
                 array(
                     'en-US' => sprintf(
-                        Wallee_Helper::getModuleInstance()->l("Could not send the completion to %s. Error: %s"), 'wallee',
+                        Wallee_Helper::getModuleInstance()->l('Could not send the void to %s. Error: %s'), 'wallee',
                         Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $voidJob->setState(Wallee_Model_VoidJob::STATE_FAILURE);

@@ -57,12 +57,12 @@ class Wallee_Webhook_DeliveryIndication extends Wallee_Webhook_OrderRelatedAbstr
     protected function review(Order $sourceOrder)
     {
         Wallee::startRecordingMailMessages();
-        $manualStatus = Wallee_OrderStatus::getManualOrderStatus();
+        $manualStatusId = Configuration::get(Wallee::CK_STATUS_MANUAL);
         Wallee_Helper::updateOrderMeta($sourceOrder, 'manual_check', true);
         $orders = $sourceOrder->getBrother();
         $orders[] = $sourceOrder;
         foreach ($orders as $order) {
-            $order->setCurrentState($manualStatus->id);
+            $order->setCurrentState($manualStatusId);
             $order->save();
         }
         Wallee::stopRecordingMailMessages();

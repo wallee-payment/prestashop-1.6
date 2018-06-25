@@ -200,6 +200,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                     ->getPaymentMethodConfiguration()
                     ->getPaymentMethod() : null);
         $info->setImage($this->getResourcePath($this->getPaymentMethodImage($transaction, $order)));
+        $info->setImageBase($this->getResourceBase($this->getPaymentMethodImage($transaction, $order)));
         $info->setLabels($this->getTransactionLabels($transaction));
         if ($transaction->getState() == \Wallee\Sdk\Model\TransactionState::FAILED ||
              $transaction->getState() == \Wallee\Sdk\Model\TransactionState::DECLINE) {
@@ -209,6 +210,9 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                 $info->setFailureReason(
                     $failedChargeAttempt->getFailureReason()
                         ->getDescription());
+            }
+            else if($transaction->getFailureReason() != null){
+                $info->setFailureReason($transaction->getFailureReason()->getDescription());
             }
         }
         $info->save();
@@ -272,11 +276,11 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
     protected function getPaymentMethodImage(\Wallee\Sdk\Model\Transaction $transaction, Order $order)
     {
         if ($transaction->getPaymentConnectorConfiguration() == null) {
-            $moduleName = $order->modue;
+            $moduleName = $order->module;
             if ($moduleName == "wallee") {
                 $id = Wallee_Helper::getOrderMeta($order, 'walleeMethodId');
                 $methodConfiguration = new Wallee_Model_MethodConfiguration($id);
-                return $methodConfiguration->getImage();
+                return Wallee_Helper::getResourceUrl($methodConfiguration->getImageBase(), $methodConfiguration->getImage());
             }
             return null;
         }
@@ -318,7 +322,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $ids = Wallee_Helper::getCartMeta($cart, 'mappingIds');
         $transaction = $this->getTransaction($ids['spaceId'], $ids['transactionId']);
         if($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING){
-            throw new Exception(Wallee_Helper::getModuleInstance()->l("The transaction timed out, please try again."));
+            throw new Exception(Wallee_Helper::getModuleInstance()->l('The transaction timed out, please try again.'));
         }
     }
 
@@ -342,7 +346,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                     $ids['transactionId']);
                 
                 if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING) {
-                    throw new Exception(Wallee_Helper::getModuleInstance()->l("The checkout expired, please try again"));
+                    throw new Exception(Wallee_Helper::getModuleInstance()->l('The checkout expired, please try again.'));
                 }
                 $pendingTransaction = new \Wallee\Sdk\Model\TransactionPending();
                 $pendingTransaction->setId($transaction->getId());

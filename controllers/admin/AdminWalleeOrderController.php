@@ -33,8 +33,7 @@ class AdminWalleeOrderController extends ModuleAdminController
             echo Tools::jsonEncode(
                 array(
                     'success' => 'false',
-                    'message' => $this->module->l(
-                        'You do not have permission to edit the order.')
+                    'message' => $this->module->l('You do not have permission to edit the order.')
                 ));
             die();
         }
@@ -80,8 +79,7 @@ class AdminWalleeOrderController extends ModuleAdminController
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'true',
-                        'message' => $this->module->l(
-                            'The order is updated automatically once the void is processed.')
+                        'message' => $this->module->l('The order is updated automatically once the void is processed.')
                     ));
                 die();
             }
@@ -113,8 +111,7 @@ class AdminWalleeOrderController extends ModuleAdminController
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'true',
-                        'message' => $this->module->l(
-                            'The order is updated automatically once the completion is processed.')
+                        'message' => $this->module->l('The order is updated automatically once the completion is processed.')
                     ));
                 die();
             }

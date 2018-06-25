@@ -68,6 +68,19 @@ abstract class Wallee_Service_Abstract {
 	    return substr($resolvedUrl, $index + strlen('resource/'));
 	}
 	
+	/**
+	 * Returns the base part of the resolved url
+	 *
+	 * @param String $resolved_url
+	 * @return string
+	 */
+	protected function getResourceBase($resolvedUrl) {
+	    if(empty($resolvedUrl)){
+	        return $resolvedUrl;
+	    }
+	    $parts = parse_url($resolvedUrl);
+	    return $parts['scheme']."://".$parts['host']."/";
+	}
 
 	/**
 	 * Creates and returns a new entity filter.

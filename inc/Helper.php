@@ -27,7 +27,7 @@ class Wallee_Helper
         $url = Configuration::getGlobalValue(Wallee::CK_BASE_URL);
         
         if ($url) {
-            return $url;
+            return rtrim($url,'/');
         }
         return 'https://app-wallee.com';
     }
@@ -96,15 +96,14 @@ class Wallee_Helper
      */
     public static function lockByTransactionId($spaceId, $transactionId)
     {
-       
-        Db::getInstance()->execute(
+        Db::getInstance()->getLink()->query(
             'SELECT locked_at FROM ' . _DB_PREFIX_ .
             'wle_transaction_info WHERE transaction_id = "' . pSQL($transactionId) .
-            '" AND space_id = "' . psql($spaceId) . '" FOR UPDATE;', false);
+            '" AND space_id = "' . pSQL($spaceId) . '" FOR UPDATE;');
         
-        Db::getInstance()->execute('UPDATE ' . _DB_PREFIX_ .
+        Db::getInstance()->getLink()->query('UPDATE ' . _DB_PREFIX_ .
             'wle_transaction_info SET locked_at = "'.pSQL(date('Y-m-d H:i:s')).'" WHERE transaction_id = "' . pSQL($transactionId) .
-            '" AND space_id = "' . psql($spaceId) . '";', false);
+            '" AND space_id = "' . pSQL($spaceId) . '";');
     }
 
     /**
@@ -338,9 +337,14 @@ class Wallee_Helper
      * @param int $spaceViewId
      * @return string
      */
-    public static function getResourceUrl($path, $language = null, $spaceId = null, $spaceViewId = null)
+    public static function getResourceUrl($base, $path, $language = null, $spaceId = null, $spaceViewId = null)
     {
-        $url = self::getBaseGatewayUrl();
+        if(empty($base)){
+            $url = self::getBaseGatewayUrl();
+        }
+        else{
+            $url = $base;
+        }
         if (! empty($language)) {
             $url .= '/' . str_replace('_', '-', $language);
         }

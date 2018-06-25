@@ -33,7 +33,7 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
             $transactionInfo = Wallee_Helper::getTransactionInfoForOrder($order);
             if ($transactionInfo === null) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction'));
+                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction.'));
             }
            
             Wallee_Helper::lockByTransactionId($transactionInfo->getSpaceId(), $transactionInfo->getTransactionId());
@@ -108,7 +108,7 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
             $completionJob->setFailureReason(
                 array(
                     'en-US' => sprintf(
-                        Wallee_Helper::getModuleInstance()->l("Could not update the line items. Error: %s"),
+                        Wallee_Helper::getModuleInstance()->l('Could not update the line items. Error: %s'),
                         Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             
@@ -143,7 +143,7 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
             $completionJob->setFailureReason(
                 array(
                     'en-US' => sprintf(
-                        Wallee_Helper::getModuleInstance()->l("Could not send the completion to %s. Error: %s"), 'wallee',
+                        Wallee_Helper::getModuleInstance()->l('Could not send the completion to %s. Error: %s'), 'wallee',
                         Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $completionJob->setState(Wallee_Model_CompletionJob::STATE_FAILURE);

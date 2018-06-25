@@ -20,7 +20,7 @@
 	<td class="actions">
 		<div class="btn-group-action">
 			<div class="btn-group">
-				<a class=" btn btn-default" href={$link->getAdminLink('AdminWalleeMethodSettings')|escape:'htmlall':'UTF-8'}&method_id={$method.id} title="{l s='Configure'}"><i class="icon-wrench"></i> {l s='Configure'}</a>
+				<a class=" btn btn-default" href={$link->getAdminLink('AdminWalleeMethodSettings')|escape:'htmlall':'UTF-8'}&method_id={$method.id} title="{l s='Configure' mod='wallee'}"><i class="icon-wrench"></i> {l s='Configure' mod='wallee'}</a>
 			</div>
 		</div>
 	</td>

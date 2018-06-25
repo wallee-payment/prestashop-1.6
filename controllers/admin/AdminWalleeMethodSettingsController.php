@@ -88,8 +88,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         $shopContext = (! Shop::isFeatureActive() || Shop::getContext() == Shop::CONTEXT_SHOP);
         if (! $shopContext) {
             $this->displayWarning(
-                $this->module->l(
-                    'You have more than one shop and must select one to configure the payment methods.'));
+                $this->module->l('You have more than one shop and must select one to configure the payment methods.'));
             return;
         }
         $spaceId = Configuration::get(Wallee::CK_SPACE_ID);
@@ -106,7 +105,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             $methodConfigurations[] = array(
                 'id' => $method->getId(),
                 'configurationName' => $method->getConfigurationName(),
-                'imageUrl' => Wallee_Helper::getResourceUrl($method->getImage(),  Wallee_Helper::convertLanguageIdToIETF($this->context->language->id), $spaceId, $spaceViewId)
+                'imageUrl' => Wallee_Helper::getResourceUrl($method->getImageBase(), $method->getImage(),  Wallee_Helper::convertLanguageIdToIETF($this->context->language->id), $spaceId, $spaceViewId)
             );
         }
         
@@ -156,7 +155,6 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         $helper->module = $this->module;
         $helper->name_controller = 'AdminWalleeMethodSettings';
         $helper->token = Tools::getAdminTokenLite('AdminWalleeMethodSettings');
-        // $helper->currentIndex = AdminController::$currentIndex . '&method_id=' . $this->name . '&tab_module=' . $this->tab . '&module_name=' . $this->name;
         $helper->tpl_vars = array(
             'languages' => $this->context->controller->getLanguages(),
             'id_language' => $this->context->language->id
@@ -248,8 +246,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'type' => 'switch',
                 'label' => $this->module->l('Add tax'),
                 'name' => 'fee_add_tax',
-                'desc' => $this->module->l(
-                        'Should the tax amount be added after the computation or should the tax be included in the computed fee.'),
+                'desc' => $this->module->l('Should the tax amount be added after the computation or should the tax be included in the computed fee.'),
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -269,8 +266,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'type' => 'text',
                 'label' => $this->module->l('Fee Fixed'),
                 'desc' => sprintf(
-                    $this->module->l(
-                        'The fee has to be entered in the shops default currency. Current default currency: %s'),
+                    $this->module->l('The fee has to be entered in the shops default currency. Current default currency: %s'),
                     $defaultCurrency['iso_code']),
                 'name' => 'fee_fixed',
                 'col' => 3
@@ -278,8 +274,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             array(
                 'type' => 'text',
                 'label' => $this->module->l('Fee Rate'),
-                'desc' => $this->module->l(
-                        'The rate in percent'),
+                'desc' => $this->module->l('The rate in percent.'),
                 'name' => 'fee_rate',
                 'col' => 3
             ),
@@ -407,8 +402,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'type' => 'switch',
                 'label' => $this->module->l('Add tax'),
                 'name' => 'fee_add_tax',
-                'desc' => $this->module->l(
-                        'Should the tax amount be added after the computation or should the tax be included in the computed fee.'),
+                'desc' => $this->module->l('Should the tax amount be added after the computation or should the tax be included in the computed fee.'),
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -428,8 +422,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'type' => 'text',
                 'label' => $this->module->l('Fee Fixed'),
                 'desc' => sprintf(
-                    $this->module->l(
-                        'The fee has to be entered in the shops default currency. Current default currency: %s'),
+                    $this->module->l('The fee has to be entered in the shops default currency. Current default currency: %s'),
                     $defaultCurrency['iso_code']),
                 'name' => 'fee_fixed',
                 'col' => 3
@@ -437,8 +430,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             array(
                 'type' => 'text',
                 'label' => $this->module->l('Fee Rate'),
-                'desc' => $this->module->l(
-                        'The rate in percent'),
+                'desc' => $this->module->l('The rate in percent.'),
                 'name' => 'fee_rate',
                 'col' => 3
             ),

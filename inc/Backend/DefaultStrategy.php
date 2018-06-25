@@ -89,13 +89,11 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
             if ($amount == 0 && $shipping_cost_amount == 0) {
                 if (! empty($refunds)) {
                     throw new Exception(
-                        Wallee_Helper::getModuleInstance()->l(
-                            'Please enter a quantity to proceed with your refund.'));
+                        Wallee_Helper::getModuleInstance()->l('Please enter a quantity to proceed with your refund.'));
                 }
                 else {
                     throw new Exception(
-                        Wallee_Helper::getModuleInstance()->l(
-                            'Please enter an amount to proceed with your refund.'));
+                        Wallee_Helper::getModuleInstance()->l('Please enter an amount to proceed with your refund.'));
                 }
             }
             $choosen = false;
@@ -143,13 +141,11 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
             else {
                 if (! empty($refunds)) {
                     throw new Exception(
-                        Wallee_Helper::getModuleInstance()->l(
-                            'Please enter a quantity to proceed with your refund.'));
+                        Wallee_Helper::getModuleInstance()->l('Please enter a quantity to proceed with your refund.'));
                 }
                 else {
                     throw new Exception(
-                        Wallee_Helper::getModuleInstance()->l(
-                            'Please enter an amount to proceed with your refund.'));
+                        Wallee_Helper::getModuleInstance()->l('Please enter an amount to proceed with your refund.'));
                 }
             }
         }
@@ -239,15 +235,13 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
                         
                         if (! $qtyCancelProduct) {
                             throw new Exception(
-                                Wallee_Helper::getModuleInstance()->l(
-                                    'No quantity has been selected for this product.'));
+                                Wallee_Helper::getModuleInstance()->l('No quantity has been selected for this product.'));
                         }
                         
                         if ($qtyCancelProduct > ($customization_quantity['quantity'] - ($customization_quantity['quantity_refunded'] +
                              $customization_quantity['quantity_returned']))) {
                             throw new Exception(
-                                Wallee_Helper::getModuleInstance()->l(
-                                    'An invalid quantity was selected for this product.'));
+                                Wallee_Helper::getModuleInstance()->l('An invalid quantity was selected for this product.'));
                         }
                     }
                 }
@@ -675,8 +669,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
                 if (! $order->deleteProduct($order, $order_detail, $qty_cancel_product)) {
                     throw new Exception(
                         sprintf(
-                            Wallee_Helper::getModuleInstance()->l(
-                                'An error occurred while attempting to delete the product. %s'),
+                            Wallee_Helper::getModuleInstance()->l('An error occurred while attempting to delete the product. %s'),
                             ' <span class="bold">' . $order_detail->product_name . '</span>'));
                 }
                 // Update weight SUM
@@ -709,8 +702,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
                     $order_detail)) {
                     throw new Exception(
                         sprintf(
-                            Wallee_Helper::getModuleInstance()->l(
-                                'An error occurred while attempting to delete product customization. %d'),
+                            Wallee_Helper::getModuleInstance()->l('An error occurred while attempting to delete product customization. %d'),
                             $id_customization));
                 }
             }
@@ -861,8 +853,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
             Wallee_Helper::rollbackDBTransaction();
             throw new Exception(
                 sprintf(
-                    Wallee_Helper::getModuleInstance()->l(
-                        'Could not load the coresponding transaction for order with id %d'),
+                    Wallee_Helper::getModuleInstance()->l('Could not load the coresponding transaction for order with id %d'),
                     $order->id));
         }
         Wallee_Helper::lockByTransactionId($transactionInfo->getSpaceId(),
@@ -885,8 +876,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
             Wallee_Helper::rollbackDBTransaction();
             throw new Exception(
                 sprintf(
-                    Wallee_Helper::getModuleInstance()->l(
-                        'Could not update the line items at %s. Reason: %s'), 'wallee',
+                    Wallee_Helper::getModuleInstance()->l('Could not update the line items at %s. Reason: %s'), 'wallee',
                     Wallee_Helper::cleanExceptionMessage($e->getMessage())));
         }
         Wallee_Helper::commitDBTransaction();
@@ -1004,8 +994,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
             if (! $transactionInfo) {
                 Wallee_Helper::rollbackDBTransaction();
                 throw new Exception(sprintf(
-                    Wallee_Helper::getModuleInstance()->l(
-                        'Could not load the coresponding transaction for order with id %d'),
+                    Wallee_Helper::getModuleInstance()->l('Could not load the coresponding transaction for order with id %d.'),
                     $order->id));
             }
             Wallee_Helper::lockByTransactionId($transactionInfo->getSpaceId(),
@@ -1013,7 +1002,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
             if ($transactionInfo->getState() != \Wallee\Sdk\Model\TransactionState::AUTHORIZED) {
                 Wallee_Helper::rollbackDBTransaction();
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('The line items for this order can not be changed'));
+                    Wallee_Helper::getModuleInstance()->l('The line items for this order can not be changed.'));
             }
             try {
                 $orders = $order->getBrother()->getResults();
@@ -1027,8 +1016,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
                 Wallee_Helper::rollbackDBTransaction();
                 throw new Exception(
                 sprintf(
-                    Wallee_Helper::getModuleInstance()->l(
-                        'Could not update the line items at %s. Reason: %s'), 'wallee',
+                    Wallee_Helper::getModuleInstance()->l('Could not update the line items at %s. Reason: %s'), 'wallee',
                     Wallee_Helper::cleanExceptionMessage($e->getMessage())));
             }
         }

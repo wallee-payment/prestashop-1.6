@@ -78,8 +78,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             
             if (Wallee_Model_RefundJob::isRefundRunningForTransaction($spaceId, $transactionId)) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l(
-                        'Please wait until the existing refund is processed.'));
+                    Wallee_Helper::getModuleInstance()->l('Please wait until the existing refund is processed.'));
             }
             $strategy = Wallee_Backend_StrategyProvider::getStrategy();
             
@@ -130,7 +129,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             $refundJob->setFailureReason(
                 array(
                     'en-US' => sprintf(
-                        Wallee_Helper::getModuleInstance()->l("Could not send the refund to %s. Error: %s"), 'wallee',
+                        Wallee_Helper::getModuleInstance()->l('Could not send the refund to %s. Error: %s'), 'wallee',
                         Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $refundJob->setState(Wallee_Model_RefundJob::STATE_FAILURE);
@@ -178,7 +177,6 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
                 $refundJob->setFailureReason(
                     array(
                         'en-US' => sprintf(
-                            Wallee_Helper::getModuleInstance()->l("Could not apply refund in shop. Error: %s"),
                             $e->getMessage())
                     ));
             }

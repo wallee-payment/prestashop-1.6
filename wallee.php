@@ -12,7 +12,7 @@ if (! defined('_PS_VERSION_')) {
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
-define('WALLEE_VERSION', '1.0.4');
+define('WALLEE_VERSION', '1.0.5');
 
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee_autoloader.php');
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee-sdk' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -94,6 +94,7 @@ class Wallee extends Wallee_AbstractModule
         $output .= $this->handleSaveFeeItem();
         $output .= $this->handleSaveDownload();
         $output .= $this->handleSaveOrderStatus();
+        $output .= $this->displayHelpButtons();
         return $output . $this->displayForm();
     }
     
@@ -111,8 +112,7 @@ class Wallee extends Wallee_AbstractModule
             }
             else {
                 $output .= $this->displayError(
-                    $this->l(
-                        'You can not store the configuration for all Shops or a Shop Group.'));
+                    $this->l('You can not store the configuration for all Shops or a Shop Group.'));
             }
         }
         return $output;
@@ -168,8 +168,7 @@ class Wallee extends Wallee_AbstractModule
                         'label' => $this->l('Hide')
                     )
                 ),
-                'desc' => $this->l(
-                    'Should a cart summary be shown on the payment details input page.'),
+                'desc' => $this->l('Should a cart summary be shown on the payment details input page.'),
                 'lang' => false
             ),
             array(
@@ -189,8 +188,7 @@ class Wallee extends Wallee_AbstractModule
                         'label' => $this->l('Hide')
                     )
                 ),
-                'desc' => $this->l(
-                    'Should the Terms of Service be shown and checked on the payment details input page.'),
+                'desc' => $this->l('Should the Terms of Service be shown and checked on the payment details input page.'),
                 'lang' => false
             ),
             array(
@@ -210,8 +208,7 @@ class Wallee extends Wallee_AbstractModule
                         'label' => $this->l('Remove')
                     )
                 ),
-                'desc' => $this->l(
-                    'Should the default Terms of Service be removed during the checkout. CAUTION: This option will remove the ToS for all payment methods.'),
+                'desc' => $this->l('Should the default Terms of Service be removed during the checkout. CAUTION: This option will remove the ToS for all payment methods.'),
                 'lang' => false
             )
         );

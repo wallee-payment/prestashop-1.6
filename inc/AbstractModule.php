@@ -247,15 +247,19 @@ abstract class Wallee_AbstractModule extends PaymentModule
     }
 
     abstract public function getContent();
+    
+    
+    protected function displayHelpButtons(){
+        return $this->display(dirname(__DIR__), 'views/templates/admin/admin_help_buttons.tpl');
+    }
 
     protected function getMailHookActiveWarning()
     {
         $output = "";
         if (! Module::isInstalled('mailhook') || ! Module::isEnabled('mailhook')) {
-            $error = "<b>" . $this->l("The module 'Mail Hook' is not active.") . "</b>";
+            $error = "<b>" . $this->l('The module "Mail Hook" is not active.') . "</b>";
             $error .= "<br/>";
-            $error .= $this->l(
-                "This module is recommend for handling the shop emails. Otherwise the mail sending behavior may be inappropriate.");
+            $error .= $this->l('This module is recommend for handling the shop emails. Otherwise the mail sending behavior may be inappropriate.');
             $error .= "<br/>";
             $error .= sprintf($this->l('You can download the module %shere%s.'),
                 '<a href="https://github.com/wallee-payment/prestashop-mailhook/releases" target="_blank">',
@@ -385,8 +389,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             }
             else {
                 $output .= $this->displayError(
-                    $this->l(
-                        'You can not store the configuration for all Shops or a Shop Group.'));
+                    $this->l('You can not store the configuration for all Shops or a Shop Group.'));
             }
         }
         return $output;
@@ -403,8 +406,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             }
             else {
                 $output .= $this->displayError(
-                    $this->l(
-                        'You can not store the configuration for all Shops or a Shop Group.'));
+                    $this->l('You can not store the configuration for all Shops or a Shop Group.'));
             }
        
         }
@@ -423,8 +425,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             }
             else {
                     $output .= $this->displayError(
-                        $this->l(
-                            'You can not store the configuration for all Shops or a Shop Group.'));
+                        $this->l('You can not store the configuration for all Shops or a Shop Group.'));
             }
            
         }
@@ -446,8 +447,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
             }else {
                     $output .= $this->displayError(
-                        $this->l(
-                            'You can not store the configuration for all Shops or a Shop Group.'));
+                        $this->l('You can not store the configuration for all Shops or a Shop Group.'));
             }
         }
         return $output;
@@ -586,6 +586,16 @@ abstract class Wallee_AbstractModule extends PaymentModule
                 $buttons = array();
             }
         }
+        else{
+            array_unshift($buttons,
+                array(
+                    'title' => $this->l('Save All'),
+                    'class' => 'pull-right',
+                    'type' => 'input',
+                    'icon' => 'process-icon-save',
+                    'name' => 'submit' . $this->name . '_all'
+            ));
+        }
         $fieldsForm = array();
         // General Settings
         $fieldsForm[]['form'] = array(
@@ -701,15 +711,14 @@ abstract class Wallee_AbstractModule extends PaymentModule
         array_unshift($products,
             array(
                 'id_product' => '-1',
-                'name' => $this->l('None (disables payment fees')
+                'name' => $this->l('None (disables payment fees)')
             ));
         
         $feeItemConfig = array(
             array(
                 'type' => 'select',
                 'label' => $this->l('Payment Fee Product'),
-                'desc' => $this->l(
-                    'Select the product that should be inserted into the cart as a payment fee.'),
+                'desc' => $this->l('Select the product that should be inserted into the cart as a payment fee.'),
                 'name' => self::CK_FEE_ITEM,
                 'options' => array(
                     'query' => $products,
@@ -843,8 +852,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             array(
                 'type' => 'select',
                 'label' => $this->l('Failed Status'),
-                'desc' => $this->l(
-                    'Status the order enters when the transaction is in the wallee failed status.'),
+                'desc' => $this->l('Status the order enters when the transaction is in the failed status.'),
                 'name' => self::CK_STATUS_FAILED,
                 'options' => array(
                     'query' => $orderStates,
@@ -855,8 +863,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             array(
                 'type' => 'select',
                 'label' => $this->l('Authorized Status'),
-                'desc' => $this->l(
-                    'Status the order enters when the transaction is in the wallee authorized status.'),
+                'desc' => $this->l('Status the order enters when the transaction is in the authorized status.'),
                 'name' => self::CK_STATUS_AUTHORIZED,
                 'options' => array(
                     'query' => $orderStates,
@@ -867,8 +874,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             array(
                 'type' => 'select',
                 'label' => $this->l('Voided Status'),
-                'desc' => $this->l(
-                    'Status the order enters when the transaction is in the wallee voided status'),
+                'desc' =>  $this->l('Status the order enters when the transaction is in the voided status.'),
                 'name' => self::CK_STATUS_VOIDED,
                 'options' => array(
                     'query' => $orderStates,
@@ -879,8 +885,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             array(
                 'type' => 'select',
                 'label' => $this->l('Waiting Status'),
-                'desc' => $this->l(
-                    'Status the order enters when the transaction is in the wallee completed status and the delivery indication is in a pending state.'),
+                'desc' => $this->l('Status the order enters when the transaction is in the completed status and the delivery indication is in a pending state.'),
                 'name' => self::CK_STATUS_COMPLETED,
                 'options' => array(
                     'query' => $orderStates,
@@ -891,8 +896,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             array(
                 'type' => 'select',
                 'label' => $this->l('Manual  Status'),
-                'desc' => $this->l(
-                    'Status the order enters when the transaction is in the wallee completed status and the delivery indication requires a manual decision.'),
+                'desc' => $this->l('Status the order enters when the transaction is in the completed status and the delivery indication requires a manual decision.'),
                 'name' => self::CK_STATUS_MANUAL,
                 'options' => array(
                     'query' => $orderStates,
@@ -903,8 +907,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             array(
                 'type' => 'select',
                 'label' => $this->l('Decline  Status'),
-                'desc' => $this->l(
-                    'Status the order enters when the transaction is in the wallee declined status.'),
+                'desc' => $this->l('Status the order enters when the transaction is in the declined status.'),
                 'name' => self::CK_STATUS_DECLINED,
                 'options' => array(
                     'query' => $orderStates,
@@ -915,8 +918,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
             array(
                 'type' => 'select',
                 'label' => $this->l('Fulfill  Status'),
-                'desc' => $this->l(
-                    'Status the order enters when the transaction is in the wallee fulfill status.'),
+                'desc' => $this->l('Status the order enters when the transaction is in the fulfill status.'),
                 'name' => self::CK_STATUS_FULFILL,
                 'options' => array(
                     'query' => $orderStates,
@@ -988,7 +990,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
         }
         catch (Exception $e) {
             PrestaShopLogger::addLog($e->getMessage(), 2, null, null, false);
-            $errors[] = $this->l('Installation of the webhooks failed.');
+            $errors[] = $this->l('Installation of the webhooks failed, please check if the feature is active in your space.');
         }
         try {
             Wallee_Service_ManualTask::instance()->update();
@@ -998,7 +1000,10 @@ abstract class Wallee_AbstractModule extends PaymentModule
             $errors[] = $this->l('Update of Manual Tasks failed.');
         }
         $this->deleteCachedEntries();
-        return implode(" ", $errors);
+        if( empty(!$errors)){
+            return $this->l('Please check your credentials and grant the application user the necessary rights (Account Admin) for your space.').' '.implode(" ", $errors);
+        }
+        return "";
     }
 
     protected function deleteCachedEntries()
@@ -1039,6 +1044,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
         $parameters['name'] = $name;
         if (! empty($methodConfiguration->getImage()) && $methodConfiguration->isShowImage()) {
             $parameters['image'] = Wallee_Helper::getResourceUrl(
+                $methodConfiguration->getImageBase(),
                 $methodConfiguration->getImage(),
                 Wallee_Helper::convertLanguageIdToIETF($cart->id_lang), $spaceId,
                 $spaceViewId);
@@ -1103,119 +1109,127 @@ abstract class Wallee_AbstractModule extends PaymentModule
         $dont_touch_amount = false, $secure_key = false, Shop $shop = null)
     {
         if ($this->active) {
-            $originalCart = new Cart($id_cart);
-            
-            // If transaction is no longer pending we stop here and the customer has to go through the checkout again
-            Wallee_Service_Transaction::instance()->checkTransactionPending(
-                $originalCart);
-            $rs = $originalCart->duplicate();
-            if (! isset($rs['success']) || ! isset($rs['cart'])) {
-                $error = 'The cart duplication failed. May be some module prevents it.';
-                PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', intval($this->id));
-                throw new Exception("There was a techincal issue, please try again.");
-            }
-            $cart = $rs['cart'];
-            if (! ($cart instanceof Cart)) {
-                $error = 'The duplicated cart is not of type "Cart".';
-                PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', intval($this->id));
-                throw new Exception("There was a techincal issue, please try again.");
-            }
-            foreach ($originalCart->getCartRules() as $rule) {
-                $ruleObject = $rule['obj'];
-                // Because free gift cart rules adds a product to the order, the product is already in the duplicated order,
-                // before we can add the cart rule to the new cart we have to remove the existing gift.
-                if ((int) $ruleObject->gift_product) { // We use the same check as the shop, to get the gift product
-                    $cart->updateQty(1, $ruleObject->gift_product,
-                        $ruleObject->gift_product_attribute, false, 'down', 0, null, false);
+            Wallee_Helper::startDBTransaction();
+            try{
+                $originalCart = new Cart($id_cart);
+                
+                // If transaction is no longer pending we stop here and the customer has to go through the checkout again
+                Wallee_Service_Transaction::instance()->checkTransactionPending(
+                    $originalCart);
+                $rs = $originalCart->duplicate();
+                if (! isset($rs['success']) || ! isset($rs['cart'])) {
+                    $error = 'The cart duplication failed. May be some module prevents it.';
+                    PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', intval($this->id));
+                    throw new Exception("There was a techincal issue, please try again.");
                 }
-                $cart->addCartRule($ruleObject->id);
+                $cart = $rs['cart'];
+                if (! ($cart instanceof Cart)) {
+                    $error = 'The duplicated cart is not of type "Cart".';
+                    PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', intval($this->id));
+                    throw new Exception("There was a techincal issue, please try again.");
+                }
+                foreach ($originalCart->getCartRules() as $rule) {
+                    $ruleObject = $rule['obj'];
+                    // Because free gift cart rules adds a product to the order, the product is already in the duplicated order,
+                    // before we can add the cart rule to the new cart we have to remove the existing gift.
+                    if ((int) $ruleObject->gift_product) { // We use the same check as the shop, to get the gift product
+                        $cart->updateQty(1, $ruleObject->gift_product,
+                            $ruleObject->gift_product_attribute, false, 'down', 0, null, false);
+                    }
+                    $cart->addCartRule($ruleObject->id);
+                }
+                // Update customizations
+                $customizationCollection = new PrestaShopCollection('Customization');
+                $customizationCollection->where('id_cart', '=', (int) $cart->id);
+                foreach ($customizationCollection->getResults() as $customization) {
+                    $customization->id_address_delivery = $cart->id_address_delivery;
+                    $customization->save();
+                }
+                
+                // Updated all specific Prices to the duplicated cart
+                $specificPriceCollection = new PrestaShopCollection('SpecificPrice');
+                $specificPriceCollection->where('id_cart', '=', (int) $id_cart);
+                foreach ($specificPriceCollection->getResults() as $specificPrice) {
+                    $specificPrice->id_cart = $cart->id;
+                    $specificPrice->save();
+                }
+                
+                $methodConfiguration = null;
+                if (strpos($payment_method, "wallee_") === 0) {
+                    $id = substr($payment_method, strpos($payment_method, "_") + 1);
+                    $methodConfiguration = new Wallee_Model_MethodConfiguration($id);
+                }
+                
+                if ($methodConfiguration == null || $methodConfiguration->getId() == null ||
+                     $methodConfiguration->getState() !=
+                     Wallee_Model_MethodConfiguration::STATE_ACTIVE || $methodConfiguration->getSpaceId() !=
+                     Configuration::get(self::CK_SPACE_ID, null, null, $cart->id_shop)) {
+                    $error = 'Wallee method configuration called with wrong payment method configuration. Method: ' .
+                     $payment_method;
+                    PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', intval($this->id));
+                    throw new Exception("There was a techincal issue, please try again.");
+                }
+                
+                $title = $methodConfiguration->getConfigurationName();
+                $translatedTitel = Wallee_Helper::translate($methodConfiguration->getTitle(),
+                    $cart->id_lang);
+                if ($translatedTitel !== null) {
+                    $title = $translatedTitel;
+                }
+                
+                Wallee::startRecordingMailMessages();
+                parent::validateOrder((int) $cart->id, $id_order_state, (float) $amount_paid, $title,
+                    $message, $extra_vars, $currency_special, $dont_touch_amount, $secure_key, $shop);
+                
+                $lastOrderId = $this->currentOrder;
+                $dataOrder = new Order($lastOrderId);
+                $orders = $dataOrder->getBrother()->getResults();
+                $orders[] = $dataOrder;
+                foreach ($orders as $order) {
+                    Wallee_Helper::updateOrderMeta($order, 'walleeMethodId',
+                        $methodConfiguration->getId());
+                    Wallee_Helper::updateOrderMeta($order,
+                        'walleeMainOrderId', $dataOrder->id);
+                    $order->save();
+                }
+                $emailMessages = Wallee::stopRecordingMailMessages();
+                
+                // Update cart <-> wallee mapping <-> order mapping
+                $ids = Wallee_Helper::getCartMeta($originalCart, 'mappingIds');
+                Wallee_Helper::updateOrderMeta($dataOrder, 'mappingIds', $ids);
+                if (Configuration::get(self::CK_MAIL, null, null, $cart->id_shop)) {
+                    Wallee_Helper::storeOrderEmails($dataOrder, $emailMessages);
+                }
+                Wallee_Helper::updateOrderMeta($dataOrder, 'originalCart', $originalCart->id);
+                Wallee_Helper::commitDBTransaction();
             }
-            // Update customizations
-            $customizationCollection = new PrestaShopCollection('Customization');
-            $customizationCollection->where('id_cart', '=', (int) $cart->id);
-            foreach ($customizationCollection->getResults() as $customization) {
-                $customization->id_address_delivery = $cart->id_address_delivery;
-                $customization->save();
+            catch(Exception $e){
+                Wallee_Helper::rollbackDBTransaction();
+                throw $e;
             }
-            
-            // Updated all specific Prices to the duplicated cart
-            $specificPriceCollection = new PrestaShopCollection('SpecificPrice');
-            $specificPriceCollection->where('id_cart', '=', (int) $id_cart);
-            foreach ($specificPriceCollection->getResults() as $specificPrice) {
-                $specificPrice->id_cart = $cart->id;
-                $specificPrice->save();
-            }
-            
-            $methodConfiguration = null;
-            if (strpos($payment_method, "wallee_") === 0) {
-                $id = substr($payment_method, strpos($payment_method, "_") + 1);
-                $methodConfiguration = new Wallee_Model_MethodConfiguration($id);
-            }
-            
-            if ($methodConfiguration == null || $methodConfiguration->getId() == null ||
-                 $methodConfiguration->getState() !=
-                 Wallee_Model_MethodConfiguration::STATE_ACTIVE || $methodConfiguration->getSpaceId() !=
-                 Configuration::get(self::CK_SPACE_ID, null, null, $cart->id_shop)) {
-                $error = 'Wallee method configuration called with wrong payment method configuration. Method: ' .
-                 $payment_method;
-                PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', intval($this->id));
-                throw new Exception("There was a techincal issue, please try again.");
-            }
-            
-            $title = $methodConfiguration->getConfigurationName();
-            $translatedTitel = Wallee_Helper::translate($methodConfiguration->getTitle(),
-                $cart->id_lang);
-            if ($translatedTitel !== null) {
-                $title = $translatedTitel;
-            }
-            
-            Wallee::startRecordingMailMessages();
-            parent::validateOrder((int) $cart->id, $id_order_state, (float) $amount_paid, $title,
-                $message, $extra_vars, $currency_special, $dont_touch_amount, $secure_key, $shop);
-            
-            $lastOrderId = $this->currentOrder;
-            $dataOrder = new Order($lastOrderId);
-            $orders = $dataOrder->getBrother()->getResults();
-            $orders[] = $dataOrder;
-            foreach ($orders as $order) {
-                Wallee_Helper::updateOrderMeta($order, 'walleeMethodId',
-                    $methodConfiguration->getId());
-                Wallee_Helper::updateOrderMeta($order,
-                    'walleeMainOrderId', $dataOrder->id);
-                $order->save();
-            }
-            $emailMessages = Wallee::stopRecordingMailMessages();
-            
-            // Update cart <-> wallee mapping <-> order mapping
-            $ids = Wallee_Helper::getCartMeta($originalCart, 'mappingIds');
-            Wallee_Helper::updateOrderMeta($dataOrder, 'mappingIds', $ids);
-            if (Configuration::get(self::CK_MAIL, null, null, $cart->id_shop)) {
-                Wallee_Helper::storeOrderEmails($dataOrder, $emailMessages);
-            }
-            Wallee_Helper::updateOrderMeta($dataOrder, 'originalCart', $originalCart->id);
+                        
             try {
-                Wallee_Service_Transaction::instance()->confirmTransaction($dataOrder,
+                $transaction = Wallee_Service_Transaction::instance()->confirmTransaction($dataOrder,
                     $orders);
+                Wallee_Service_Transaction::instance()->updateTransactionInfo($transaction, $dataOrder);
             }
             catch (Exception $e) {
                 PrestaShopLogger::addLog($e->getMessage(), 3, null, null, false);
                 Wallee_Helper::deleteOrderEmails($dataOrder);
                 Wallee::startRecordingMailMessages();
-                $canceledStatusId = Configuration::get('PS_OS_CANCELED');
+                $canceledStatusId = Configuration::get(self::CK_STATUS_FAILED);
                 foreach ($orders as $order) {
                     $order->setCurrentState($canceledStatusId);
                     $order->save();
                 }
                 $emailMessages = Wallee::stopRecordingMailMessages();
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l(
-                        "There was a techincal issue, please try again."));
+                    Wallee_Helper::getModuleInstance()->l("There was a techincal issue, please try again."));
             }
         }
         else {
             throw new Exception(
-                Wallee_Helper::getModuleInstance()->l(
-                    "There was a techincal issue, please try again."));
+                Wallee_Helper::getModuleInstance()->l("There was a techincal issue, please try again."));
         }
     }
     
@@ -1500,8 +1514,8 @@ abstract class Wallee_AbstractModule extends PaymentModule
         $tplVars = array(
             'currency' => new Currency($order->id_currency),
             'configurationName' => $method->getConfigurationName(),
-            'methodImage' => Wallee_Helper::getResourceUrl($transactionInfo->getImage(),
-                Wallee_Helper::convertLanguageIdToIETF($order->id_lang), $spaceId,
+            'methodImage' => Wallee_Helper::getResourceUrl( $transactionInfo->getImageBase(),
+                $transactionInfo->getImage(),Wallee_Helper::convertLanguageIdToIETF($order->id_lang), $spaceId,
                 $transactionInfo->getSpaceViewId()),
             'transactionState' => Wallee_Helper::getTransactionState($transactionInfo),
             'failureReason' => Wallee_Helper::translate(
@@ -1743,8 +1757,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
                             'result' => false,
                             'error' => Tools::displayError(
                                 sprintf(
-                                    $this->l(
-                                        'Could not load the corresponding transaction for order with id %d'),
+                                    $this->l('Could not load the corresponding transaction for order with id %d.'),
                                     $order->id))
                         )));
             }
@@ -1756,7 +1769,7 @@ abstract class Wallee_AbstractModule extends PaymentModule
                         array(
                             'result' => false,
                             'error' => Tools::displayError(
-                                $this->l('The line items for this order can not be changed'))
+                                $this->l('The line items for this order can not be changed.'))
                         )));
             }
             
@@ -1771,9 +1784,8 @@ abstract class Wallee_AbstractModule extends PaymentModule
                         array(
                             'result' => false,
                             'error' => Tools::displayError(
-                                sprintf($this->l('Could not update the line items at %. Reason: %s'),
-                                    'wallee',
-                                    
+                                sprintf($this->l('Could not update the line items at %s. Reason: %s'),
+                                    'wallee',                                    
                                     Wallee_Helper::cleanExceptionMessage(
                                         $e->getMessage())))
                         )));

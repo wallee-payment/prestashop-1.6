@@ -33,7 +33,7 @@
     	<input type="hidden" name="cartHash" value="{$cartHash}" />
     	<input type="hidden" name="methodId" value="{$methodId}" />
     	<h3 class="page-subheading">
-                {$name}
+                <span style="font-size:smaller">{l s='Payment Method:' mod='wallee'}</span> {$name}
         </h3>
         <div id="wallee-method-configuration" class="wallee-method-configuration" style="display: none;"
 	data-method-id="{$methodId}" data-configuration-id="{$configurationId}"></div>
@@ -48,8 +48,8 @@
 				<div class="box">
 					<p class="checkbox">
 						<input type="checkbox" name="cgv" id="cgv" value="1" {if $checkedTOS}checked="checked"{/if}/>
-						<label for="cgv">{l s='I agree to the terms of service and will adhere to them unconditionally.'}</label>
-						<a href="{$linkConditions|escape:'html':'UTF-8'}" class="iframe" rel="nofollow">{l s='(Read the Terms of Service)'}</a>
+						<label for="cgv">{l s='I agree to the terms of service and will adhere to them unconditionally.' mod='wallee'}</label>
+						<a href="{$linkConditions|escape:'html':'UTF-8'}" class="iframe" rel="nofollow">{l s='(Read the Terms of Service)' mod='wallee'}</a>
 					</p>
 				</div>
 			{/if}

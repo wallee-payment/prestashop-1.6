@@ -27,4 +27,5 @@ class Wallee_VersionAdapter
     public static function clearCartRuleStaticCache(){
         
     }
+       
 }
