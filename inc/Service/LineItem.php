@@ -296,6 +296,7 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                 $items[] = $this->cleanLineItem($item);
             }
             $taxAddress = new Address((int) $order->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+            $shippingItem = null;
             // Add shipping costs
             $shippingCosts = floatval($order->total_shipping);
             $shippingCostExcl = floatval($order->total_shipping_tax_excl);
@@ -303,13 +304,13 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                 $uniqueId = 'order-' . $order->id . '-shipping';
                 
                 $item = new \Wallee\Sdk\Model\LineItemCreate();
-                $item->setAmountIncludingTax($this->roundAmount($shippingCosts, $currencyCode));
                 $name = Wallee_Helper::getModuleInstance()->l('Shipping');
                 
                 $item->setName($name);
                 $item->setQuantity(1);
                 $item->setShippingRequired(false);
                 $item->setSku('shipping');
+                $item->setAmountIncludingTax($this->roundAmount($shippingCosts, $currencyCode));
                 
                 $carrier = new Carrier($order->id_carrier);
                 if ($carrier->id && $taxAddress->id) {
@@ -342,12 +343,13 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                             ));
                     }
                 }
+                    
                 $item->setType(\Wallee\Sdk\Model\LineItemType::SHIPPING);
-                $item->setShippingRequired(false);
                 $item->setUniqueId($uniqueId);
-                $items[] = $this->cleanLineItem($item);
+                $shippingItem = $this->cleanLineItem($item);
+                $items[] = $shippingItem;
             }
-            
+                    
             // Add wrapping costs
             $wrappingCosts = floatval($order->total_wrapping);
             $wrappingCostExcl = floatval($order->total_wrapping_tax_excl);
@@ -393,10 +395,44 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                 $items = array_merge($items, $discountItems);
             }
             //We do not collapse the refunds with the equal tax rates as one. This would cause issues during refunds of orders
+            
+            $discountOnly =$this->isFreeShippingDiscountOnly($order);
+            if($discountOnly && $shippingItem != null){
+                $itemFreeShipping = new \Wallee\Sdk\Model\LineItemCreate();
+                $name = Wallee_Helper::getModuleInstance()->l('Shipping Discount');
+                
+                $itemFreeShipping->setName($discountOnly['name']);
+                $itemFreeShipping->setQuantity(1);
+                $itemFreeShipping->setShippingRequired(false);
+                $itemFreeShipping->setSku('discount-' . $discountOnly['id_order_cart_rule']);
+                $itemFreeShipping->setAmountIncludingTax($shippingItem->getAmountIncludingTax()*-1);
+                $itemFreeShipping->setTaxes($shippingItem->getTaxes());
+                $itemFreeShipping->setType(\Wallee\Sdk\Model\LineItemType::DISCOUNT);
+                $itemFreeShipping->setUniqueId('order-' . $order->id . '-discount-' . $discountOnly['id_order_cart_rule']);
+                $items[] = $this->cleanLineItem($itemFreeShipping);
+            }
         }
         return $items;
     }
     
+    
+    private function isFreeShippingDiscountOnly($order){
+        $shippingOnly = false;
+        foreach ($order->getCartRules() as $orderCartRule) {
+            $cartRuleObj = new CartRule($orderCartRule['id_cart_rule']);
+            if($cartRuleObj->free_shipping){
+                if($cartRuleObj->reduction_percent == 0 && $cartRuleObj->reduction_amount==0){
+                    $shippingOnly = $orderCartRule;
+                }
+                else{
+                    //If there is a cart rule, that has free shipping and an amount value, the amount of the shipping 
+                    //fee is included in the total amount of the discount. So we do not need an extra line item for the shipping discount.
+                    return false;
+                }
+            }
+        }
+        return $shippingOnly;        
+    }
         
     private function getDiscountItems($nameBase, $skuBase, $uniqueIdBase, $discountWithTax, $discountWithoutTax, CartRule $cartRule, $usedTaxes = array(), $cheapestProductId, $productTotalWithoutTax, $cartIdUsed, $currencyCode){
         
@@ -575,8 +611,14 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
                     return $discountItems;
                 }
             }
-            // the other two cases ($reductionProduct == -1 or -2)  are not available for fixed amount discounts
+            else{
+                // the other two cases ($reductionProduct == -1 or -2)  are not available for fixed amount discounts
+                return array();
+            }
+            
         }
+        //Free Shipping Only Discounts are not processed here 
+        return array();
     }
 
     /**
