@@ -12,7 +12,7 @@ if (! defined('_PS_VERSION_')) {
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
-define('WALLEE_VERSION', '1.0.8');
+define('WALLEE_VERSION', '1.0.9');
 
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee_autoloader.php');
 require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee-sdk' . DIRECTORY_SEPARATOR . 'autoload.php');
@@ -93,6 +93,7 @@ class Wallee extends Wallee_AbstractModule
         $output .= $this->handleSaveEmail();
         $output .= $this->handleSaveFeeItem();
         $output .= $this->handleSaveDownload();
+        $output .= $this->handleSaveSpaceViewId();
         $output .= $this->handleSaveOrderStatus();
         $output .= $this->displayHelpButtons();
         return $output . $this->displayForm();
@@ -124,6 +125,7 @@ class Wallee extends Wallee_AbstractModule
             $this->getEmailForm(),
             $this->getFeeForm(),
             $this->getDocumentForm(),
+            $this->getSpaceViewIdForm(),
             $this->getOrderStatusForm()
         );
     }
@@ -136,6 +138,7 @@ class Wallee extends Wallee_AbstractModule
             $this->getEmailConfigValues(),
             $this->getFeeItemConfigValues(),
             $this->getDownloadConfigValues(),
+            $this->getSpaceViewIdConfigValues(),
             $this->getOrderStatusConfigValues()
         );
     }
