@@ -32,7 +32,6 @@ class AdminWalleeCronJobsController extends ModuleAdminController
     private function handleList()
     {
         $this->display = 'list';
-        $this->context->smarty->assign('title', 'wallee '.$this->module->l('CronJobs'));
         $this->context->smarty->assign('jobs', Wallee_Cron::getAllCronJobs());
     }
     

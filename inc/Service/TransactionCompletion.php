@@ -33,7 +33,7 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
             $transactionInfo = Wallee_Helper::getTransactionInfoForOrder($order);
             if ($transactionInfo === null) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction.'));
+                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction.','transactioncompletion'));
             }
            
             Wallee_Helper::lockByTransactionId($transactionInfo->getSpaceId(), $transactionInfo->getTransactionId());
@@ -43,17 +43,17 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
             $transactionId = $transactionInfo->getTransactionId();
             
             if ($transactionInfo->getState() != \Wallee\Sdk\Model\TransactionState::AUTHORIZED) {
-                throw new Exception(Wallee_Helper::getModuleInstance()->l('The transaction is not in a state to be completed.'));
+                throw new Exception(Wallee_Helper::getModuleInstance()->l('The transaction is not in a state to be completed.','transactioncompletion'));
             }
             
             if (Wallee_Model_CompletionJob::isCompletionRunningForTransaction(
                 $spaceId, $transactionId)){
-                    throw new Exception( Wallee_Helper::getModuleInstance()->l('Please wait until the existing completion is processed.'));
+                    throw new Exception( Wallee_Helper::getModuleInstance()->l('Please wait until the existing completion is processed.','transactioncompletion'));
             }
             
             if (Wallee_Model_VoidJob::isVoidRunningForTransaction($spaceId, $transactionId)) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('There is a void in process. The order can not be completed.'));
+                    Wallee_Helper::getModuleInstance()->l('There is a void in process. The order can not be completed.','transactioncompletion'));
             }
 
             $completionJob = new Wallee_Model_CompletionJob();
@@ -108,7 +108,7 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
             $completionJob->setFailureReason(
                 array(
                     'en-US' => sprintf(
-                        Wallee_Helper::getModuleInstance()->l('Could not update the line items. Error: %s'),
+                        Wallee_Helper::getModuleInstance()->l('Could not update the line items. Error: %s','transactioncompletion'),
                         Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             
@@ -143,7 +143,7 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
             $completionJob->setFailureReason(
                 array(
                     'en-US' => sprintf(
-                        Wallee_Helper::getModuleInstance()->l('Could not send the completion to %s. Error: %s'), 'wallee',
+                        Wallee_Helper::getModuleInstance()->l('Could not send the completion to %s. Error: %s','transactioncompletion'), 'wallee',
                         Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $completionJob->setState(Wallee_Model_CompletionJob::STATE_FAILURE);
@@ -177,7 +177,7 @@ class Wallee_Service_TransactionCompletion extends Wallee_Service_Abstract
             }
             catch (Exception $e) {
                 $message = sprintf(
-                    Wallee_Helper::getModuleInstance()->l('Error updating completion job with id %d: %s'), $id,
+                    Wallee_Helper::getModuleInstance()->l('Error updating completion job with id %d: %s','transactioncompletion'), $id,
                     $e->getMessage());
                 PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_CompletionJob');
                 

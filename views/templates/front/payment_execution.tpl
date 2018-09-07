@@ -38,6 +38,7 @@
         <div id="wallee-method-configuration" class="wallee-method-configuration" style="display: none;"
 	data-method-id="{$methodId}" data-configuration-id="{$configurationId}"></div>
 		<div id="wallee-method-container">
+			<input type="hidden" id="wallee-iframe-possible" name="wallee-iframe-possible" value="false" />
 			<div class="wallee-loader"></div>		
 		</div>
 		

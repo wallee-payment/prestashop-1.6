@@ -32,11 +32,11 @@ class WalleeDocumentsModuleFrontController extends ModuleFrontController
 	    }
 	    
 	    if (!isset($order) || !Validate::isLoadedObject($order)) {
-	        die(Tools::displayError($this->module->l('The document was not found.')));
+	        die(Tools::displayError($this->module->l('The document was not found.','documents')));
 	    }
 	    
 	    if ((isset($this->context->customer->id) && $order->id_customer != $this->context->customer->id) || (Tools::isSubmit('secure_key') && $order->secure_key != Tools::getValue('secure_key'))) {
-	        die(Tools::displayError($this->module->l('The document was not found.')));
+	        die(Tools::displayError($this->module->l('The document was not found.','documents')));
 	    }
 	    if ($type = Tools::getValue('type')) {
 	        switch($type){
@@ -52,7 +52,7 @@ class WalleeDocumentsModuleFrontController extends ModuleFrontController
 	                break;
 	        }
 	    } 
-	    die(Tools::displayError($this->module->l('The document was not found.')));
+	    die(Tools::displayError($this->module->l('The document was not found.','documents')));
 	   
 	}
 	
@@ -61,7 +61,7 @@ class WalleeDocumentsModuleFrontController extends ModuleFrontController
         try {
             Wallee_DownloadHelper::downloadInvoice($order);
         } catch (Exception $e) {
-            die(Tools::displayError($this->module->l('Could not fetch the document.')));
+            die(Tools::displayError($this->module->l('Could not fetch the document.','documents')));
         }
 	    
 	}
@@ -71,7 +71,7 @@ class WalleeDocumentsModuleFrontController extends ModuleFrontController
         try {
             Wallee_DownloadHelper::downloadPackingSlip($order);
         } catch (Exception $e) {
-            die(Tools::displayError($this->module->l('Could not fetch the document.')));
+            die(Tools::displayError($this->module->l('Could not fetch the document.','documents')));
         }
 	    
 	}

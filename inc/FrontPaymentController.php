@@ -24,7 +24,7 @@ class Wallee_FrontPaymentController extends ModuleFrontController {
      */
     protected function checkAvailablility(Cart $cart){
         if ($cart->id_address_delivery == 0 || $cart->id_address_invoice == 0 || !$this->module->active || !Validate::isLoadedObject(new Customer($cart->id_customer))){
-            $this->context->cookie->wle_error = $this->module->l('Your session expired, please try again.');
+            $this->context->cookie->wle_error = $this->module->l('Your session expired, please try again.','frontpaymentcontroller');
             return $this->context->link->getPageLink('order', true, NULL, "step=1");
         }
         // Check that this payment option is still available in case the customer changed his address just before the end of the checkout process
@@ -37,12 +37,12 @@ class Wallee_FrontPaymentController extends ModuleFrontController {
             }
         }
         if (!$authorized){
-            $this->context->cookie->wle_error = $this->module->l('This payment method is no longer available, please try another one.');
+            $this->context->cookie->wle_error = $this->module->l('This payment method is no longer available, please try another one.','frontpaymentcontroller');
             return $this->context->link->getPageLink('order', true, NULL, "step=3");
         }
         
         if(!$this->module instanceof Wallee){
-            $this->context->cookie->wle_error = $this->module->l('There was a technical issue, please try again.');
+            $this->context->cookie->wle_error = $this->module->l('There was a technical issue, please try again.', 'frontpaymentcontroller');
             return $this->context->link->getPageLink('order', true, NULL, "step=3");
         }
         return null;

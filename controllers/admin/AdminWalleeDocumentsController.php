@@ -30,7 +30,7 @@ class AdminWalleeDocumentsController extends ModuleAdminController
         if ($access['view'] === '1' && ($action = Tools::getValue('action'))) {
             $this->action = $action;
         } else {
-            die(Tools::displayError($this->module->l('You do not have permission to view this.')));
+            die(Tools::displayError($this->module->l('You do not have permission to view this.','adminwalleedocumentscontroller')));
         }
     }
 
@@ -41,10 +41,10 @@ class AdminWalleeDocumentsController extends ModuleAdminController
                 $order = new Order(Tools::getValue('id_order'));
                 Wallee_DownloadHelper::downloadInvoice($order);
             } catch (Exception $e) {
-                die(Tools::displayError($this->module->l('Could not fetch the document.')));
+                die(Tools::displayError($this->module->l('Could not fetch the document.', 'adminwalleedocumentscontroller')));
             }
         } else {
-            die(Tools::displayError($this->module->l('The order Id is missing.')));
+            die(Tools::displayError($this->module->l('The order Id is missing.','adminwalleedocumentscontroller')));
         }
     }
 
@@ -55,10 +55,10 @@ class AdminWalleeDocumentsController extends ModuleAdminController
                 $order = new Order(Tools::getValue('id_order'));
                 Wallee_DownloadHelper::downloadPackingSlip($order);
             } catch (Exception $e) {
-                die(Tools::displayError($this->module->l('Could not fetch the document.')));
+                die(Tools::displayError($this->module->l('Could not fetch the document.','adminwalleedocumentscontroller')));
             }
         } else {
-            die(Tools::displayError($this->module->l('The order Id is missing.')));
+            die(Tools::displayError($this->module->l('The order Id is missing.','adminwalleedocumentscontroller')));
         }
     }
 }

@@ -34,7 +34,7 @@ class Wallee_Service_TransactionVoid extends Wallee_Service_Abstract
             $transactionInfo = Wallee_Helper::getTransactionInfoForOrder($order);
             if ($transactionInfo === null) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction.'));
+                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction.','transactionvoid'));
             }
            
             Wallee_Helper::lockByTransactionId($transactionInfo->getSpaceId(), $transactionInfo->getTransactionId());
@@ -44,15 +44,15 @@ class Wallee_Service_TransactionVoid extends Wallee_Service_Abstract
             $transactionId = $transactionInfo->getTransactionId();
             
             if ($transactionInfo->getState() != \Wallee\Sdk\Model\TransactionState::AUTHORIZED) {
-                throw new Exception(Wallee_Helper::getModuleInstance()->l('The transaction is not in a state to be voided.'));
+                throw new Exception(Wallee_Helper::getModuleInstance()->l('The transaction is not in a state to be voided.','transactionvoid'));
             }            
             if (Wallee_Model_VoidJob::isVoidRunningForTransaction($spaceId, $transactionId)) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('Please wait until the existing void is processed.'));
+                    Wallee_Helper::getModuleInstance()->l('Please wait until the existing void is processed.','transactionvoid'));
             }
             if (Wallee_Model_CompletionJob::isCompletionRunningForTransaction(
                 $spaceId, $transactionId)){
-                    throw new Exception( Wallee_Helper::getModuleInstance()->l('There is a completion in process. The order can not be voided.'));
+                    throw new Exception( Wallee_Helper::getModuleInstance()->l('There is a completion in process. The order can not be voided.','transactionvoid'));
             }
             
             $voidJob = new Wallee_Model_VoidJob();
@@ -95,7 +95,7 @@ class Wallee_Service_TransactionVoid extends Wallee_Service_Abstract
             $voidJob->setFailureReason(
                 array(
                     'en-US' => sprintf(
-                        Wallee_Helper::getModuleInstance()->l('Could not send the void to %s. Error: %s'), 'wallee',
+                        Wallee_Helper::getModuleInstance()->l('Could not send the void to %s. Error: %s','transactionvoid'), 'wallee',
                         Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $voidJob->setState(Wallee_Model_VoidJob::STATE_FAILURE);
@@ -130,7 +130,7 @@ class Wallee_Service_TransactionVoid extends Wallee_Service_Abstract
             }
             catch (Exception $e) {
                 $message = sprintf(
-                    Wallee_Helper::getModuleInstance()->l('Error updating void job with id %d: %s'), $id,
+                    Wallee_Helper::getModuleInstance()->l('Error updating void job with id %d: %s','transactionvoid'), $id,
                     $e->getMessage());
                 PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_VoidJob');
                 

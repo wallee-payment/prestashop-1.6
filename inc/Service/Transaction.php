@@ -112,6 +112,17 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
             $transaction->getId());
     }
 
+    
+    /**
+     * Returns the URL to wallee's payment page.
+     *
+     * @param Cart $cart
+     * @return string
+     */
+    public function getPaymentPageUrl($spaceId, $transactionId)
+    {
+        return $this->getTransactionService()->buildPaymentPageUrl($spaceId,$transactionId);
+    }
     /**
      * Returns the transaction with the given id.
      *
@@ -322,7 +333,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         $ids = Wallee_Helper::getCartMeta($cart, 'mappingIds');
         $transaction = $this->getTransaction($ids['spaceId'], $ids['transactionId']);
         if($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING){
-            throw new Exception(Wallee_Helper::getModuleInstance()->l('The transaction timed out, please try again.'));
+            throw new Exception(Wallee_Helper::getModuleInstance()->l('The transaction timed out, please try again.','transaction'));
         }
     }
 
@@ -346,7 +357,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                     $ids['transactionId']);
                 
                 if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING) {
-                    throw new Exception(Wallee_Helper::getModuleInstance()->l('The checkout expired, please try again.'));
+                    throw new Exception(Wallee_Helper::getModuleInstance()->l('The checkout expired, please try again.','transaction'));
                 }
                 $pendingTransaction = new \Wallee\Sdk\Model\TransactionPending();
                 $pendingTransaction->setId($transaction->getId());

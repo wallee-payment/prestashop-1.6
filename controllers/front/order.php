@@ -20,7 +20,7 @@ class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
 		$methodId = Tools::getValue('methodId', null);
 		$cartHash = Tools::getValue('cartHash', null);
 		if ($methodId == null || $cartHash == null) {
-		    $this->context->cookie->wle_error = $this->module->l('There was a techincal issue, please try again.');
+		    $this->context->cookie->wle_error = $this->module->l('There was a techincal issue, please try again.', 'order');
 		    echo json_encode(array('result' => 'failure', 'redirect' => $this->context->link->getPageLink('order', true, NULL, "step=3")));
 		    die();
 		}
@@ -34,7 +34,7 @@ class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
 		$spaceId = Configuration::get(Wallee::CK_SPACE_ID, null, null, $cart->id_shop);
 		$methodConfiguration = new Wallee_Model_MethodConfiguration($methodId);
 		if (! $methodConfiguration->isActive() || $methodConfiguration->getSpaceId() != $spaceId) {
-		    $this->context->cookie->wle_error = $this->module->l('This payment method is no longer available, please try another one.');
+		    $this->context->cookie->wle_error = $this->module->l('This payment method is no longer available, please try another one.', 'order');
 		    echo json_encode(array('result' => 'failure', 'redirect' => $this->context->link->getPageLink('order', true, NULL, "step=3")));
 		    die();
 		}
@@ -48,7 +48,7 @@ class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
 		    
 		    if(!$agreed){
 		        $this->context->cookie->checkedTOS = null;
-		        $this->context->cookie->wle_error = $this->module->l('Please accept the terms of service.');
+		        $this->context->cookie->wle_error = $this->module->l('Please accept the terms of service.', 'order');
 		        echo json_encode(array('result' => 'failure', 'reload' => 'true'));
 		        die();
 		    }
@@ -57,7 +57,7 @@ class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
 				
 		Wallee_FeeHelper::addFeeProductToCart($methodConfiguration, $cart);
 		if($cartHash != Wallee_Helper::calculateCartHash($cart)){
-		    $this->context->cookie->wle_error = $this->module->l('The cart was changed, please try again.');
+		    $this->context->cookie->wle_error = $this->module->l('The cart was changed, please try again.', 'order');
 		    echo json_encode(array('result' => 'failure', 'reload' => 'true'));
 		    die();
 		}		
@@ -67,8 +67,15 @@ class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
 		    $customer = new Customer(intval($cart->id_customer));
 		    $this->module->validateOrder($cart->id, $orderState->id, $cart->getOrderTotal(true, Cart::BOTH, null, null, false),
 		        'wallee_'.$methodId, null, array(), null, false, $customer->secure_key);
-		      echo json_encode(array('result' => 'success'));
-		      die();
+		    $noIframeParamater = Tools::getValue('wallee-iframe-possible', null);
+		    $noIframe = $noIframeParamater == 'false';
+		    if($noIframe){
+		        $url = Wallee_Service_Transaction::instance()->getPaymentPageUrl($GLOBALS['walleeTransactionIds']['spaceId'], $GLOBALS['walleeTransactionIds']['transactionId']);		        
+		        echo json_encode(array('result' => 'redirect', 'redirect' => $url));
+		        die();
+		    }	
+		    echo json_encode(array('result' => 'success'));
+		    die();
 		}
 		catch(Exception $e){
 		    $this->context->cookie->wle_error = Wallee_Helper::cleanExceptionMessage($e->getMessage());

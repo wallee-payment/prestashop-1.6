@@ -60,7 +60,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             $transactionInfo = Wallee_Helper::getTransactionInfoForOrder($order);
             if ($transactionInfo === null) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction'));
+                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction','refund'));
             }
             
             Wallee_Helper::lockByTransactionId($transactionInfo->getSpaceId(),
@@ -73,12 +73,12 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             
             if (! in_array($transactionInfo->getState(), self::$refundableStates)) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('The transaction is not in a state to be refunded.'));
+                    Wallee_Helper::getModuleInstance()->l('The transaction is not in a state to be refunded.','refund'));
             }
             
             if (Wallee_Model_RefundJob::isRefundRunningForTransaction($spaceId, $transactionId)) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('Please wait until the existing refund is processed.'));
+                    Wallee_Helper::getModuleInstance()->l('Please wait until the existing refund is processed.','refund'));
             }
             $strategy = Wallee_Backend_StrategyProvider::getStrategy();
             
@@ -129,7 +129,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             $refundJob->setFailureReason(
                 array(
                     'en-US' => sprintf(
-                        Wallee_Helper::getModuleInstance()->l('Could not send the refund to %s. Error: %s'), 'wallee',
+                        Wallee_Helper::getModuleInstance()->l('Could not send the refund to %s. Error: %s','refund'), 'wallee',
                         Wallee_Helper::cleanExceptionMessage($e->getMessage()))
                 ));
             $refundJob->setState(Wallee_Model_RefundJob::STATE_FAILURE);
@@ -212,7 +212,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             }
             catch (Exception $e) {
                 $message = sprintf(
-                    Wallee_Helper::getModuleInstance()->l('Error updating refund job with id %d: %s'), $id,
+                    Wallee_Helper::getModuleInstance()->l('Error updating refund job with id %d: %s','refund'), $id,
                     $e->getMessage());
                 PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_RefundJob');
             }
@@ -227,7 +227,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             }
             catch (Exception $e) {
                 $message = sprintf(
-                    Wallee_Helper::getModuleInstance()->l('Error applying refund job with id %d: %s'), $id,
+                    Wallee_Helper::getModuleInstance()->l('Error applying refund job with id %d: %s','refund'), $id,
                     $e->getMessage());
                 PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_RefundJob');
             }

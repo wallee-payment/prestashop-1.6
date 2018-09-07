@@ -10,12 +10,13 @@ jQuery(function($) {
 
     var wallee_checkout = {
 	    
-	    
+	handlerCounter: 0, 
 	iframe_handler: null,
 	configuration_id: null,
 	height: null,
 
 	init : function() {
+		this.handlerCounter = 0;
 	    var configuration = $("#wallee-method-configuration");
 	    this.configuration_id = configuration.data("configuration-id");
 	    this.register_method();
@@ -25,22 +26,29 @@ jQuery(function($) {
 	register_method : function() {
 	    var self = this;
 	    if (typeof window.IframeCheckoutHandler === 'undefined') {
-		setTimeout(function() {
-			self.register_method();
-		}, 100);
-		return;
+	    	if(this.handlerCounter > 20){
+	    		$('.wallee-loader').remove();
+	    		this.enable_pay_button();	    		
+	    		return;
+	    	}
+	    	this.handlerCounter++;
+			setTimeout(function() {
+				self.register_method();
+			}, 100);
+			return;
 	    }
 	    
 	    if (this.iframe_handler != null) {
-		return;
+	    	return;
 	    }	 
 	    this.iframe_handler = window.IframeCheckoutHandler(this.configuration_id);
 	    this.iframe_handler.setValidationCallback(function(validation_result) {
 			self.process_validation(validation_result);
 	    	});
 	    this.iframe_handler.setInitializeCallback(function(){
-		$('.wallee-loader').remove();
-		self.enable_pay_button();
+			$('#wallee-iframe-possible').remove();
+			$('.wallee-loader').remove();
+			self.enable_pay_button();
 	    });
 	    this.iframe_handler.create("wallee-method-container");
 	},
@@ -57,12 +65,16 @@ jQuery(function($) {
 	    
 	    var tosInput = $("#cgv");
 	    if(tosInput.size() > 0){
-		if(!tosInput.is(':checked')){
-		    self.remove_existing_errors();
-		    self.show_new_errors(wallee_msg_tos_error);
-		    self.enable_pay_button();
-		    return false;
-		}
+			if(!tosInput.is(':checked')){
+			    self.remove_existing_errors();
+			    self.show_new_errors(wallee_msg_tos_error);
+			    self.enable_pay_button();
+			    return false;
+			}
+	    }
+	    if(self.iframe_handler == null){
+	    	self.process_validation({success: true});
+	    	return false;
 	    }
 	    self.iframe_handler.validate();
 	    return false;
@@ -83,15 +95,19 @@ jQuery(function($) {
 					    	self.iframe_handler.submit();
 					    	return;
 					}
+					else if(response.result =='redirect'){
+						location.replace(response.redirect+"&paymentMethodConfigurationId="+self.configuration_id);
+						return;
+					}
 					else if ( response.result == 'failure' ) {
 					    if(response.reload == 'true' ){
-						location.reload();
-						self.enable_pay_button();
-						return;
+							location.reload();
+							self.enable_pay_button();
+							return;
 					    }
 					    else if(response.redirect) {
-						location.replace(response.redirect);
-						return;
+					    	location.replace(response.redirect);
+					    	return;
 					    }
 					}
 					self.remove_existing_errors();
