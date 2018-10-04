@@ -1,14 +1,11 @@
 <?php
-if (! defined('_PS_VERSION_')) {
-    exit();
-}
-
 /**
  * wallee Prestashop
  *
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
+ * @copyright 2017 - 2018 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
@@ -27,8 +24,10 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
     {
         
         $entities = Wallee_Model_MethodConfiguration::loadByConfiguration(
-            $configuration->getLinkedSpaceId(), $configuration->getId());
-        foreach($entities as $entity){
+            $configuration->getLinkedSpaceId(),
+            $configuration->getId()
+        );
+        foreach ($entities as $entity) {
             if ($this->hasChanged($configuration, $entity)) {
                 $entity->setConfigurationName($configuration->getName());
                 $entity->setState($this->getConfigurationState($configuration));
@@ -42,18 +41,19 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
         }
     }
 
-    private function hasChanged(\Wallee\Sdk\Model\PaymentMethodConfiguration $configuration,
-        Wallee_Model_MethodConfiguration $entity)
-    {
+    private function hasChanged(
+        \Wallee\Sdk\Model\PaymentMethodConfiguration $configuration,
+        Wallee_Model_MethodConfiguration $entity
+    ) {
         if ($configuration->getName() != $entity->getConfigurationName()) {
             return true;
         }
         
-        if($this->getConfigurationState($configuration) != $entity->getState()){
+        if ($this->getConfigurationState($configuration) != $entity->getState()) {
             return true;
         }
         
-        if($configuration->getSortOrder() != $entity->getSortOrder()){
+        if ($configuration->getSortOrder() != $entity->getSortOrder()) {
             return true;
         }
         
@@ -69,12 +69,12 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
         $image = $this->getResourcePath($configuration->getResolvedImageUrl());
         if ($image != $entity->getImage()) {
             return true;
-        }   
+        }
         
         $imageBase = $this->getResourceBase($configuration->getResolvedImageUrl());
         if ($imageBase != $entity->getImageBase()) {
             return true;
-        } 
+        }
         
         return false;
     }
@@ -91,22 +91,25 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
         $spaceIdCache = array();
         
         $paymentMethodConfigurationService = new \Wallee\Sdk\Service\PaymentMethodConfigurationService(
-            Wallee_Helper::getApiClient());
+            Wallee_Helper::getApiClient()
+        );
         
         foreach (Shop::getShops(true, null, true) as $shopId) {
             $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null, null, $shopId);
             
-            if ($spaceId){
-                if(!array_key_exists($spaceId, $spaceIdCache)){
-                    $spaceIdCache[$spaceId] = $paymentMethodConfigurationService->search($spaceId,
-                        new \Wallee\Sdk\Model\EntityQuery());
-                }                
+            if ($spaceId) {
+                if (!array_key_exists($spaceId, $spaceIdCache)) {
+                    $spaceIdCache[$spaceId] = $paymentMethodConfigurationService->search(
+                        $spaceId,
+                        new \Wallee\Sdk\Model\EntityQuery()
+                    );
+                }
                 $configurations = $spaceIdCache[$spaceId];
-                foreach ($configurations as $configuration) {                    
+                foreach ($configurations as $configuration) {
                     $method = Wallee_Model_MethodConfiguration::loadByConfigurationAndShop($spaceId, $configuration->getId(), $shopId);
                     if ($method->getId() !== null) {
                         $existingFound[] = $method->getId();
-                    }                    
+                    }
                     $method->setShopId($shopId);
                     $method->setSpaceId($spaceId);
                     $method->setConfigurationId($configuration->getId());
@@ -150,8 +153,8 @@ class Wallee_Service_MethodConfiguration extends Wallee_Service_Abstract
      * @return string
      */
     protected function getConfigurationState(
-        \Wallee\Sdk\Model\PaymentMethodConfiguration $configuration)
-    {
+        \Wallee\Sdk\Model\PaymentMethodConfiguration $configuration
+    ) {
         switch ($configuration->getState()) {
             case \Wallee\Sdk\Model\CreationEntityState::ACTIVE:
                 return Wallee_Model_MethodConfiguration::STATE_ACTIVE;

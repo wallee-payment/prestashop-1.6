@@ -1,14 +1,11 @@
 <?php
-if (! defined('_PS_VERSION_')) {
-    exit();
-}
-
 /**
  * wallee Prestashop
  *
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
+ * @copyright 2017 - 2018 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
@@ -29,11 +26,11 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
         if ($methodId == null) {
             $this->context->cookie->wle_error = $this->module->l('There was a technical issue, please try again.', 'payment');
             Tools::redirect('index.php?controller=order&step=3');
-        }        
+        }
         $cart = $this->context->cart;
         
         $redirect = $this->checkAvailablility($cart);
-        if(!empty($redirect)){
+        if (!empty($redirect)) {
             Tools::redirect($redirect);
             die();
         }
@@ -43,7 +40,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
         
         if (! $methodConfiguration->isActive() || $methodConfiguration->getSpaceId() != $spaceId) {
             $this->context->cookie->wle_error = $this->module->l('This payment method is no longer available, please try another one.', 'payment');
-            Tools::redirect($this->context->link->getPageLink('order', true, NULL, "step=3"));
+            Tools::redirect($this->context->link->getPageLink('order', true, null, "step=3"));
         }
 
         Wallee_FeeHelper::addFeeProductToCart($methodConfiguration, $cart);
@@ -70,19 +67,25 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
         
         $hook_override_tos_display = Hook::exec('overrideTOSDisplay');
         $cms = new CMS(Configuration::get('PS_CONDITIONS_CMS_ID'), $this->context->language->id);
-        $this->link_conditions = $this->context->link->getCMSLink($cms, $cms->link_rewrite,
-            (bool) Configuration::get('PS_SSL_ENABLED'));
+        $this->link_conditions = $this->context->link->getCMSLink(
+            $cms,
+            $cms->link_rewrite,
+            (bool) Configuration::get('PS_SSL_ENABLED')
+        );
         if (! strpos($this->link_conditions, '?')) {
             $this->link_conditions .= '?content_only=1';
         } else {
             $this->link_conditions .= '&content_only=1';
         }
         
-        $this->context->smarty->registerPlugin('function', 'wallee_resolve_template',
+        $this->context->smarty->registerPlugin(
+            'function',
+            'wallee_resolve_template',
             array(
                 $this,
                 'resolveTemplatePath'
-            ));
+            )
+        );
         $this->context->smarty->assign(
             array(
                 'name' => $name,
@@ -101,7 +104,8 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
                 'this_path_ssl' => Tools::getShopDomainSsl(true, true) . __PS_BASE_URI__ . 'modules/' .
                      $this->module->name . '/',
                 'form_target_url' => $this->context->link->getModuleLink('wallee', 'order', array(), true)
-            ));
+            )
+        );
         $this->addJquery();
         $this->addJS($jsUrl, false);
         $this->addJS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/js/frontend/checkout.js');
@@ -132,8 +136,10 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
                 $productAttributeId = (int) isset($productUpdate['id_product_attribute']) ? $productUpdate['id_product_attribute'] : $productUpdate['product_attribute_id'];
                 
                 if (isset($customizedDatas[$productId][$productAttributeId])) {
-                    $productUpdate['tax_rate'] = Tax::getProductTaxRate($productId,
-                        $cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')});
+                    $productUpdate['tax_rate'] = Tax::getProductTaxRate(
+                        $productId,
+                        $cart->{Configuration::get('PS_TAX_ADDRESS_TYPE')}
+                    );
                 }
             }
             Product::addCustomizationPrice($summary['products'], $customizedDatas);
@@ -147,25 +153,50 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
                 $cart_product_context->shop = new Shop((int) $product['id_shop']);
             }
             $product['price_without_specific_price'] = Product::getPriceStatic(
-                $product['id_product'], ! Product::getTaxCalculationMethod(),
-                $product['id_product_attribute'], 6, null, false, false, 1, false, null, null, null,
-                $null, true, true, $cart_product_context);
+                $product['id_product'],
+                ! Product::getTaxCalculationMethod(),
+                $product['id_product_attribute'],
+                6,
+                null,
+                false,
+                false,
+                1,
+                false,
+                null,
+                null,
+                null,
+                $null,
+                true,
+                true,
+                $cart_product_context
+            );
             
             if (Product::getTaxCalculationMethod()) {
                 $product['is_discounted'] = Tools::ps_round(
-                    $product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_) !=
+                    $product['price_without_specific_price'],
+                    _PS_PRICE_COMPUTE_PRECISION_
+                ) !=
                      Tools::ps_round($product['price'], _PS_PRICE_COMPUTE_PRECISION_);
             } else {
                 $product['is_discounted'] = Tools::ps_round(
-                    $product['price_without_specific_price'], _PS_PRICE_COMPUTE_PRECISION_) !=
+                    $product['price_without_specific_price'],
+                    _PS_PRICE_COMPUTE_PRECISION_
+                ) !=
                      Tools::ps_round($product['price_wt'], _PS_PRICE_COMPUTE_PRECISION_);
             }
         }
         
         // Get available cart rules and unset the cart rules already in the cart
-        $available_cart_rules = CartRule::getCustomerCartRules($this->context->language->id,
-            (isset($this->context->customer->id) ? $this->context->customer->id : 0), true, true,
-            true, $cart, false, true);
+        $available_cart_rules = CartRule::getCustomerCartRules(
+            $this->context->language->id,
+            (isset($this->context->customer->id) ? $this->context->customer->id : 0),
+            true,
+            true,
+            true,
+            $cart,
+            false,
+            true
+        );
         $cart_cart_rules = $cart->getCartRules();
         foreach ($available_cart_rules as $key => $available_cart_rule) {
             foreach ($cart_cart_rules as $cart_cart_rule) {
@@ -189,6 +220,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
                 'CUSTOMIZE_TEXTFIELD' => Product::CUSTOMIZE_TEXTFIELD,
                 'displayVouchers' => $available_cart_rules,
                 'smallSize' => Image::getSize(ImageType::getFormatedName('small'))
-            ));
+            )
+        );
     }
 }

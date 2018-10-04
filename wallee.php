@@ -1,21 +1,20 @@
 <?php
-if (! defined('_PS_VERSION_')) {
-    exit();
-}
-
 /**
  * wallee Prestashop
  *
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
+ * @copyright 2017 - 2018 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
-define('WALLEE_VERSION', '1.0.11');
+if (! defined('_PS_VERSION_')) {
+    exit();
+}
 
-require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee_autoloader.php');
-require_once (__DIR__ . DIRECTORY_SEPARATOR . 'wallee-sdk' . DIRECTORY_SEPARATOR . 'autoload.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'wallee_autoloader.php');
+require_once(__DIR__ . DIRECTORY_SEPARATOR . 'wallee-sdk' . DIRECTORY_SEPARATOR . 'autoload.php');
 
 class Wallee extends Wallee_AbstractModule
 {
@@ -31,7 +30,16 @@ class Wallee extends Wallee_AbstractModule
     const CK_CRONJOB_RUNNING = 'WLE_CRONJOB_RUNNING';
 
     const CRON_MIN_INTERVAL_SEC = 300;
-
+    
+    /**
+     * Class constructor
+     */
+    public function __construct()
+    {
+        parent::__construct();
+        $this->version = '1.0.13';
+        $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.1.21');
+    }
 
     protected function installHooks()
     {
@@ -40,9 +48,9 @@ class Wallee extends Wallee_AbstractModule
             $this->registerHook('displayHeader') &&
             $this->registerHook('displayMobileHeader') &&
             $this->registerHook('displayPaymentEU') &&
-            $this->registerHook('displayTop') && 
+            $this->registerHook('displayTop') &&
             $this->registerHook('payment') &&
-            $this->registerHook('paymentReturn') && 
+            $this->registerHook('paymentReturn') &&
             $this->registerHook('walleeCron');
     }
 
@@ -70,7 +78,7 @@ class Wallee extends Wallee_AbstractModule
 
     protected function installConfigurationValues()
     {
-        return parent::installConfigurationValues() && 
+        return parent::installConfigurationValues() &&
              Configuration::updateValue(self::CK_SHOW_CART, true) &&
              Configuration::updateValue(self::CK_SHOW_TOS, false) &&
              Configuration::updateValue(self::CK_REMOVE_TOS, false);
@@ -99,27 +107,35 @@ class Wallee extends Wallee_AbstractModule
         return $output . $this->displayForm();
     }
     
-    protected function handleSaveCheckout(){
+    protected function handleSaveCheckout()
+    {
         $output = "";
         if (Tools::isSubmit('submit' . $this->name . '_checkout')) {
             if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
-                Configuration::updateValue(self::CK_SHOW_CART,
-                    Tools::getValue(self::CK_SHOW_CART));
-                Configuration::updateValue(self::CK_SHOW_TOS,
-                    Tools::getValue(self::CK_SHOW_TOS));
-                Configuration::updateValue(self::CK_REMOVE_TOS,
-                    Tools::getValue(self::CK_REMOVE_TOS));
+                Configuration::updateValue(
+                    self::CK_SHOW_CART,
+                    Tools::getValue(self::CK_SHOW_CART)
+                );
+                Configuration::updateValue(
+                    self::CK_SHOW_TOS,
+                    Tools::getValue(self::CK_SHOW_TOS)
+                );
+                Configuration::updateValue(
+                    self::CK_REMOVE_TOS,
+                    Tools::getValue(self::CK_REMOVE_TOS)
+                );
                 $output .= $this->displayConfirmation($this->l('Settings updated'));
-            }
-            else {
+            } else {
                 $output .= $this->displayError(
-                    $this->l('You can not store the configuration for all Shops or a Shop Group.'));
+                    $this->l('You can not store the configuration for all Shops or a Shop Group.')
+                );
             }
         }
         return $output;
     }
     
-    protected function getConfigurationForms(){
+    protected function getConfigurationForms()
+    {
         return array(
             $this->getCheckoutForm(),
             $this->getEmailForm(),
@@ -143,15 +159,17 @@ class Wallee extends Wallee_AbstractModule
         );
     }
     
-    protected function getConfigurationKeys(){
+    protected function getConfigurationKeys()
+    {
         $base = parent::getConfigurationKeys();
         $base[] = self::CK_SHOW_CART;
         $base[] = self::CK_SHOW_TOS;
-        $base[] = self::CK_REMOVE_TOS;       
+        $base[] = self::CK_REMOVE_TOS;
         return $base;
     }
     
-    protected function getCheckoutForm(){
+    protected function getCheckoutForm()
+    {
         
         $checkoutConfig = array(
             array(
@@ -245,11 +263,14 @@ class Wallee extends Wallee_AbstractModule
         $values = array();
         if (!$this->context->shop->isFeatureActive() || $this->context->shop->getContext() == Shop::CONTEXT_SHOP) {
                 $values[self::CK_SHOW_CART] = (bool) Configuration::get(
-                    self::CK_SHOW_CART);
+                    self::CK_SHOW_CART
+                );
                 $values[self::CK_SHOW_TOS] = (bool) Configuration::get(
-                    self::CK_SHOW_TOS);
+                    self::CK_SHOW_TOS
+                );
                 $values[self::CK_REMOVE_TOS] = (bool) Configuration::get(
-                    self::CK_REMOVE_TOS);
+                    self::CK_REMOVE_TOS
+                );
         }
         return $values;
     }
@@ -284,14 +305,14 @@ class Wallee extends Wallee_AbstractModule
     
     public function hookDisplayHeader($params)
     {
-        if($this->context->controller instanceof ParentOrderControllerCore){
+        if ($this->context->controller instanceof ParentOrderControllerCore) {
             return $this->getDeviceIdentifierScript();
         }
     }
 
     public function hookDisplayMobileHeader($params)
     {
-        if($this->context->controller instanceof ParentOrderControllerCore){
+        if ($this->context->controller instanceof ParentOrderControllerCore) {
             return $this->getDeviceIdentifierScript();
         }
     }
@@ -318,9 +339,9 @@ class Wallee extends Wallee_AbstractModule
         $cart = $params['cart'];
         try {
             $possiblePaymentMethods = Wallee_Service_Transaction::instance()->getPossiblePaymentMethods(
-                $cart);
-        }
-        catch (Exception $e) {
+                $cart
+            );
+        } catch (Exception $e) {
             return;
         }
         $shopId = $cart->id_shop;
@@ -329,7 +350,10 @@ class Wallee extends Wallee_AbstractModule
         $methods = array();
         foreach ($possiblePaymentMethods as $possible) {
             $methodConfiguration = Wallee_Model_MethodConfiguration::loadByConfigurationAndShop(
-                $possible->getSpaceId(), $possible->getId(), $shopId);
+                $possible->getSpaceId(),
+                $possible->getId(),
+                $shopId
+            );
             if (! $methodConfiguration->isActive()) {
                 continue;
             }
@@ -337,8 +361,12 @@ class Wallee extends Wallee_AbstractModule
         }
         $result = array();
         foreach (Wallee_Helper::sortMethodConfiguration($methods) as $methodConfiguration) {
-            $parameters = $this->getParametersFromMethodConfiguration($methodConfiguration, $cart,
-                $shopId, $language);
+            $parameters = $this->getParametersFromMethodConfiguration(
+                $methodConfiguration,
+                $cart,
+                $shopId,
+                $language
+            );
             $this->smarty->assign($parameters);
             
             $result[] = array(
@@ -363,9 +391,13 @@ class Wallee extends Wallee_AbstractModule
             array(
                 'reference' => $order->reference,
                 'params' => $params,
-                'total' => Tools::displayPrice($params['total_to_pay'], $params['currencyObj'],
-                    false)
-            ));
+                'total' => Tools::displayPrice(
+                    $params['total_to_pay'],
+                    $params['currencyObj'],
+                    false
+                )
+            )
+        );
         return $this->display(__DIR__, 'hook/payment_return.tpl');
     }
 
@@ -380,9 +412,9 @@ class Wallee extends Wallee_AbstractModule
         $cart = $params['cart'];
         try {
             $possiblePaymentMethods = Wallee_Service_Transaction::instance()->getPossiblePaymentMethods(
-                $cart);
-        }
-        catch (Exception $e) {
+                $cart
+            );
+        } catch (Exception $e) {
             return;
         }
         $shopId = $cart->id_shop;
@@ -391,7 +423,10 @@ class Wallee extends Wallee_AbstractModule
         $methods = array();
         foreach ($possiblePaymentMethods as $possible) {
             $methodConfiguration = Wallee_Model_MethodConfiguration::loadByConfigurationAndShop(
-                $possible->getSpaceId(), $possible->getId(), $shopId);
+                $possible->getSpaceId(),
+                $possible->getId(),
+                $shopId
+            );
             if (! $methodConfiguration->isActive()) {
                 continue;
             }
@@ -399,8 +434,12 @@ class Wallee extends Wallee_AbstractModule
         }
         $result = "";
         foreach (Wallee_Helper::sortMethodConfiguration($methods) as $methodConfiguration) {
-            $templateVars = $this->getParametersFromMethodConfiguration($methodConfiguration, $cart,
-                $shopId, $language);
+            $templateVars = $this->getParametersFromMethodConfiguration(
+                $methodConfiguration,
+                $cart,
+                $shopId,
+                $language
+            );
             $this->smarty->assign($templateVars);
             $result .= $this->display(__DIR__, 'hook/payment.tpl');
         }
@@ -427,10 +466,14 @@ class Wallee extends Wallee_AbstractModule
         
         $currentToken = Wallee_Cron::getCurrentSecurityTokenForPendingCron();
         if ($currentToken) {
-            $url = $this->context->link->getModuleLink('wallee', 'cron',
+            $url = $this->context->link->getModuleLink(
+                'wallee',
+                'cron',
                 array(
                     'security_token' => $currentToken
-                ), true);
+                ),
+                true
+            );
             return '<img src="' . $url . '" style="display:none" />';
         }
     }
@@ -439,12 +482,14 @@ class Wallee extends Wallee_AbstractModule
     {
         if ($this->context->controller instanceof ParentOrderControllerCore) {
             $this->context->controller->addCSS(
-                __PS_BASE_URI__ . 'modules/' . $this->name . '/css/frontend/checkout.css');
+                __PS_BASE_URI__ . 'modules/' . $this->name . '/css/frontend/checkout.css'
+            );
             $cart = $this->context->cart;
             if (Configuration::get(self::CK_REMOVE_TOS, null, null, $cart->id_shop)) {
                 $this->context->cookie->checkedTOS = 1;
                 $this->context->controller->addJS(
-                    __PS_BASE_URI__ . 'modules/' . $this->name . '/js/frontend/tos-handling.js');
+                    __PS_BASE_URI__ . 'modules/' . $this->name . '/js/frontend/tos-handling.js'
+                );
             }
         }
     }
@@ -471,9 +516,4 @@ class Wallee extends Wallee_AbstractModule
     {
         return $backendController->tabAccess['edit'] === '1';
     }
-    
-   
 }
-
-
-

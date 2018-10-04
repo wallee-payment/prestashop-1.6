@@ -1,20 +1,18 @@
 <?php
-if (! defined('_PS_VERSION_')) {
-    exit();
-}
-
 /**
  * wallee Prestashop
  *
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
+ * @copyright 2017 - 2018 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
 class Wallee_FeeHelper
 {
-    public static function removeFeeProductFromCart(Cart $cart){
+    public static function removeFeeProductFromCart(Cart $cart)
+    {
         $feeProductId = Configuration::get(Wallee::CK_FEE_ITEM);
         $feeProduct = new Product($feeProductId, false, Configuration::get('PS_LANG_DEFAULT'), $cart->id_shop);
         if (Validate::isLoadedObject($feeProduct)) {
@@ -26,7 +24,8 @@ class Wallee_FeeHelper
         Wallee_VersionAdapter::clearCartRuleStaticCache();
     }
     
-    public static function addFeeProductToCart(Wallee_Model_MethodConfiguration $methodConfiguration, Cart $cart){
+    public static function addFeeProductToCart(Wallee_Model_MethodConfiguration $methodConfiguration, Cart $cart)
+    {
         
         $feeProductId = Configuration::get(Wallee::CK_FEE_ITEM);
         $feeProduct = new Product($feeProductId, false, Configuration::get('PS_LANG_DEFAULT'), $cart->id_shop);
@@ -61,9 +60,10 @@ class Wallee_FeeHelper
         Wallee_VersionAdapter::clearCartRuleStaticCache();
     }
     
-    public static function getFeeValues(Cart $cart,
-        Wallee_Model_MethodConfiguration $methodConfiguration)
-    {
+    public static function getFeeValues(
+        Cart $cart,
+        Wallee_Model_MethodConfiguration $methodConfiguration
+    ) {
         $feeProductId = Configuration::get(Wallee::CK_FEE_ITEM);
         $feeProduct = new Product($feeProductId, false, Configuration::get('PS_LANG_DEFAULT'), $cart->id_shop);
         if (!Validate::isLoadedObject($feeProduct)) {
@@ -75,12 +75,12 @@ class Wallee_FeeHelper
         
         $configuration = Wallee_VersionAdapter::getConfigurationInterface();
         
-        $currency = Currency::getCurrencyInstance($cart->id_currency);
-        
         $fixed = $methodConfiguration->getFeeFixed();
         
-        $feeFixedConverted = Tools::convertPrice($fixed,
-            Currency::getCurrencyInstance((int) $cart->id_currency));
+        $feeFixedConverted = Tools::convertPrice(
+            $fixed,
+            Currency::getCurrencyInstance((int) $cart->id_currency)
+        );
         
         $rate = $methodConfiguration->getFeeRate();
         $feeBaseType = $methodConfiguration->getFeeBase();
@@ -139,16 +139,18 @@ class Wallee_FeeHelper
             $taxCalculator = TaxManagerFactory::getManager($address, $taxGroup)->getTaxCalculator();
             if ($methodConfiguration->isFeeAddTax()) {
                 $result['fee_total_wt'] = Tools::ps_round(
-                    $taxCalculator->addTaxes($feeTotal), $computePrecision);
+                    $taxCalculator->addTaxes($feeTotal),
+                    $computePrecision
+                );
                 $result['fee_total'] = Tools::ps_round($feeTotal, $computePrecision);
             } else {
                 $result['fee_total_wt'] = Tools::ps_round($feeTotal, $computePrecision);
                 $result['fee_total'] = Tools::ps_round(
-                    $taxCalculator->removeTaxes($feeTotal), $computePrecision);
+                    $taxCalculator->removeTaxes($feeTotal),
+                    $computePrecision
+                );
             }
         }
         return $result;
     }
-    
 }
-

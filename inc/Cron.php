@@ -1,18 +1,16 @@
 <?php
-if (! defined('_PS_VERSION_')) {
-    exit();
-}
-
 /**
  * wallee Prestashop
  *
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
+ * @copyright 2017 - 2018 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
-class Wallee_Cron {
+class Wallee_Cron
+{
     
     const STATE_PENDING = 'pending';
     
@@ -24,9 +22,10 @@ class Wallee_Cron {
     
     const MAX_RUN_TIME_MINUTES = 10;
     
-    public static function cleanUpHangingCrons(){
+    public static function cleanUpHangingCrons()
+    {
         Wallee_Helper::startDBTransaction();
-        try{
+        try {
             $timeout = new DateTime();
             $timeout->sub(new DateInterval('PT'.self::MAX_RUN_TIME_MINUTES.'M'));
             $endTime =  new DateTime();
@@ -36,24 +35,27 @@ class Wallee_Cron {
                 pSQL(Wallee_Cron::STATE_PROCESSING) . '" AND date_started < "' . pSQL($timeout->format('Y-m-d H:i:s')) . '"';
             DB::getInstance()->execute($sqlCleanUp, false);
             Wallee_Helper::commitDBTransaction();
-        }
-        catch(PrestaShopDatabaseException $e){
+        } catch (PrestaShopDatabaseException $e) {
             Wallee_Helper::rollbackDBTransaction();
             PrestaShopLogger::addLog(
-                'Error updating hanging cron jobs.', 2, null,
-                'Wallee');
+                'Error updating hanging cron jobs.',
+                2,
+                null,
+                'Wallee'
+            );
         }
     }
     
-    public static function insertNewPendingCron(){
+    public static function insertNewPendingCron()
+    {
         Wallee_Helper::startDBTransaction();
         $time = new DateTime();
         $time->add(new DateInterval('PT3M'));
-        try{
+        try {
             $sqlQuery = 'SELECT security_token FROM ' . _DB_PREFIX_ . 'wle_cron_job WHERE state = "' .
                 pSQL(Wallee_Cron::STATE_PENDING) . '"';
             $queryResult = DB::getInstance()->getValue($sqlQuery, false);
-            if($queryResult){
+            if ($queryResult) {
                 Wallee_Helper::commitDBTransaction();
                 return;
             }
@@ -68,25 +70,33 @@ class Wallee_Cron {
                 $code = DB::getInstance()->getNumberError();
                 if ($code != Wallee::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
                     PrestaShopLogger::addLog(
-                        'Could not insert new pending cron job. ' . DB::getInstance()->getMsgError(), 2, null,
-                        'Wallee');
+                        'Could not insert new pending cron job. ' . DB::getInstance()->getMsgError(),
+                        2,
+                        null,
+                        'Wallee'
+                    );
                 }
             }
-        }
-        catch(PrestaShopDatabaseException $e){
+        } catch (PrestaShopDatabaseException $e) {
             $code = DB::getInstance()->getNumberError();
             if ($code != Wallee::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
                 PrestaShopLogger::addLog(
-                    'Could not insert new pending cron job. ' . DB::getInstance()->getMsgError(), 2, null,
-                    'Wallee');
+                    'Could not insert new pending cron job. ' . DB::getInstance()->getMsgError(),
+                    2,
+                    null,
+                    'Wallee'
+                );
             }
         }
         Wallee_Helper::commitDBTransaction();
     }
     
-    public static function getAllCronJobs(){
+    public static function getAllCronJobs()
+    {
         $result = DB::getInstance()->query(
-            'SELECT * FROM ' . _DB_PREFIX_ . 'wle_cron_job ORDER BY id_cron_job DESC', false);
+            'SELECT * FROM ' . _DB_PREFIX_ . 'wle_cron_job ORDER BY id_cron_job DESC',
+            false
+        );
         $jobs = array();
         while ($row = DB::getInstance()->nextRow($result)) {
             $jobs[] = $row;
@@ -98,7 +108,8 @@ class Wallee_Cron {
      * Returns the current token or false if no pending job is scheduled to run
      * @return string|false
      */
-    public static function getCurrentSecurityTokenForPendingCron(){
+    public static function getCurrentSecurityTokenForPendingCron()
+    {
         $now = new DateTime();
         $sqlQuery = 'SELECT security_token FROM ' . _DB_PREFIX_ . 'wle_cron_job WHERE state = "' .
             pSQL(Wallee_Cron::STATE_PENDING) . '" AND date_scheduled < "' .
@@ -107,7 +118,8 @@ class Wallee_Cron {
         return $queryResult;
     }
     
-    public static function cleanUpCronDB($endtime){
+    public static function cleanUpCronDB()
+    {
         $sqlQuery = 'DELETE FROM ' . _DB_PREFIX_ . 'wle_cron_job WHERE (state = "' .
             pSQL(Wallee_Cron::STATE_SUCCESS). '" OR state = "'.pSQL(Wallee_Cron::STATE_ERROR). '") AND id_cron_job <= (
                 SELECT id_cron_job
@@ -118,7 +130,6 @@ class Wallee_Cron {
                   LIMIT 1 OFFSET 50
                 ) tmp
               );';
-        $queryResult = DB::getInstance()->execute($sqlQuery, false);
+        DB::getInstance()->execute($sqlQuery, false);
     }
-    
 }

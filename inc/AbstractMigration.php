@@ -1,32 +1,32 @@
 <?php
-
-if (!defined('_PS_VERSION_')) {
-    exit;
-}
-
 /**
  * wallee Prestashop
  *
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
+ * @copyright 2017 - 2018 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
 abstract class Wallee_AbstractMigration
-{   
+{
+
     const CK_DB_VERSION = 'WLE_DB_VERSION';
 
     abstract protected static function getMigrations();
     
-    public static function installDb(){
-        try{
+    public static function installDb()
+    {
+        try {
             static::migrateDb();
-        }
-        catch(Exception $e){
+        } catch (Exception $e) {
             PrestaShopLogger::addLog(
-                $e->getMessage(), 2, null,
-                'Wallee');
+                $e->getMessage(),
+                2,
+                null,
+                'Wallee'
+            );
             return false;
         }
         return true;
@@ -35,21 +35,20 @@ abstract class Wallee_AbstractMigration
     public static function migrateDb()
     {
         $currentVersion = Configuration::getGlobalValue(self::CK_DB_VERSION);
-        if($currentVersion === false){
+        if ($currentVersion === false) {
             $currentVersion = '0.0.0';
         }
         foreach (static::getMigrations() as $version => $functionName) {
             if (version_compare($currentVersion, $version, '<')) {
                 Wallee_Helper::startDBTransaction();
-                try{
+                try {
                     call_user_func(array(
                         get_called_class(),
                         $functionName
                     ));
                     Configuration::updateGlobalValue(self::CK_DB_VERSION, $version);
                     Wallee_Helper::commitDBTransaction();
-                }
-                catch(Exception $e){
+                } catch (Exception $e) {
                     Wallee_Helper::rollbackDBTransaction();
                     throw $e;
                 }
@@ -144,7 +143,7 @@ abstract class Wallee_AbstractMigration
         
         if ($result === false) {
             throw new Exception(DB::getMsgError());
-        }        
+        }
         
         $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_cart_meta(
 				`cart_id` int(10) unsigned NOT NULL,
@@ -170,7 +169,7 @@ abstract class Wallee_AbstractMigration
             throw new Exception(DB::getMsgError());
         }
                 
-        $result = Db::getInstance()->execute( "CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_void_job(
+        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_void_job(
 				`id_void_job` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `void_id` bigint(20) unsigned,
 				`state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -191,7 +190,7 @@ abstract class Wallee_AbstractMigration
             throw new Exception(DB::getMsgError());
         }
         
-        $result = Db::getInstance()->execute( "CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_completion_job(
+        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_completion_job(
 				`id_completion_job` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `completion_id` bigint(20) unsigned,
 				`state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -233,12 +232,13 @@ abstract class Wallee_AbstractMigration
                 INDEX `idx_date_upd` (`date_upd`)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
          
-          if ($result === false) {
+        if ($result === false) {
             throw new Exception(DB::getMsgError());
-          }
+        }
     }
     
-    protected static function installOrderStatusConfigBase(){
+    protected static function installOrderStatusConfigBase()
+    {
         
         $authorizedStatus = Wallee_OrderStatus::getAuthorizedOrderStatus();
         $waitingStatus = Wallee_OrderStatus::getWaitingOrderStatus();
@@ -251,33 +251,37 @@ abstract class Wallee_AbstractMigration
         Configuration::updateGlobalValue(Wallee::CK_STATUS_MANUAL, $manualStatus->id);
         Configuration::updateGlobalValue(Wallee::CK_STATUS_DECLINED, Configuration::get('PS_OS_CANCELED'));
         Configuration::updateGlobalValue(Wallee::CK_STATUS_FULFILL, Configuration::get('PS_OS_PAYMENT'));
-
     }
     
-    protected static function installOrderPaymentSaveHookBase(){
+    protected static function installOrderPaymentSaveHookBase()
+    {
         Wallee_Helper::getModuleInstance()->registerHook('actionObjectOrderPaymentAddBefore');
     }
     
-    protected static function updateCustomerIdOnTokenInfoBase(){
+    protected static function updateCustomerIdOnTokenInfoBase()
+    {
         $result = Db::getInstance()->execute(
-            "ALTER TABLE `" . _DB_PREFIX_ . "wle_token_info` CHANGE `customer_id` `customer_id` int(10) unsigned NULL DEFAULT NULL;");      
+            "ALTER TABLE `" . _DB_PREFIX_ . "wle_token_info` CHANGE `customer_id` `customer_id` int(10) unsigned NULL DEFAULT NULL;"
+        );
         if ($result === false) {
             throw new Exception(DB::getMsgError());
-        }       
+        }
     }
     
-    protected static function updateImageBase(){
+    protected static function updateImageBase()
+    {
         $result = Db::getInstance()->execute(
-            "ALTER TABLE `" . _DB_PREFIX_ . "wle_method_configuration` ADD COLUMN `image_base` varchar(2047) COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER image;");
+            "ALTER TABLE `" . _DB_PREFIX_ . "wle_method_configuration` ADD COLUMN `image_base` varchar(2047) COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER image;"
+        );
         if ($result === false) {
             throw new Exception(DB::getMsgError());
         }
         
         $result = Db::getInstance()->execute(
-            "ALTER TABLE `" . _DB_PREFIX_ . "wle_transaction_info` ADD COLUMN `image_base` VARCHAR(2047)  COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER image;");        
+            "ALTER TABLE `" . _DB_PREFIX_ . "wle_transaction_info` ADD COLUMN `image_base` VARCHAR(2047)  COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER image;"
+        );
         if ($result === false) {
             throw new Exception(DB::getMsgError());
         }
     }
 }
-
