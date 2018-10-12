@@ -36,9 +36,14 @@ class Wallee extends Wallee_AbstractModule
      */
     public function __construct()
     {
-        parent::__construct();
-        $this->version = '1.0.13';
+        $this->name = 'wallee';
+        $this->tab = 'payments_gateways';
+        $this->author = 'Customweb GmbH';
+        $this->bootstrap = true;
+        $this->need_instance = 0;
+        $this->version = '1.0.14';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.1.21');
+        parent::__construct();
     }
 
     protected function installHooks()

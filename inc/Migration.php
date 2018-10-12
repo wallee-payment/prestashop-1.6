@@ -18,7 +18,8 @@ class Wallee_Migration extends Wallee_AbstractMigration
             '1.0.0' => 'initializeTables',
             '1.0.1' => 'orderStatusUpdate',
             '1.0.2' => 'tokenInfoImproved',
-            '1.0.3' => 'updateImageBase'
+            '1.0.3' => 'updateImageBase',
+            '1.0.4' => 'userFailureMessage',
         );
     }
     
@@ -57,4 +58,10 @@ class Wallee_Migration extends Wallee_AbstractMigration
     {
         static::updateCustomerIdOnTokenInfoBase();
     }
+    
+    public static function userFailureMessage() 
+    {
+    	static::userFailureMessageBase();
+    }
+    
 }

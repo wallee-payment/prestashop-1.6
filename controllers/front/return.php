@@ -85,11 +85,21 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
             5
         );
         $transaction = Wallee_Model_TransactionInfo::loadByOrderId($order->id);
-        $failureReason = $transaction->getFailureReason();
         
-        if ($failureReason !== null) {
-            $this->context->cookie->wle_error = Wallee_Helper::translate($failureReason);
+        $userFailureMessage = $transaction->getUserFailureMessage();
+        
+        if (empty($userFailureMessage)) {
+           	$failureReason = $transaction->getFailureReason();
+        
+        	if ($failureReason !== null) {
+           	    $userFailureMessage = Wallee_Helper::translate($failureReason);
+           	}
         }
+        
+        if (!empty($userFailureMessage)) {
+            $this->context->cookie->wle_error = $userFailureMessage;
+        }
+        
         $this->redirect_after = $this->context->link->getPageLink('order', true, null, "step=3");
     }
 

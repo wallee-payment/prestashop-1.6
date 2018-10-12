@@ -232,6 +232,8 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
             } elseif ($transaction->getFailureReason() != null) {
                 $info->setFailureReason($transaction->getFailureReason()->getDescription());
             }
+            $info->setUserFailureMessage($transaction->getUserFailureMessage());
+            
         }
         $info->save();
         return $info;

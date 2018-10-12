@@ -73,12 +73,6 @@ abstract class Wallee_AbstractModule extends PaymentModule
      */
     public function __construct()
     {
-        $this->name = 'wallee';
-        $this->tab = 'payments_gateways';
-        $this->author = 'Customweb GmbH';
-        $this->bootstrap = true;
-        $this->need_instance = 0;
-        
         parent::__construct();
         
         $this->displayName = 'wallee';

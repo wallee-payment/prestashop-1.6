@@ -284,4 +284,15 @@ abstract class Wallee_AbstractMigration
             throw new Exception(DB::getMsgError());
         }
     }
+    
+    protected static function userFailureMessageBase()
+    {
+        $result = Db::getInstance()->execute(
+            "ALTER TABLE `" . _DB_PREFIX_ . "wle_transaction_info` ADD COLUMN `user_failure_message` VARCHAR(2047)  COLLATE utf8_unicode_ci NULL DEFAULT NULL AFTER image;"
+        );
+        if ($result === false) {
+            throw new Exception(DB::getMsgError());
+        }
+    }
+    
 }
