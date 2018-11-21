@@ -326,10 +326,16 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         if (! isset(self::$possiblePaymentMethodCache[$currentCartId]) ||
              self::$possiblePaymentMethodCache[$currentCartId] == null) {
             $transaction = $this->getTransactionFromCart($cart);
-            $paymentMethods = $this->getTransactionService()->fetchPossiblePaymentMethods(
-                $transaction->getLinkedSpaceId(),
-                $transaction->getId()
-            );
+            try{
+                $paymentMethods = $this->getTransactionService()->fetchPossiblePaymentMethods(
+                    $transaction->getLinkedSpaceId(),
+                    $transaction->getId()
+                    );
+            } catch (\WhitelabelMachineName\Sdk\ApiException $e) {
+                self::$possiblePaymentMethodCache[$currentCartId] = array();
+                throw $e;
+            }	
+            
             $methodConfigurationService = Wallee_Service_MethodConfiguration::instance();
             foreach ($paymentMethods as $paymentMethod) {
                 $methodConfigurationService->updateData($paymentMethod);

@@ -108,9 +108,9 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
         );
         $this->addJquery();
         $this->addJS($jsUrl, false);
-        $this->addJS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/js/frontend/checkout.js');
+        $this->addJS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/view/js/frontend/checkout.js');
         $this->addJqueryPlugin('fancybox');
-        $this->addCSS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/css/frontend/checkout.css');
+        $this->addCSS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/view/css/frontend/checkout.css');
         
         $this->setTemplate('payment_execution.tpl');
     }
@@ -165,7 +165,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
                 null,
                 null,
                 null,
-                $null,
+                null,
                 true,
                 true,
                 $cart_product_context

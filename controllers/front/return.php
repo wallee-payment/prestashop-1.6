@@ -36,7 +36,7 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
                     
                     return;
                 case 'failure':
-                    self::process_failure($order);
+                    self::processFailure($order);
                     
                     return;
                 default:
@@ -74,7 +74,7 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
         );
     }
 
-    private function process_failure(Order $order)
+    private function processFailure(Order $order)
     {
         $transactionService = Wallee_Service_Transaction::instance();
         $transactionService->waitForTransactionState(

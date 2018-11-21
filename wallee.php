@@ -41,7 +41,7 @@ class Wallee extends Wallee_AbstractModule
         $this->author = 'Customweb GmbH';
         $this->bootstrap = true;
         $this->need_instance = 0;
-        $this->version = '1.0.14';
+        $this->version = '1.0.15';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.1.21');
         parent::__construct();
     }
@@ -487,13 +487,13 @@ class Wallee extends Wallee_AbstractModule
     {
         if ($this->context->controller instanceof ParentOrderControllerCore) {
             $this->context->controller->addCSS(
-                __PS_BASE_URI__ . 'modules/' . $this->name . '/css/frontend/checkout.css'
+                __PS_BASE_URI__ . 'modules/' . $this->name . '/view/css/frontend/checkout.css'
             );
             $cart = $this->context->cart;
             if (Configuration::get(self::CK_REMOVE_TOS, null, null, $cart->id_shop)) {
                 $this->context->cookie->checkedTOS = 1;
                 $this->context->controller->addJS(
-                    __PS_BASE_URI__ . 'modules/' . $this->name . '/js/frontend/tos-handling.js'
+                    __PS_BASE_URI__ . 'modules/' . $this->name . '/view/js/frontend/tos-handling.js'
                 );
             }
         }
