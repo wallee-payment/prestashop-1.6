@@ -213,7 +213,7 @@
             {assign var='ignoreProductLast' value=isset($customizedDatas.$productId.$productAttributeId)}
             {assign var='cannotModify' value=1}
             {* Display the gift product line *}
-            {include file="./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first}
+            {include file="$tpl_dir./shopping-cart-product-line.tpl" productLast=$product@last productFirst=$product@first}
         {/foreach}
         </tbody>
 
