@@ -24,7 +24,7 @@ namespace Wallee\Sdk\Model;
 use Wallee\Sdk\ValidationException;
 
 /**
- * PaymentContractType model
+ * TwoFactorAuthenticationType model
  *
  * @category    Class
  * @description 
@@ -32,14 +32,14 @@ use Wallee\Sdk\ValidationException;
  * @author      customweb GmbH
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class PaymentContractType  {
+class TwoFactorAuthenticationType  {
 
 	/**
 	 * The original name of the model.
 	 *
 	 * @var string
 	 */
-	private static $swaggerModelName = 'PaymentContractType';
+	private static $swaggerModelName = 'TwoFactorAuthenticationType';
 
 	/**
 	 * An array of property to type mappings. Used for (de)serialization.
@@ -48,7 +48,8 @@ class PaymentContractType  {
 	 */
 	private static $swaggerTypes = array(
 		'description' => 'map[string,string]',
-		'feature' => '\Wallee\Sdk\Model\Feature',
+		'feature' => 'int',
+		'icon' => 'string',
 		'id' => 'int',
 		'name' => 'map[string,string]'	);
 
@@ -73,9 +74,16 @@ class PaymentContractType  {
 	/**
 	 * 
 	 *
-	 * @var \Wallee\Sdk\Model\Feature
+	 * @var int
 	 */
 	private $feature;
+
+	/**
+	 * 
+	 *
+	 * @var string
+	 */
+	private $icon;
 
 	/**
 	 * The ID is the primary key of the entity. The ID identifies the entity uniquely.
@@ -101,9 +109,6 @@ class PaymentContractType  {
 		if (isset($data['description'])) {
 			$this->setDescription($data['description']);
 		}
-		if (isset($data['feature'])) {
-			$this->setFeature($data['feature']);
-		}
 		if (isset($data['name'])) {
 			$this->setName($data['name']);
 		}
@@ -125,7 +130,7 @@ class PaymentContractType  {
 	 * Sets description.
 	 *
 	 * @param map[string,string] $description
-	 * @return PaymentContractType
+	 * @return TwoFactorAuthenticationType
 	 */
 	public function setDescription($description) {
 		if (is_array($description) && empty($description)) {
@@ -142,7 +147,7 @@ class PaymentContractType  {
 	 *
 	 * 
 	 *
-	 * @return \Wallee\Sdk\Model\Feature
+	 * @return int
 	 */
 	public function getFeature() {
 		return $this->feature;
@@ -151,11 +156,34 @@ class PaymentContractType  {
 	/**
 	 * Sets feature.
 	 *
-	 * @param \Wallee\Sdk\Model\Feature $feature
-	 * @return PaymentContractType
+	 * @param int $feature
+	 * @return TwoFactorAuthenticationType
 	 */
-	public function setFeature($feature) {
+	protected function setFeature($feature) {
 		$this->feature = $feature;
+
+		return $this;
+	}
+
+	/**
+	 * Returns icon.
+	 *
+	 * 
+	 *
+	 * @return string
+	 */
+	public function getIcon() {
+		return $this->icon;
+	}
+
+	/**
+	 * Sets icon.
+	 *
+	 * @param string $icon
+	 * @return TwoFactorAuthenticationType
+	 */
+	protected function setIcon($icon) {
+		$this->icon = $icon;
 
 		return $this;
 	}
@@ -175,7 +203,7 @@ class PaymentContractType  {
 	 * Sets id.
 	 *
 	 * @param int $id
-	 * @return PaymentContractType
+	 * @return TwoFactorAuthenticationType
 	 */
 	protected function setId($id) {
 		$this->id = $id;
@@ -198,7 +226,7 @@ class PaymentContractType  {
 	 * Sets name.
 	 *
 	 * @param map[string,string] $name
-	 * @return PaymentContractType
+	 * @return TwoFactorAuthenticationType
 	 */
 	public function setName($name) {
 		if (is_array($name) && empty($name)) {

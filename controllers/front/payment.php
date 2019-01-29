@@ -5,7 +5,7 @@
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
- * @copyright 2017 - 2018 customweb GmbH
+ * @copyright 2017 - 2019 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
@@ -108,9 +108,9 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
         );
         $this->addJquery();
         $this->addJS($jsUrl, false);
-        $this->addJS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/view/js/frontend/checkout.js');
+        $this->addJS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/views/js/frontend/checkout.js');
         $this->addJqueryPlugin('fancybox');
-        $this->addCSS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/view/css/frontend/checkout.css');
+        $this->addCSS(__PS_BASE_URI__ . 'modules/' . $this->module->name . '/views/css/frontend/checkout.css');
         
         $this->setTemplate('payment_execution.tpl');
     }
@@ -152,6 +152,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
             if ($cart_product_context->shop->id != $product['id_shop']) {
                 $cart_product_context->shop = new Shop((int) $product['id_shop']);
             }
+            $nullValue = null;
             $product['price_without_specific_price'] = Product::getPriceStatic(
                 $product['id_product'],
                 ! Product::getTaxCalculationMethod(),
@@ -165,7 +166,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
                 null,
                 null,
                 null,
-                null,
+                $nullValue,
                 true,
                 true,
                 $cart_product_context
