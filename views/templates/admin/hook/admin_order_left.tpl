@@ -144,7 +144,7 @@
 								<span class="title_box ">{l s='Status' mod='wallee'}</span>
 							</th>
 							<th>
-								<span class="title_box ">{l s='Error Message' mod='wallee}</span>
+								<span class="title_box ">{l s='Error Message' mod='wallee'}</span>
 							</th>
 							<th>
 								<span class="title_box ">{l s='Links' mod='wallee'}</span>

@@ -576,7 +576,7 @@ class Wallee_Helper
             $labelsByGroupId = array();
             foreach ($info->getLabels() as $descriptorId => $value) {
                 $descriptor = $labelDescriptionProvider->find($descriptorId);
-                if ($descriptor) {
+                if ($descriptor && $descriptor->getCategory() == \Wallee\Sdk\Model\LabelDescriptorCategory::HUMAN) {
                     $labelsByGroupId[$descriptor->getGroup()][] = array(
                         'descriptor' => $descriptor,
                         'translatedName' => Wallee_Helper::translate($descriptor->getName()),
