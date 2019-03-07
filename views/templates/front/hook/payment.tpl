@@ -9,29 +9,28 @@
  *}
 <div class="row">
 	<div class="col-xs-12">
-			<p class="payment_module wallee-method">
-				<a class="wallee {if empty($image)}no_logo{/if}" href="{$link|escape:'html'}" title="{$name}" 
+		<div class="payment_module wallee-method">
+			<div class="wallee {if empty($image)}no_logo{/if}" 
 					{if !empty($image)} 
-						style="background: url({$image|escape:'html'}) no-repeat #fbfbfb; background-size: 64px; background-position:15px;"
+						style="background-image: url({$image|escape:'html'}); background-repeat: no-repeat; background-size: 64px; background-position:15px;"		
 					{/if}
-				>
-					{$name}
-		{if !empty($description)}
-			<span class="payment-method-description">{$description}</span>
-		{/if}
-		{if !empty($feeValues)}
-			<span class="wallee-payment-fee"><span class="wallee-payment-fee-text">{l s='Additional Fee:' mod='wallee'}</span>
-				<span class="wallee-payment-fee-value">
-					{if $priceDisplay}
-			          	{displayPrice price=$feeValues.fee_total} {if $display_tax_label}{l s='(tax excl.)' mod='wallee'}{/if}
-			        {else}
-			          	{displayPrice price=$feeValues.fee_total_wt} {if $display_tax_label}{l s='(tax incl.)' mod='wallee'}{/if}
-			        {/if}
-		       </span>
-		   </span>
-		{/if}					
-				</a>
-			</p>	
+					onclick="document.getElementById('wallee-{$methodId}-link').click();" >
+				<a class="wallee" id="wallee-{$methodId}-link" href="{$link|escape:'html'}" title="{$name}" >{$name}</a>
+			{if !empty($description)}
+				<span class="payment-method-description">{$description}</span>
+			{/if}
+			{if !empty($feeValues)}
+				<span class="wallee-payment-fee"><span class="wallee-payment-fee-text">{l s='Additional Fee:' mod='wallee'}</span>
+					<span class="wallee-payment-fee-value">
+						{if $priceDisplay}
+				          	{displayPrice price=$feeValues.fee_total} {if $display_tax_label}{l s='(tax excl.)' mod='wallee'}{/if}
+				        {else}
+				          	{displayPrice price=$feeValues.fee_total_wt} {if $display_tax_label}{l s='(tax incl.)' mod='wallee'}{/if}
+				        {/if}
+			       </span>
+			   </span>
+			{/if}
+			</div>					
+		</div>	
 	</div>
 </div>
-

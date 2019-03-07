@@ -7,12 +7,45 @@
  * @copyright 2017 - 2019 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
-p.payment_module a.wallee.no_logo {
+div.wallee-method div.wallee.no_logo {
 	padding: 33px 40px 34px 20px;
-	background: #fbfbfb;
 }
 
-p.wallee-method a.wallee:after {
+div.wallee-method div.wallee{
+	display: block;
+    border: 1px solid #d6d4d4;
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    font-size: 17px;
+    line-height: 23px;
+    padding: 33px 40px 34px 99px;
+    letter-spacing: -1px;
+    position: relative;
+    margin-bottom: 10px;
+    cursor: pointer;
+    background: #fbfbfb;
+}
+
+div.wallee-method div.wallee:hover {
+	background-color: #f6f6f6; 
+}
+
+div.wallee-method span {
+    font-weight: bold;
+    color: #777;  
+}
+
+div.wallee-method a.wallee{
+	color: #333;
+	font-weight: bold;
+}
+
+div.wallee-method a:not(.wallee) {
+	text-decoration: underline;
+}
+
+div.wallee-method div.wallee:after {
 	display: block;
 	content: "\f054";
 	position: absolute;
@@ -26,16 +59,16 @@ p.wallee-method a.wallee:after {
 	color: #777;
 }
 
-p.payment_module a span.wallee-payment-fee {
+div.wallee-method div span.wallee-payment-fee {
 	display:block;
 	font-size: 0.8em;
 }
 
-p.payment_module a span.wallee-payment-fee span.wallee-payment-fee-text{
+div.wallee-method div span.wallee-payment-fee span.wallee-payment-fee-text{
 	font-weight: normal;
 }
 
-p.payment_module a span.wallee-payment-fee span.wallee-payment-fee-value{
+div.wallee-method a span.wallee-payment-fee span.wallee-payment-fee-value{
 	font-weight: bold;
 }
 

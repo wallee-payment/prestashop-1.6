@@ -49,6 +49,10 @@ jQuery(function($) {
 	    this.iframe_handler.setInitializeCallback(function(){
 			$('#wallee-iframe-possible').remove();
 			$('.wallee-loader').remove();
+			$('html, body').animate(
+					{
+						scrollTop : ($('#wallee-method-container').offset().top - screen.height/8)
+					}, 1000);
 			self.enable_pay_button();
 	    });
 	    this.iframe_handler.create("wallee-method-container");

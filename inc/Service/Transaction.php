@@ -444,7 +444,8 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                 array(
                     'order_id' => $dataSource->id,
                     'secret' => Wallee_Helper::computeOrderSecret($dataSource),
-                    'action' => 'success'
+                    'action' => 'success',
+                    'utm_nooverride' => '1'
                 ),
                 true
             )
@@ -457,7 +458,8 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                 array(
                     'order_id' => $dataSource->id,
                     'secret' => Wallee_Helper::computeOrderSecret($dataSource),
-                    'action' => 'failure'
+                    'action' => 'failure',
+                    'utm_nooverride' => '1'
                 ),
                 true
             )
