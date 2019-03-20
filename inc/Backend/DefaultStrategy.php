@@ -375,7 +375,7 @@ class Wallee_Backend_DefaultStrategy implements Wallee_Backend_IStrategy
         
         if ($shippingCostAmount > 0) {
             $uniqueId = 'order-' . $order->id . '-shipping';
-            if (! $parsedData['TaxMethod']) {
+            if (isset($parsedData['TaxMethod']) && !$parsedData['TaxMethod']) {
                 $tax = new Tax();
                 $tax->rate = $order->carrier_tax_rate;
                 $taxCalculator = new TaxCalculator(array(

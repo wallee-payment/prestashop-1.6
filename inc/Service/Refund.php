@@ -92,6 +92,8 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
             $refundJob->setExternalId(uniqid($order->id . '-'));
             $refundJob->setRefundParameters($parsedParameters);
             $refundJob->save();
+            //validate Refund Job
+            $this->createRefundObject($refundJob);
             $currentRefundJob = $refundJob->getId();
             Wallee_Helper::commitDBTransaction();
         } catch (Exception $e) {

@@ -45,7 +45,7 @@ div.wallee-method a:not(.wallee) {
 	text-decoration: underline;
 }
 
-div.wallee-method div.wallee:after {
+div.wallee-method div.wallee:not(.amount-error):after {
 	display: block;
 	content: "\f054";
 	position: absolute;
@@ -57,6 +57,11 @@ div.wallee-method div.wallee:after {
 	height: 22px;
 	width: 14px;
 	color: #777;
+}
+
+div.wallee-method div.amount-error span.danger {
+    font-weight: bold;
+    color: #333;
 }
 
 div.wallee-method div span.wallee-payment-fee {
@@ -79,6 +84,20 @@ div#wallee-method-container {
 	margin-left: auto;
 }
 
+div#wallee-payment-container h3{
+	display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+div#wallee-payment-container.invisible {
+	display:none;
+}
+
+button#wallee-submit-top {
+	border-radius: 4px;
+}
+
 .wallee-loader {
 	border: 16px solid #f3f3f3; /* Light grey */
     border-top: 16px solid #3eb0eb; /* Blue */
@@ -92,5 +111,9 @@ div#wallee-method-container {
 @keyframes wallee-spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
+}
+
+p.wallee-indent {
+    margin-bottom: 9px;
 }
 	

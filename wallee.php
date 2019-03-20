@@ -41,7 +41,7 @@ class Wallee extends Wallee_AbstractModule
         $this->author = 'Customweb GmbH';
         $this->bootstrap = true;
         $this->need_instance = 0;
-        $this->version = '1.0.19';
+        $this->version = '1.0.20';
         $this->ps_versions_compliancy = array('min' => '1.6', 'max' => '1.6.1.21');
         parent::__construct();
     }
@@ -346,6 +346,18 @@ class Wallee extends Wallee_AbstractModule
             $possiblePaymentMethods = Wallee_Service_Transaction::instance()->getPossiblePaymentMethods(
                 $cart
             );
+        } catch(Wallee_Exception_InvalidTransactionAmount $e) {
+            PrestaShopLogger::addLog(
+                $e->getMessage()." CartId: ".$cart->id,
+                3,
+                null,
+                'Wallee'
+                );
+            return array(
+                array(
+                    'cta_text' => $this->display(__DIR__, 'hook/amount_error_eu.tpl'),
+                    'form' => ""
+            ));
         } catch (Exception $e) {
             return;
         }
@@ -419,6 +431,14 @@ class Wallee extends Wallee_AbstractModule
             $possiblePaymentMethods = Wallee_Service_Transaction::instance()->getPossiblePaymentMethods(
                 $cart
             );
+        } catch(Wallee_Exception_InvalidTransactionAmount $e) {
+            PrestaShopLogger::addLog(
+                $e->getMessage()." CartId: ".$cart->id,
+                3,
+                null,
+                'Wallee'
+                );
+            return $this->display(__DIR__, 'hook/amount_error.tpl');        
         } catch (Exception $e) {
             return;
         }

@@ -331,11 +331,13 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                     $transaction->getLinkedSpaceId(),
                     $transaction->getId()
                     );
-            } catch (\WhitelabelMachineName\Sdk\ApiException $e) {
+            } catch (\WhitelabelMachineName\Sdk\ApiException $e)  {
+                self::$possiblePaymentMethodCache[$currentCartId] = array();
+                throw $e;
+            } catch (Wallee_Exception_InvalidTransactionAmount $e)  {
                 self::$possiblePaymentMethodCache[$currentCartId] = array();
                 throw $e;
             }	
-            
             $methodConfigurationService = Wallee_Service_MethodConfiguration::instance();
             foreach ($paymentMethods as $paymentMethod) {
                 $methodConfigurationService->updateData($paymentMethod);

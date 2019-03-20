@@ -219,8 +219,7 @@ class Wallee_Service_LineItem extends Wallee_Service_Abstract
         $items = $this->getItemsFromOrdersInner($orders);
         $orderTotal = 0;
         foreach ($orders as $order) {
-            $orderTotal += ((float) $order->total_products_wt) + ((float) $order->total_shipping) -
-            ((float) $order->total_discounts) + ((float) $order->total_wrapping);
+            $orderTotal += (float) $order->total_paid;
         }
         $cleaned = Wallee_Helper::cleanupLineItems(
             $items,

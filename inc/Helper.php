@@ -179,18 +179,10 @@ class Wallee_Helper
             self::getTotalAmountIncludingTax($lineItems),
             $currencyCode
         );
-        $diff = self::roundAmount($expectedSum, $currencyCode) - $effectiveSum;
+        $roundedExcpected = self::roundAmount($expectedSum, $currencyCode);
+        $diff = $roundedExcpected - $effectiveSum;
         if ($diff != 0) {
-            $lineItem = new \Wallee\Sdk\Model\LineItemCreate();
-            $lineItem->setAmountIncludingTax(self::roundAmount($diff, $currencyCode));
-            $lineItem->setName(self::getModuleInstance()->l('Rounding Adjustment', 'helper'));
-            $lineItem->setQuantity(1);
-            $lineItem->setSku('rounding-adjustment');
-            $lineItem->setType(
-                $diff < 0 ? \Wallee\Sdk\Model\LineItemType::DISCOUNT : \Wallee\Sdk\Model\LineItemType::FEE
-            );
-            $lineItem->setUniqueId('rounding-adjustment');
-            $lineItems[] = $lineItem;
+            throw new Wallee_Exception_InvalidTransactionAmount($effectiveSum, $roundedExcpected);
         }
         
         return self::ensureUniqueIds($lineItems);

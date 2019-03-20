@@ -12,7 +12,7 @@
 {/capture}
 
 <h1 class="page-heading">
-    {l s='Order summary' mod='wallee'}
+    {l s='Order Review' mod='wallee'}
 </h1>
 
 {assign var='current_step' value='payment'}
@@ -24,18 +24,51 @@
     </p>
 {else}
 	{if $showCart}
+		<div class="box">
+			<p>
+                <strong class="dark">
+				{l s='Please finalize the order by clicking "I confirm my order".' mod='wallee'}
+			 </strong>
+            </p>
+		</div>
 		{assign var='cartTemplate' value="{wallee_resolve_template template='cart_contents.tpl'}"}
 		{include file="$cartTemplate"}
+	{else}
+		<div class="box">
+			<p class="wallee-indent">
+                <strong class="dark">
+                	{l s='Please finalize your order.' mod='wallee'}
+                </strong>
+            </p>
+			<p>
+                - {l s='The total amount of your order comes to' mod='wallee'}
+	                <span id="amount" class="price">{displayPrice price=$total_price}</span>
+					{if $use_taxes == 1}
+				    	{l s='(tax incl.)' mod='wallee'}
+				    {/if}
+            </p>
+            <p>
+                - {l s='To finalize the order click "I confirm my order".' mod='wallee'}
+            </p>
+		</div>
 	{/if}
 	
 	<div id="wallee-error-messages"></div>
 	
+	
+	<div id="wallee-payment-container" class="invisible">
+	<h3 class="page-subheading" id="wallee-method-title">
+        <span><span style="font-size:smaller">{l s='Payment Method:' mod='wallee'}</span> {$name}</span>
+        
+        <button class="button btn btn-default button-medium wallee-submit right" id="wallee-submit-top" disabled>
+            <span>{l s='I confirm my order' mod='wallee'}<i class="icon-chevron-right right"></i></span>
+        </button>
+    </h3>
+	</div>
 	<form action="{$form_target_url|escape:'html':'UTF-8'}" method="post" id="wallee-payment-form">
     	<input type="hidden" name="cartHash" value="{$cartHash}" />
     	<input type="hidden" name="methodId" value="{$methodId}" />
-    	<h3 class="page-subheading">
-                <span style="font-size:smaller">{l s='Payment Method:' mod='wallee'}</span> {$name}
-        </h3>
+    	
         <div id="wallee-method-configuration" class="wallee-method-configuration" style="display: none;"
 	data-method-id="{$methodId}" data-configuration-id="{$configurationId}"></div>
 		<div id="wallee-method-container">
@@ -60,11 +93,12 @@
             <a class="button-exclusive btn btn-default" href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" tabindex="-1" id="wallee-back">
                 <i class="icon-chevron-left"></i>{l s='Other payment methods' mod='wallee'}
             </a>
-            <button class="button btn btn-default button-medium" id="wallee-submit" disabled>
+            <button class="button btn btn-default button-medium wallee-submit" id="wallee-submit-bottom" disabled>
                 <span>{l s='I confirm my order' mod='wallee'}<i class="icon-chevron-right right"></i></span>
             </button>
         </p>
     </form>
+    
     <script type="text/javascript">$("a.iframe").fancybox({
 		"type" : "iframe",
 		"width":600,
