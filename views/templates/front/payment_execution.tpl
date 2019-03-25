@@ -23,6 +23,9 @@
         {l s='Your shopping cart is empty.' mod='wallee'}
     </p>
 {else}
+	<div id="wallee-processing-spinner-container" class="wallee-processing-spinner-container invisible">
+		<div class="wallee-processing-spinner"></div>
+	</div>
 	{if $showCart}
 		<div class="box">
 			<p>

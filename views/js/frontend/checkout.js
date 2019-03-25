@@ -99,11 +99,21 @@ jQuery(function($) {
 	    self.iframe_handler.validate();
 	    return false;
 	},
+	
+	
+	show_processing_spinner : function(){
+		$('#wallee-processing-spinner-container').removeClass('invisible');
+	},
+	
+	hide_processing_spinner: function(){
+		$('#wallee-processing-spinner-container').addClass('invisible');
+	},
 
 	
 	process_validation : function(validation_result) {
 	    var self = this;
 	    if (validation_result.success) {
+	    	self.show_processing_spinner();	    	
 			var form = $('#wallee-payment-form');		
 			$.ajax({
 				type:		'POST',
@@ -122,6 +132,7 @@ jQuery(function($) {
 					else if ( response.result == 'failure' ) {
 					    if(response.reload == 'true' ){
 							location.reload();
+							self.hide_processing_spinner();
 							self.enable_pay_button();
 							return;
 					    }
@@ -132,11 +143,13 @@ jQuery(function($) {
 					}
 					self.remove_existing_errors();
 					self.show_new_errors(wallee_msg_json_error);
+					self.hide_processing_spinner();
 					self.enable_pay_button();
 				},
 				error: 		function(jqXHR, textStatus, errorThrown){
 				    self.remove_existing_errors();
 				    self.show_new_errors(wallee_msg_json_error);
+				    self.hide_processing_spinner();
 				    self.enable_pay_button();
 				},
 			});

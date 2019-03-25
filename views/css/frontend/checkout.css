@@ -116,4 +116,34 @@ button#wallee-submit-top {
 p.wallee-indent {
     margin-bottom: 9px;
 }
+
+
+/* Transparent Overlay */
+.wallee-processing-spinner-container {
+  content: '';
+  display: block;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.3);
+  z-index: 90000;
+}
+
+
+.wallee-processing-spinner {
+	position: fixed;
+	z-index: 90002;
+	overflow: visible;
+	top: 30%;
+	left: 50%;
+	border: 16px solid #f3f3f3; /* Light grey */
+    border-top: 16px solid #3eb0eb; /* Blue */
+    border-radius: 50%;
+    width: 120px;
+    height: 120px;
+    animation: wallee-spin 2s linear infinite;
+    margin: 0 auto;
+}
 	

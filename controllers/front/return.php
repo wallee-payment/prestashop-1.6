@@ -94,10 +94,15 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
         	if ($failureReason !== null) {
            	    $userFailureMessage = Wallee_Helper::translate($failureReason);
            	}
-        }
-        
+        }        
         if (!empty($userFailureMessage)) {
             $this->context->cookie->wle_error = $userFailureMessage;
+        }
+        
+        //Set cart to cookie
+        $originalCartId = Wallee_Helper::getOrderMeta($order, 'originalCart');
+        if (!empty($originalCartId)) {
+            $this->context->cookie->id_cart= $originalCartId;
         }
         
         $this->redirect_after = $this->context->link->getPageLink('order', true, null, "step=3");
