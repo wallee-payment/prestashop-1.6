@@ -103,6 +103,7 @@ class WalleeCronModuleFrontController extends ModuleFrontController
                     $error[] = "Cron overloaded could not execute all registered tasks.";
                     break 2;
                 }
+                $callableName = null;
                 if (! is_callable($subTask, false, $callableName)) {
                     $error[] = "Module '$module' returns not callable task '$callableName'.";
                     continue;

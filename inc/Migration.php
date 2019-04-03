@@ -26,7 +26,8 @@ class Wallee_Migration extends Wallee_AbstractMigration
     public static function initializeTables()
     {
         static::installTableBase();
-        $result = Db::getInstance()->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_cron_job(
+        $instance = DB::getInstance();
+        $result = $instance->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_cron_job(
                 `id_cron_job` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `constraint_key` int(10),
                 `state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -44,7 +45,7 @@ class Wallee_Migration extends Wallee_AbstractMigration
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
         
         if ($result === false) {
-            throw new Exception(DB::getMsgError());
+            throw new Exception($instance->getMsgError());
         }
     }
     
