@@ -22,17 +22,21 @@ abstract class Wallee_Webhook_OrderRelatedAbstract extends Wallee_Webhook_Abstra
      */
     public function process(Wallee_Webhook_Request $request)
     {
-        
         Wallee_Helper::startDBTransaction();
         $entity = $this->loadEntity($request);
         try {
             $order = new Order($this->getOrderId($entity));
             if (Validate::isLoadedObject($order)) {
                 $ids = Wallee_Helper::getOrderMeta($order, 'mappingIds');
-
                 if ($ids['transactionId'] != $this->getTransactionId($entity)) {
                     return;
                 }
+                //We never have an employee on webhooks, but the stock magement sometimes needs one
+                if(Context::getContext()->employee == null){
+                    $employees = Employee::getEmployeesByProfile(_PS_ADMIN_PROFILE_, true);
+                    $employeeArray = reset($employees);
+                    Context::getContext()->employee = new Employee($employeeArray['id_employee']);
+                }                
                 Wallee_Helper::lockByTransactionId($request->getSpaceId(), $this->getTransactionId($entity));
                 $order = new Order($this->getOrderId($entity));
                 $this->processOrderRelatedInner($order, $entity);

@@ -64,16 +64,16 @@ div.wallee-method div.amount-error span.danger {
     color: #333;
 }
 
-div.wallee-method div span.wallee-payment-fee {
+div.wallee-method div span.wallee-additional-amount {
 	display:block;
 	font-size: 0.8em;
 }
 
-div.wallee-method div span.wallee-payment-fee span.wallee-payment-fee-text{
+div.wallee-method div span.wallee-additional-amount span.wallee-additional-amount-text{
 	font-weight: normal;
 }
 
-div.wallee-method a span.wallee-payment-fee span.wallee-payment-fee-value{
+div.wallee-method a span.wallee-additional-amount span.wallee-additional-amount-value{
 	font-weight: bold;
 }
 

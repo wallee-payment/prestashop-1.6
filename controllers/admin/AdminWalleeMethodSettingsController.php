@@ -315,7 +315,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                             'type' => Wallee::TOTAL_MODE_PRODUCTS_INC
                         ),
                         array(
-                            'name' => $this->module->l('Products only(exc Tax)', 'adminwalleemethodsettingscontroller'),
+                            'name' => $this->module->l('Products only (exc Tax)', 'adminwalleemethodsettingscontroller'),
                             'type' => Wallee::TOTAL_MODE_PRODUCTS_EXC
                         )
                         
@@ -325,11 +325,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 )
             )
         );
-        
-        $submit = array(
-            'title' => $this->module->l('Save', 'adminwalleemethodsettingscontroller'),
-            'class' => 'btn btn-default pull-right'
-        );
+
         $fieldsForm = array();
         $fieldsForm[]['form'] = array(
             'legend' => array(
@@ -338,14 +334,14 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             'input' => $configuration,
             'buttons' => array(
                 array(
-                    'title' =>$this->l('Save All', 'adminwalleemethodsettingscontroller'),
+                    'title' =>$this->module->l('Save All', 'adminwalleemethodsettingscontroller'),
                     'class' => 'pull-right',
                     'type' => 'input',
                     'icon' => 'process-icon-save',
                     'name' => 'save_all'
                 ),
                 array(
-                    'title' =>$this->l('Save', 'adminwalleemethodsettingscontroller'),
+                    'title' =>$this->module->l('Save', 'adminwalleemethodsettingscontroller'),
                     'class' => 'pull-right',
                     'type' => 'input',
                     'icon' => 'process-icon-save',
@@ -360,14 +356,14 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             'input' => $fees,
             'buttons' => array(
                 array(
-                    'title' =>$this->l('Save All', 'adminwalleemethodsettingscontroller'),
+                    'title' =>$this->module->l('Save All', 'adminwalleemethodsettingscontroller'),
                     'class' => 'pull-right',
                     'type' => 'input',
                     'icon' => 'process-icon-save',
                     'name' => 'save_all'
                 ),
                 array(
-                    'title' =>$this->l('Save', 'adminwalleemethodsettingscontroller'),
+                    'title' =>$this->module->l('Save', 'adminwalleemethodsettingscontroller'),
                     'class' => 'pull-right',
                     'type' => 'input',
                     'icon' => 'process-icon-save',
@@ -476,7 +472,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                             'type' => Wallee::TOTAL_MODE_PRODUCTS_INC
                         ),
                         array(
-                            'name' => $this->module->l('Products only(exc Tax)', 'adminwalleemethodsettingscontroller'),
+                            'name' => $this->module->l('Products only (exc Tax)', 'adminwalleemethodsettingscontroller'),
                             'type' => Wallee::TOTAL_MODE_PRODUCTS_EXC
                         )
                     

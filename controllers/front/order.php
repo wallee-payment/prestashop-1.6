@@ -53,7 +53,10 @@ class WalleeOrderModuleFrontController extends Wallee_FrontPaymentController
             $this->context->cookie->checkedTOS = 1;
         }
                 
+        Wallee_FeeHelper::removeFeeSurchargeProductsFromCart($cart);
+        Wallee_FeeHelper::addSurchargeProductToCart($cart);
         Wallee_FeeHelper::addFeeProductToCart($methodConfiguration, $cart);
+        
         if ($cartHash != Wallee_Helper::calculateCartHash($cart)) {
             $this->context->cookie->wle_error = $this->module->l('The cart was changed, please try again.', 'order');
             echo json_encode(array('result' => 'failure', 'reload' => 'true'));

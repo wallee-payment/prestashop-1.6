@@ -12,9 +12,20 @@
 			<span class="payment-method-description">{$description}</span>
 {/if}
 
+{if !empty($surchargeValues)}
+	<span class="wallee-surcharge wallee-additional-amount"><span class="wallee-surcharge-text wallee-additional-amount-text">{l s='Minimum Sales Surcharge:' mod='wallee'}</span>
+		<span class="wallee-surcharge-value wallee-additional-amount-value">
+			{if $priceDisplay}
+	          	{displayPrice price=$surchargeValues.surcharge_total} {if $display_tax_label}{l s='(tax excl.)' mod='wallee'}{/if}
+	        {else}
+	          	{displayPrice price=$surchargeValues.surcharge_total_wt} {if $display_tax_label}{l s='(tax incl.)' mod='wallee'}{/if}
+	        {/if}
+       </span>
+   </span>
+{/if}
 {if !empty($feeValues)}
-	<span class="wallee-payment-fee"><span class="wallee-payment-fee-text">{l s='Additional Fee:' mod='wallee'}</span>
-		<span class="wallee-payment-fee-value">
+	<span class="wallee-payment-fee wallee-additional-amount"><span class="wallee-payment-fee-text wallee-additional-amount-text">{l s='Payment Fee:' mod='wallee'}</span>
+		<span class="wallee-payment-fee-value wallee-additional-amount-value">
 			{if $priceDisplay}
 	          	{displayPrice price=$feeValues.fee_total} {if $display_tax_label}{l s='(tax excl.)' mod='wallee'}{/if}
 	        {else}
