@@ -62,6 +62,7 @@ class Wallee_Webhook_Refund extends Wallee_Webhook_OrderRelatedAbstract
                 break;
             case \Wallee\Sdk\Model\RefundState::SUCCESSFUL:
                 $this->refunded($refund, $order);
+                break;
             default:
                 // Nothing to do.
                 break;

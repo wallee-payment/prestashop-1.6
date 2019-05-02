@@ -89,12 +89,12 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
         $userFailureMessage = $transaction->getUserFailureMessage();
         
         if (empty($userFailureMessage)) {
-           	$failureReason = $transaction->getFailureReason();
+            $failureReason = $transaction->getFailureReason();
         
-        	if ($failureReason !== null) {
-           	    $userFailureMessage = Wallee_Helper::translate($failureReason);
-           	}
-        }        
+            if ($failureReason !== null) {
+                $userFailureMessage = Wallee_Helper::translate($failureReason);
+            }
+        }
         if (!empty($userFailureMessage)) {
             $this->context->cookie->wle_error = $userFailureMessage;
         }

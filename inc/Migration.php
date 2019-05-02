@@ -60,7 +60,7 @@ class Wallee_Migration extends Wallee_AbstractMigration
         static::updateCustomerIdOnTokenInfoBase();
     }
     
-    public static function userFailureMessage() 
+    public static function userFailureMessage()
     {
     	static::userFailureMessageBase();
     }

@@ -233,7 +233,6 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                 $info->setFailureReason($transaction->getFailureReason()->getDescription());
             }
             $info->setUserFailureMessage($transaction->getUserFailureMessage());
-            
         }
         $info->save();
         return $info;
@@ -326,18 +325,18 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         if (! isset(self::$possiblePaymentMethodCache[$currentCartId]) ||
              self::$possiblePaymentMethodCache[$currentCartId] == null) {
             $transaction = $this->getTransactionFromCart($cart);
-            try{
+            try {
                 $paymentMethods = $this->getTransactionService()->fetchPossiblePaymentMethods(
                     $transaction->getLinkedSpaceId(),
                     $transaction->getId()
-                    );
-            } catch (\WhitelabelMachineName\Sdk\ApiException $e)  {
+                );
+            } catch (\WhitelabelMachineName\Sdk\ApiException $e) {
                 self::$possiblePaymentMethodCache[$currentCartId] = array();
                 throw $e;
-            } catch (Wallee_Exception_InvalidTransactionAmount $e)  {
+            } catch (Wallee_Exception_InvalidTransactionAmount $e) {
                 self::$possiblePaymentMethodCache[$currentCartId] = array();
                 throw $e;
-            }	
+            }
             $methodConfigurationService = Wallee_Service_MethodConfiguration::instance();
             foreach ($paymentMethods as $paymentMethod) {
                 $methodConfigurationService->updateData($paymentMethod);
@@ -546,7 +545,7 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
                     $ids['spaceId'],
                     $ids['transactionId']
                 );
-                if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING) {
+                if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING || (!empty($transaction->getCustomerId()) && $transaction->getCustomerId() != $cart->id_customer)) {
                     return $this->createTransactionFromCart($cart);
                 }
                 $pendingTransaction = new \Wallee\Sdk\Model\TransactionPending();

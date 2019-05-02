@@ -128,7 +128,7 @@ class WalleePaymentModuleFrontController extends Wallee_FrontPaymentController
 
     protected function assignSummaryInformations(Cart $cart)
     {
-        $summary = $cart->getSummaryDetails();
+        $summary = $cart->getSummaryDetails(null, true);
         $customizedDatas = Product::getAllCustomizedDatas($cart->id);
         
         // override customization tax rate with real tax (tax rules)
