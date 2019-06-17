@@ -511,9 +511,11 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
         );
         $createTransaction->setAutoConfirmationEnabled(false);
         $createTransaction->setDeviceSessionIdentifier(Context::getContext()->cookie->wle_device_id);
-        $createTransaction->setSpaceViewId(
-            Configuration::get(Wallee::CK_SPACE_VIEW_ID, null, null, $cart->id_shop)
-        );
+        
+        $spaceViewId = Configuration::get(Wallee::CK_SPACE_VIEW_ID, null, null, $cart->id_shop);
+        if(!empty($spaceViewId)){
+            $createTransaction->setSpaceViewId($spaceViewId);
+        }
         $this->assembleCartTransactionData($cart, $createTransaction);
         $transaction = $this->getTransactionService()->create($spaceId, $createTransaction);
         Wallee_Helper::updateCartMeta(
