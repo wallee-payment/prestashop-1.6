@@ -41,7 +41,7 @@ class Wallee extends Wallee_AbstractModule
         $this->author = 'Customweb GmbH';
         $this->bootstrap = true;
         $this->need_instance = 0;
-        $this->version = '1.1.4';
+        $this->version = '1.1.5';
         $this->description = sprintf(
             $this->l('This PrestaShop module enables to process payments with %s.'),
             'wallee'

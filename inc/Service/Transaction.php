@@ -478,10 +478,16 @@ class Wallee_Service_Transaction extends Wallee_Service_Abstract
     public function getTransactionFromCart(Cart $cart)
     {
         $currentCartId = $cart->id;
+        $spaceId = Configuration::get(
+            Wallee::CK_SPACE_ID,
+            null,
+            $cart->id_shop_group,
+            $cart->id_shop
+            );
         if (! isset(self::$transactionCache[$currentCartId]) ||
              self::$transactionCache[$currentCartId] == null) {
             $ids = Wallee_Helper::getCartMeta($cart, 'mappingIds');
-            if (empty($ids)) {
+            if (empty($ids) || !isset($ids['spaceId']) || $ids['spaceId'] != $spaceId) {
                 $transaction = $this->createTransactionFromCart($cart);
             } else {
                 $transaction = $this->loadAndUpdateTransactionFromCart($cart);
