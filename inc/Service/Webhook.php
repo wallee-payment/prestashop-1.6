@@ -12,22 +12,23 @@
 /**
  * This service handles webhooks.
  */
-class Wallee_Service_Webhook extends Wallee_Service_Abstract
+class WalleeServiceWebhook extends WalleeServiceAbstract
 {
-    
+
     /**
      * The webhook listener API service.
      *
      * @var \Wallee\Sdk\Service\WebhookListenerService
      */
     private $webhookListenerService;
-    
+
     /**
      * The webhook url API service.
      *
      * @var \Wallee\Sdk\Service\WebhookUrlService
      */
     private $webhookUrlService;
+
     private $webhookEntities = array();
 
     /**
@@ -35,102 +36,101 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
      */
     public function __construct()
     {
-        $this->webhookEntities[1487165678181] = new Wallee_Webhook_Entity(
+        $this->webhookEntities[1487165678181] = new WalleeWebhookEntity(
             1487165678181,
             'Manual Task',
             array(
-                    \Wallee\Sdk\Model\ManualTaskState::DONE,
-                    \Wallee\Sdk\Model\ManualTaskState::EXPIRED,
-                    \Wallee\Sdk\Model\ManualTaskState::OPEN
-                ),
-            'Wallee_Webhook_ManualTask'
+                \Wallee\Sdk\Model\ManualTaskState::DONE,
+                \Wallee\Sdk\Model\ManualTaskState::EXPIRED,
+                \Wallee\Sdk\Model\ManualTaskState::OPEN
+            ),
+            'WalleeWebhookManualtask'
         );
-        $this->webhookEntities[1472041857405] = new Wallee_Webhook_Entity(
+        $this->webhookEntities[1472041857405] = new WalleeWebhookEntity(
             1472041857405,
             'Payment Method Configuration',
             array(
-                    \Wallee\Sdk\Model\CreationEntityState::ACTIVE,
-                    \Wallee\Sdk\Model\CreationEntityState::DELETED,
-                    \Wallee\Sdk\Model\CreationEntityState::DELETING,
-                    \Wallee\Sdk\Model\CreationEntityState::INACTIVE
-                ),
-            'Wallee_Webhook_MethodConfiguration',
+                \Wallee\Sdk\Model\CreationEntityState::ACTIVE,
+                \Wallee\Sdk\Model\CreationEntityState::DELETED,
+                \Wallee\Sdk\Model\CreationEntityState::DELETING,
+                \Wallee\Sdk\Model\CreationEntityState::INACTIVE
+            ),
+            'WalleeWebhookMethodconfiguration',
             true
         );
-        $this->webhookEntities[1472041829003] = new Wallee_Webhook_Entity(
+        $this->webhookEntities[1472041829003] = new WalleeWebhookEntity(
             1472041829003,
             'Transaction',
             array(
-                    \Wallee\Sdk\Model\TransactionState::AUTHORIZED,
-                    \Wallee\Sdk\Model\TransactionState::DECLINE,
-                    \Wallee\Sdk\Model\TransactionState::FAILED,
-                    \Wallee\Sdk\Model\TransactionState::FULFILL,
-                    \Wallee\Sdk\Model\TransactionState::VOIDED,
-                    \Wallee\Sdk\Model\TransactionState::COMPLETED,
-                ),
-            'Wallee_Webhook_Transaction'
+                \Wallee\Sdk\Model\TransactionState::AUTHORIZED,
+                \Wallee\Sdk\Model\TransactionState::DECLINE,
+                \Wallee\Sdk\Model\TransactionState::FAILED,
+                \Wallee\Sdk\Model\TransactionState::FULFILL,
+                \Wallee\Sdk\Model\TransactionState::VOIDED,
+                \Wallee\Sdk\Model\TransactionState::COMPLETED
+            ),
+            'WalleeWebhookTransaction'
         );
-        $this->webhookEntities[1472041819799] = new Wallee_Webhook_Entity(
+        $this->webhookEntities[1472041819799] = new WalleeWebhookEntity(
             1472041819799,
             'Delivery Indication',
             array(
-                    \Wallee\Sdk\Model\DeliveryIndicationState::MANUAL_CHECK_REQUIRED
-                ),
-            'Wallee_Webhook_DeliveryIndication'
+                \Wallee\Sdk\Model\DeliveryIndicationState::MANUAL_CHECK_REQUIRED
+            ),
+            'WalleeWebhookDeliveryindication'
         );
-        
-        $this->webhookEntities[1472041831364] = new Wallee_Webhook_Entity(
+
+        $this->webhookEntities[1472041831364] = new WalleeWebhookEntity(
             1472041831364,
             'Transaction Completion',
             array(
-                    \Wallee\Sdk\Model\TransactionCompletionState::FAILED,
-                    \Wallee\Sdk\Model\TransactionCompletionState::SUCCESSFUL
-                ),
-            'Wallee_Webhook_TransactionCompletion'
+                \Wallee\Sdk\Model\TransactionCompletionState::FAILED,
+                \Wallee\Sdk\Model\TransactionCompletionState::SUCCESSFUL
+            ),
+            'WalleeWebhookTransactioncompletion'
         );
-        
-        $this->webhookEntities[1472041867364] = new Wallee_Webhook_Entity(
+
+        $this->webhookEntities[1472041867364] = new WalleeWebhookEntity(
             1472041867364,
             'Transaction Void',
             array(
-                    \Wallee\Sdk\Model\TransactionVoidState::FAILED,
-                    \Wallee\Sdk\Model\TransactionVoidState::SUCCESSFUL
-                ),
-            'Wallee_Webhook_TransactionVoid'
+                \Wallee\Sdk\Model\TransactionVoidState::FAILED,
+                \Wallee\Sdk\Model\TransactionVoidState::SUCCESSFUL
+            ),
+            'WalleeWebhookTransactionvoid'
         );
-        
-        $this->webhookEntities[1472041839405] = new Wallee_Webhook_Entity(
+
+        $this->webhookEntities[1472041839405] = new WalleeWebhookEntity(
             1472041839405,
             'Refund',
             array(
-                    \Wallee\Sdk\Model\RefundState::FAILED,
-                    \Wallee\Sdk\Model\RefundState::SUCCESSFUL
-                ),
-            'Wallee_Webhook_Refund'
+                \Wallee\Sdk\Model\RefundState::FAILED,
+                \Wallee\Sdk\Model\RefundState::SUCCESSFUL
+            ),
+            'WalleeWebhookRefund'
         );
-        $this->webhookEntities[1472041806455] = new Wallee_Webhook_Entity(
+        $this->webhookEntities[1472041806455] = new WalleeWebhookEntity(
             1472041806455,
             'Token',
             array(
-                    \Wallee\Sdk\Model\CreationEntityState::ACTIVE,
-                    \Wallee\Sdk\Model\CreationEntityState::DELETED,
-                    \Wallee\Sdk\Model\CreationEntityState::DELETING,
-                    \Wallee\Sdk\Model\CreationEntityState::INACTIVE
-                ),
-            'Wallee_Webhook_Token'
+                \Wallee\Sdk\Model\CreationEntityState::ACTIVE,
+                \Wallee\Sdk\Model\CreationEntityState::DELETED,
+                \Wallee\Sdk\Model\CreationEntityState::DELETING,
+                \Wallee\Sdk\Model\CreationEntityState::INACTIVE
+            ),
+            'WalleeWebhookToken'
         );
-        $this->webhookEntities[1472041811051] = new Wallee_Webhook_Entity(
+        $this->webhookEntities[1472041811051] = new WalleeWebhookEntity(
             1472041811051,
             'Token Version',
             array(
-                    \Wallee\Sdk\Model\TokenVersionState::ACTIVE,
-                    \Wallee\Sdk\Model\TokenVersionState::OBSOLETE
-                ),
-            'Wallee_Webhook_TokenVersion'
+                \Wallee\Sdk\Model\TokenVersionState::ACTIVE,
+                \Wallee\Sdk\Model\TokenVersionState::OBSOLETE
+            ),
+            'WalleeWebhookTokenversion'
         );
     }
 
-    
     /**
      * Installs the necessary webhooks in wallee.
      */
@@ -138,7 +138,7 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
     {
         $spaceIds = array();
         foreach (Shop::getShops(true, null, true) as $shopId) {
-            $spaceId = Configuration::get(Wallee::CK_SPACE_ID, null, null, $shopId);
+            $spaceId = Configuration::get(WalleeBasemodule::CK_SPACE_ID, null, null, $shopId);
             if ($spaceId && ! in_array($spaceId, $spaceIds)) {
                 $webhookUrl = $this->getWebhookUrl($spaceId);
                 if ($webhookUrl == null) {
@@ -146,7 +146,7 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
                 }
                 $existingListeners = $this->getWebhookListeners($spaceId, $webhookUrl);
                 foreach ($this->webhookEntities as $webhookEntity) {
-                    /* @var Wallee_Webhook_Entity $webhookEntity */
+                    /* @var WalleeWebhookEntity $webhookEntity */
                     $exists = false;
                     foreach ($existingListeners as $existingListener) {
                         if ($existingListener->getEntity() == $webhookEntity->getId()) {
@@ -163,8 +163,9 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
     }
 
     /**
+     *
      * @param int|string $id
-     * @return Wallee_Webhook_Entity
+     * @return WalleeWebhookEntity
      */
     public function getWebhookEntityForId($id)
     {
@@ -177,13 +178,16 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
     /**
      * Create a webhook listener.
      *
-     * @param Wallee_Webhook_Entity $entity
+     * @param WalleeWebhookEntity $entity
      * @param int $spaceId
      * @param \Wallee\Sdk\Model\WebhookUrl $webhookUrl
      * @return \Wallee\Sdk\Model\WebhookListenerCreate
      */
-    protected function createWebhookListener(Wallee_Webhook_Entity $entity, $spaceId, \Wallee\Sdk\Model\WebhookUrl $webhookUrl)
-    {
+    protected function createWebhookListener(
+        WalleeWebhookEntity $entity,
+        $spaceId,
+        \Wallee\Sdk\Model\WebhookUrl $webhookUrl
+    ) {
         $webhookListener = new \Wallee\Sdk\Model\WebhookListenerCreate();
         $webhookListener->setEntity($entity->getId());
         $webhookListener->setEntityStates($entity->getStates());
@@ -208,9 +212,9 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
         $filter->setType(\Wallee\Sdk\Model\EntityQueryFilterType::_AND);
         $filter->setChildren(
             array(
-                    $this->createEntityFilter('state', \Wallee\Sdk\Model\CreationEntityState::ACTIVE),
-                    $this->createEntityFilter('url.id', $webhookUrl->getId())
-                )
+                $this->createEntityFilter('state', \Wallee\Sdk\Model\CreationEntityState::ACTIVE),
+                $this->createEntityFilter('url.id', $webhookUrl->getId())
+            )
         );
         $query->setFilter($filter);
         return $this->getWebhookListenerService()->search($spaceId, $query);
@@ -251,7 +255,7 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
         $query->setFilter($filter);
         $query->setNumberOfEntities(1);
         $result = $this->getWebhookUrlService()->search($spaceId, $query);
-        if (!empty($result)) {
+        if (! empty($result)) {
             return $result[0];
         } else {
             return null;
@@ -266,17 +270,17 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
     protected function getUrl()
     {
         $link = Context::getContext()->link;
-        
+
         $shopIds = Shop::getShops(true, null, true);
         asort($shopIds);
         $shopId = reset($shopIds);
-        
+
         $languageIds = Language::getLanguages(true, $shopId, true);
         asort($languageIds);
         $languageId = reset($languageIds);
-        
+
         $url = $link->getModuleLink('wallee', 'webhook', array(), true, $languageId, $shopId);
-        //We have to  parse the link, because of issue http://forge.prestashop.com/browse/BOOM-5799
+        // We have to parse the link, because of issue http://forge.prestashop.com/browse/BOOM-5799
         $urlQuery = parse_url($url, PHP_URL_QUERY);
         if (stripos($urlQuery, 'controller=module') !== false && stripos($urlQuery, 'controller=webhook') !== false) {
             $url = str_replace('controller=module', 'fc=module', $url);
@@ -292,7 +296,9 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
     protected function getWebhookListenerService()
     {
         if ($this->webhookListenerService == null) {
-            $this->webhookListenerService = new \Wallee\Sdk\Service\WebhookListenerService(Wallee_Helper::getApiClient());
+            $this->webhookListenerService = new \Wallee\Sdk\Service\WebhookListenerService(
+                WalleeHelper::getApiClient()
+            );
         }
         return $this->webhookListenerService;
     }
@@ -305,7 +311,9 @@ class Wallee_Service_Webhook extends Wallee_Service_Abstract
     protected function getWebhookUrlService()
     {
         if ($this->webhookUrlService == null) {
-            $this->webhookUrlService = new \Wallee\Sdk\Service\WebhookUrlService(Wallee_Helper::getApiClient());
+            $this->webhookUrlService = new \Wallee\Sdk\Service\WebhookUrlService(
+                WalleeHelper::getApiClient()
+            );
         }
         return $this->webhookUrlService;
     }

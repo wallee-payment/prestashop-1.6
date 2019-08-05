@@ -8,7 +8,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
 *}
 <div class="tab-pane" id="wallee_documents">
-<h4 class="visible-print">wallee {l s='Documents' mod='wallee'} <span class="badge">({$walleeDocuments|@count})</span></h4>
+<h4 class="visible-print">wallee {l s='Documents' mod='wallee'} <span class="badge">({$walleeDocumentsCount|escape:'html':'UTF-8'})</span></h4>
 
 	<div class="table-responsive">
 		<table class="table" id="wallee_documents_table">

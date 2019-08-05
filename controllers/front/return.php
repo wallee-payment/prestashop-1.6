@@ -11,7 +11,6 @@
 
 class WalleeReturnModuleFrontController extends ModuleFrontController
 {
-
     public $ssl = true;
 
     /**
@@ -23,21 +22,21 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
         $orderId = Tools::getValue('order_id', null);
         $orderKey = Tools::getValue('secret', null);
         $action = Tools::getValue('action', null);
-        
+
         if ($orderId != null) {
             $order = new Order($orderId);
-            if ($orderKey == null || $orderKey != Wallee_Helper::computeOrderSecret($order)) {
+            if ($orderKey == null || $orderKey != WalleeHelper::computeOrderSecret($order)) {
                 $error = Tools::displayError('Invalid Secret.');
                 die($error);
             }
             switch ($action) {
                 case 'success':
                     $this->processSuccess($order);
-                    
+
                     return;
                 case 'failure':
                     self::processFailure($order);
-                    
+
                     return;
                 default:
             }
@@ -48,7 +47,7 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
 
     private function processSuccess(Order $order)
     {
-        $transactionService = Wallee_Service_Transaction::instance();
+        $transactionService = WalleeServiceTransaction::instance();
         $transactionService->waitForTransactionState(
             $order,
             array(
@@ -60,7 +59,7 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
         );
         $cartId = $order->id_cart;
         $customer = new Customer($order->id_customer);
-        
+
         $this->redirect_after = $this->context->link->getPageLink(
             'order-confirmation',
             true,
@@ -76,7 +75,7 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
 
     private function processFailure(Order $order)
     {
-        $transactionService = Wallee_Service_Transaction::instance();
+        $transactionService = WalleeServiceTransaction::instance();
         $transactionService->waitForTransactionState(
             $order,
             array(
@@ -84,27 +83,27 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
             ),
             5
         );
-        $transaction = Wallee_Model_TransactionInfo::loadByOrderId($order->id);
-        
+        $transaction = WalleeModelTransactioninfo::loadByOrderId($order->id);
+
         $userFailureMessage = $transaction->getUserFailureMessage();
-        
+
         if (empty($userFailureMessage)) {
             $failureReason = $transaction->getFailureReason();
-        
+
             if ($failureReason !== null) {
-                $userFailureMessage = Wallee_Helper::translate($failureReason);
+                $userFailureMessage = WalleeHelper::translate($failureReason);
             }
         }
-        if (!empty($userFailureMessage)) {
+        if (! empty($userFailureMessage)) {
             $this->context->cookie->wle_error = $userFailureMessage;
         }
-        
-        //Set cart to cookie
-        $originalCartId = Wallee_Helper::getOrderMeta($order, 'originalCart');
-        if (!empty($originalCartId)) {
-            $this->context->cookie->id_cart= $originalCartId;
+
+        // Set cart to cookie
+        $originalCartId = WalleeHelper::getOrderMeta($order, 'originalCart');
+        if (! empty($originalCartId)) {
+            $this->context->cookie->id_cart = $originalCartId;
         }
-        
+
         $this->redirect_after = $this->context->link->getPageLink('order', true, null, "step=3");
     }
 
@@ -112,17 +111,17 @@ class WalleeReturnModuleFrontController extends ModuleFrontController
     {
         // We do not need styling here
     }
-    
+
     protected function displayMaintenancePage()
     {
         // We never display the maintenance page.
     }
-    
+
     protected function displayRestrictedCountryPage()
     {
         // We do not want to restrict the content by any country.
     }
-    
+
     protected function canonicalRedirection($canonical_url = '')
     {
         // We do not need any canonical redirect

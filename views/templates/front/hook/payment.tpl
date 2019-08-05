@@ -14,10 +14,10 @@
 					{if !empty($image)} 
 						style="background-image: url({$image|escape:'html'}); background-repeat: no-repeat; background-size: 64px; background-position:15px;"		
 					{/if}
-					onclick="document.getElementById('wallee-{$methodId}-link').click();" >
-				<a class="wallee" id="wallee-{$methodId}-link" href="{$link|escape:'html'}" title="{$name}" >{$name}</a>
+					onclick="document.getElementById('wallee-{$methodId|escape:'html':'UTF-8'}-link').click();" >
+				<a class="wallee" id="wallee-{$methodId|escape:'html':'UTF-8'}-link" href="{$link|escape:'html'}" title="{$name}" >{$name}</a>
 			{if !empty($description)}
-				<span class="payment-method-description">{$description}</span>
+				<span class="payment-method-description">{wallee_clean_html text=$description}</span>
 			{/if}
 			{if !empty($surchargeValues)}
 				<span class="wallee-surcharge wallee-additional-amount"><span class="wallee-surcharge-text wallee-additional-amount-text">{l s='Minimum Sales Surcharge:' mod='wallee'}</span>

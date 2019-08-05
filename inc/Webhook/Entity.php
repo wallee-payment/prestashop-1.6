@@ -9,12 +9,16 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
-class Wallee_Webhook_Entity
+class WalleeWebhookEntity
 {
     private $id;
+
     private $name;
+
     private $states;
+
     private $notifyEveryChange;
+
     private $handlerClassName;
 
     public function __construct($id, $name, array $states, $handlerClassName, $notifyEveryChange = false)

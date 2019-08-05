@@ -13,7 +13,7 @@
 			<i class="icon-bullhorn"></i>
 				{if $manualTotal > 0}
 					<span id="wallee_manual_messages_notif_number_wrapper" class="notifs_badge">
-						<span id="wallee_manual_messages_notif_value">{$manualTotal}</span>
+						<span id="wallee_manual_messages_notif_value">{$manualTotal|escape:'html':'UTF-8'}</span>
 					</span>
 				{/if}
 		</a>
@@ -24,7 +24,7 @@
 				</div>
 				<div id="list_wallee_manual_messages_notif" class="list_notif">
 					{if $manualTotal > 0}
-					<a href="{$manualUrl|escape:'html':'UTF-8'}" target="_blank">
+					<a href="{$manualUrl|escape:'html'}" target="_blank">
 						<p>{if $manualTotal > 1}
 							{l s='There are %s manual tasks that need your attention.' sprintf=$manualTotal mod='wallee'}
 						{else}

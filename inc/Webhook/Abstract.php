@@ -12,17 +12,18 @@
 /**
  * Abstract webhook processor.
  */
-abstract class Wallee_Webhook_Abstract
+abstract class WalleeWebhookAbstract
 {
     private static $instances = array();
 
     /**
+     *
      * @return static
      */
     public static function instance()
     {
         $class = get_called_class();
-        if (!isset(self::$instances[$class])) {
+        if (! isset(self::$instances[$class])) {
             self::$instances[$class] = new $class();
         }
         return self::$instances[$class];
@@ -31,7 +32,7 @@ abstract class Wallee_Webhook_Abstract
     /**
      * Processes the received webhook request.
      *
-     * @param Wallee_Webhook_Request $request
+     * @param WalleeWebhookRequest $request
      */
-    abstract public function process(Wallee_Webhook_Request $request);
+    abstract public function process(WalleeWebhookRequest $request);
 }

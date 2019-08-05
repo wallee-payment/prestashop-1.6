@@ -12,12 +12,11 @@
 /**
  * Webhook processor to handle token state transitions.
  */
-class Wallee_Webhook_Token extends Wallee_Webhook_Abstract
+class WalleeWebhookToken extends WalleeWebhookAbstract
 {
-
-    public function process(Wallee_Webhook_Request $request)
+    public function process(WalleeWebhookRequest $request)
     {
-        $tokenService = Wallee_Service_Token::instance();
+        $tokenService = WalleeServiceToken::instance();
         $tokenService->updateToken($request->getSpaceId(), $request->getEntityId());
     }
 }

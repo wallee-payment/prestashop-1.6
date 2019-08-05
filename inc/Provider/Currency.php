@@ -12,9 +12,8 @@
 /**
  * Provider of currency information from the gateway.
  */
-class Wallee_Provider_Currency extends Wallee_Provider_Abstract
+class WalleeProviderCurrency extends WalleeProviderAbstract
 {
-
     protected function __construct()
     {
         parent::__construct('wallee_currencies');
@@ -43,7 +42,9 @@ class Wallee_Provider_Currency extends Wallee_Provider_Abstract
 
     protected function fetchData()
     {
-        $currencyService = new \Wallee\Sdk\Service\CurrencyService(Wallee_Helper::getApiClient());
+        $currencyService = new \Wallee\Sdk\Service\CurrencyService(
+            WalleeHelper::getApiClient()
+        );
         return $currencyService->all();
     }
 

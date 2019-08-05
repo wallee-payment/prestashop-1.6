@@ -41,14 +41,26 @@
 				{if isset($jobs) && count($jobs) > 0 }
 					{foreach from=$jobs item=job}
 						<tr class="">
-							<td class=" fixed-width-xs text-center">{$job.id_cron_job}</td>
-							<td class=" fixed-width-s text-center">{$job.state}</td>
-							<td class=" fixed-width-m text-center">{$job.date_scheduled|date_format:"%Y-%m-%d %H:%M:%S"}</td>
-							<td class=" fixed-width-m text-center">{$job.date_started|date_format:"%Y-%m-%d %H:%M:%S"}</td>
-							<td class=" fixed-width-m text-center">{$job.date_finished|date_format:"%Y-%m-%d %H:%M:%S"}</td>
+							<td class=" fixed-width-xs text-center">{$job.id_cron_job|escape:'html':'UTF-8'}</td>
+							<td class=" fixed-width-s text-center">{$job.state|escape:'html':'UTF-8'}</td>
+							<td class=" fixed-width-m text-center">{$job.date_scheduled|date_format:'%Y-%m-%d %H:%M:%S'|escape:'html':'UTF-8'}</td>
+							<td class=" fixed-width-m text-center">
+								{if !empty($job.date_started) }
+									{$job.date_started|date_format:'%Y-%m-%d %H:%M:%S'|escape:'html':'UTF-8'}
+								{else}
+								 	--
+								{/if}								
+							</td>
+							<td class=" fixed-width-m text-center">
+								{if !empty($job.date_finished) }
+									{$job.date_finished|date_format:'%Y-%m-%d %H:%M:%S'|escape:'html':'UTF-8'}
+								{else}
+								 	--
+								{/if}								
+							</td>
 							<td class=" fixed-width-l text-center">
 								{if !empty($job.error_msg) }
-									{$job.error_msg}
+									{$job.error_msg|escape:'html':'UTF-8'}
 								{else}
 								 	--
 								{/if}

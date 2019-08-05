@@ -9,9 +9,8 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
-class Wallee_Migration extends Wallee_AbstractMigration
+class WalleeMigration extends WalleeAbstractmigration
 {
-    
     protected static function getMigrations()
     {
         return array(
@@ -19,15 +18,16 @@ class Wallee_Migration extends Wallee_AbstractMigration
             '1.0.1' => 'orderStatusUpdate',
             '1.0.2' => 'tokenInfoImproved',
             '1.0.3' => 'updateImageBase',
-            '1.0.4' => 'userFailureMessage',
+            '1.0.4' => 'userFailureMessage'
         );
     }
-    
+
     public static function initializeTables()
     {
         static::installTableBase();
         $instance = DB::getInstance();
-        $result = $instance->execute("CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_cron_job(
+        $result = $instance->execute(
+            "CREATE TABLE IF NOT EXISTS " . _DB_PREFIX_ . "wle_cron_job(
                 `id_cron_job` int(10) unsigned NOT NULL AUTO_INCREMENT,
                 `constraint_key` int(10),
                 `state` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -42,27 +42,27 @@ class Wallee_Migration extends Wallee_AbstractMigration
                 INDEX `idx_security_token` (`security_token`),
                 INDEX `idx_date_scheduled` (`date_scheduled`),
                 INDEX `idx_date_started` (`date_started`)
-            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci");
-        
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"
+        );
+
         if ($result === false) {
             throw new Exception($instance->getMsgError());
         }
     }
-    
+
     public static function orderStatusUpdate()
     {
         static::installOrderStatusConfigBase();
         static::installOrderPaymentSaveHookBase();
     }
-    
+
     public static function tokenInfoImproved()
     {
         static::updateCustomerIdOnTokenInfoBase();
     }
-    
+
     public static function userFailureMessage()
     {
-    	static::userFailureMessageBase();
+        static::userFailureMessageBase();
     }
-    
 }

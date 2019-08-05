@@ -134,7 +134,7 @@
             <tr class="cart_total_price">
                 <td colspan="4" class="total_price_container text-right"><span>{l s='Total' mod='wallee'}</span></td>
                 <td colspan="2" class="price" id="total_price_container">
-                    <span id="total_price" data-selenium-total-price="{$total_price}">{displayPrice price=$total_price}</span>
+                    <span id="total_price" data-selenium-total-price="{$total_price|escape:'html':'UTF-8'}">{displayPrice price=$total_price}</span>
                 </td>
             </tr>
         {else}
@@ -143,7 +143,7 @@
                     <span>{l s='Total' mod='wallee'}</span>
                 </td>
                 <td colspan="2" class="price total_price_container" id="total_price_container">
-                    <span id="total_price" data-selenium-total-price="{$total_price_without_tax}">{displayPrice price=$total_price_without_tax}</span>
+                    <span id="total_price" data-selenium-total-price="{$total_price_without_tax|escape:'html':'UTF-8'}">{displayPrice price=$total_price_without_tax}</span>
                 </td>
             </tr>
         {/if}
@@ -164,7 +164,7 @@
             {* Then the customized datas ones*}
             {if isset($customizedDatas.$productId.$productAttributeId)}
                 {foreach from=$customizedDatas.$productId.$productAttributeId[$product.id_address_delivery] key='id_customization' item='customization'}
-                    <tr id="product_{$product.id_product}_{$product.id_product_attribute}_{$id_customization}" class="alternate_item cart_item">
+                    <tr id="product_{$product.id_product|escape:'html':'UTF-8'}_{$product.id_product_attribute|escape:'html':'UTF-8'}_{$id_customization|escape:'html':'UTF-8'}" class="alternate_item cart_item">
                         <td colspan="4">
                             {foreach from=$customization.datas key='type' item='datas'}
                                 {if $type == $CUSTOMIZE_FILE}
@@ -172,7 +172,7 @@
                                         <ul class="customizationUploaded">
                                             {foreach from=$datas item='picture'}
                                                 <li>
-                                                    <img src="{$pic_dir}{$picture.value}_small" alt="" class="customizationUploaded" />
+                                                    <img src="{$pic_dir|escape:'html'}{$picture.value|escape:'html'}_small" alt="" class="customizationUploaded" />
                                                 </li>
                                             {/foreach}
                                         </ul>
@@ -186,7 +186,7 @@
                                                 {else}
                                                     {l s='Text #%s:' sprintf=$smarty.foreach.typedText.index+1 mod='wallee'}
                                                 {/if}
-                                                {$textField.value}
+                                                {$textField.value|escape:'html':'UTF-8'}
                                             </li>
                                         {/foreach}
                                     </ul>
@@ -194,7 +194,7 @@
                             {/foreach}
                         </td>
                         <td class="cart_quantity text-center">
-                            {$customization.quantity}
+                            {$customization.quantity|escape:'html':'UTF-8'}
                         </td>
                         <td class="cart_total"></td>
                     </tr>
@@ -223,8 +223,8 @@
                 {if (float)$discount.value_real == 0}
                     {continue}
                 {/if}
-                <tr class="cart_discount {if $smarty.foreach.discountLoop.last}last_item{elseif $smarty.foreach.discountLoop.first}first_item{else}item{/if}" id="cart_discount_{$discount.id_discount}">
-                    <td class="cart_discount_name" colspan="{if $PS_STOCK_MANAGEMENT}3{else}2{/if}">{$discount.name}</td>
+                <tr class="cart_discount {if $smarty.foreach.discountLoop.last}last_item{elseif $smarty.foreach.discountLoop.first}first_item{else}item{/if}" id="cart_discount_{$discount.id_discount|escape:'html':'UTF-8'}">
+                    <td class="cart_discount_name" colspan="{if $PS_STOCK_MANAGEMENT}3{else}2{/if}">{$discount.name|escape:'html':'UTF-8'}</td>
                     <td class="cart_discount_price">
 						<span class="price-discount">
 							{if $discount.value_real > 0}

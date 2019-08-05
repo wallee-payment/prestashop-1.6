@@ -12,14 +12,20 @@
 /**
  * Webhook request.
  */
-class Wallee_Webhook_Request
+class WalleeWebhookRequest
 {
     private $eventId;
+
     private $entityId;
+
     private $listenerEntityId;
+
     private $listenerEntityTechnicalName;
+
     private $spaceId;
+
     private $webhookListenerId;
+
     private $timestamp;
 
     /**

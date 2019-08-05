@@ -12,32 +12,37 @@
 /**
  * Webhook processor to handle refund state transitions.
  */
-class Wallee_Webhook_Refund extends Wallee_Webhook_OrderRelatedAbstract
+class WalleeWebhookRefund extends WalleeWebhookOrderrelatedabstract
 {
-       
+
     /**
-    * Processes the received order related webhook request.
-    *
-    * @param Wallee_Webhook_Request $request
-    */
-    public function process(Wallee_Webhook_Request $request)
+     * Processes the received order related webhook request.
+     *
+     * @param WalleeWebhookRequest $request
+     */
+    public function process(WalleeWebhookRequest $request)
     {
         parent::process($request);
         $refund = $this->loadEntity($request);
-        $refundJob = Wallee_Model_RefundJob::loadByExternalId($refund->getLinkedSpaceId(), $refund->getExternalId());
-        if ($refundJob->getState() == Wallee_Model_RefundJob::STATE_APPLY) {
-            Wallee_Service_Refund::instance()->applyRefundToShop($refundJob->getId());
+        $refundJob = WalleeModelRefundjob::loadByExternalId(
+            $refund->getLinkedSpaceId(),
+            $refund->getExternalId()
+        );
+        if ($refundJob->getState() == WalleeModelRefundjob::STATE_APPLY) {
+            WalleeServiceRefund::instance()->applyRefundToShop($refundJob->getId());
         }
     }
 
     /**
      *
-     * @see Wallee_Webhook_OrderRelatedAbstract::loadEntity()
+     * @see WalleeWebhookOrderrelatedabstract::loadEntity()
      * @return \Wallee\Sdk\Model\Refund
      */
-    protected function loadEntity(Wallee_Webhook_Request $request)
+    protected function loadEntity(WalleeWebhookRequest $request)
     {
-        $refundService = new \Wallee\Sdk\Service\RefundService(Wallee_Helper::getApiClient());
+        $refundService = new \Wallee\Sdk\Service\RefundService(
+            WalleeHelper::getApiClient()
+        );
         return $refundService->read($request->getSpaceId(), $request->getEntityId());
     }
 
@@ -71,12 +76,16 @@ class Wallee_Webhook_Refund extends Wallee_Webhook_OrderRelatedAbstract
 
     protected function failed(\Wallee\Sdk\Model\Refund $refund, Order $order)
     {
-        $refundJob = Wallee_Model_RefundJob::loadByExternalId($refund->getLinkedSpaceId(), $refund->getExternalId());
+        $refundJob = WalleeModelRefundjob::loadByExternalId(
+            $refund->getLinkedSpaceId(),
+            $refund->getExternalId()
+        );
         if ($refundJob->getId()) {
-            $refundJob->setState(Wallee_Model_RefundJob::STATE_FAILURE);
+            $refundJob->setState(WalleeModelRefundjob::STATE_FAILURE);
             $refundJob->setRefundId($refund->getId());
             if ($refund->getFailureReason() != null) {
-                $refundJob->setFailureReason($refund->getFailureReason()->getDescription());
+                $refundJob->setFailureReason($refund->getFailureReason()
+                    ->getDescription());
             }
             $refundJob->save();
         }
@@ -84,9 +93,12 @@ class Wallee_Webhook_Refund extends Wallee_Webhook_OrderRelatedAbstract
 
     protected function refunded(\Wallee\Sdk\Model\Refund $refund, Order $order)
     {
-        $refundJob = Wallee_Model_RefundJob::loadByExternalId($refund->getLinkedSpaceId(), $refund->getExternalId());
+        $refundJob = WalleeModelRefundjob::loadByExternalId(
+            $refund->getLinkedSpaceId(),
+            $refund->getExternalId()
+        );
         if ($refundJob->getId()) {
-            $refundJob->setState(Wallee_Model_RefundJob::STATE_APPLY);
+            $refundJob->setState(WalleeModelRefundjob::STATE_APPLY);
             $refundJob->setRefundId($refund->getId());
             $refundJob->save();
         }

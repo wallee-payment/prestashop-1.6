@@ -11,7 +11,6 @@
 
 class AdminWalleeDocumentsController extends ModuleAdminController
 {
-
     public function postProcess()
     {
         parent::postProcess();
@@ -29,7 +28,14 @@ class AdminWalleeDocumentsController extends ModuleAdminController
         if ($access['view'] === '1' && ($action = Tools::getValue('action'))) {
             $this->action = $action;
         } else {
-            die(Tools::displayError($this->module->l('You do not have permission to view this.', 'adminwalleedocumentscontroller')));
+            die(
+                Tools::displayError(
+                    $this->module->l(
+                        'You do not have permission to view this.',
+                        'adminwalleedocumentscontroller'
+                    )
+                )
+            );
         }
     }
 
@@ -38,12 +44,23 @@ class AdminWalleeDocumentsController extends ModuleAdminController
         if (Tools::isSubmit('id_order')) {
             try {
                 $order = new Order(Tools::getValue('id_order'));
-                Wallee_DownloadHelper::downloadInvoice($order);
+                WalleeDownloadhelper::downloadInvoice($order);
             } catch (Exception $e) {
-                die(Tools::displayError($this->module->l('Could not fetch the document.', 'adminwalleedocumentscontroller')));
+                die(
+                    Tools::displayError(
+                        $this->module->l(
+                            'Could not fetch the document.',
+                            'adminwalleedocumentscontroller'
+                        )
+                    )
+                );
             }
         } else {
-            die(Tools::displayError($this->module->l('The order Id is missing.', 'adminwalleedocumentscontroller')));
+            die(
+                Tools::displayError(
+                    $this->module->l('The order Id is missing.', 'adminwalleedocumentscontroller')
+                )
+            );
         }
     }
 
@@ -52,12 +69,23 @@ class AdminWalleeDocumentsController extends ModuleAdminController
         if (Tools::isSubmit('id_order')) {
             try {
                 $order = new Order(Tools::getValue('id_order'));
-                Wallee_DownloadHelper::downloadPackingSlip($order);
+                WalleeDownloadhelper::downloadPackingSlip($order);
             } catch (Exception $e) {
-                die(Tools::displayError($this->module->l('Could not fetch the document.', 'adminwalleedocumentscontroller')));
+                die(
+                    Tools::displayError(
+                        $this->module->l(
+                            'Could not fetch the document.',
+                            'adminwalleedocumentscontroller'
+                        )
+                    )
+                );
             }
         } else {
-            die(Tools::displayError($this->module->l('The order Id is missing.', 'adminwalleedocumentscontroller')));
+            die(
+                Tools::displayError(
+                    $this->module->l('The order Id is missing.', 'adminwalleedocumentscontroller')
+                )
+            );
         }
     }
 }

@@ -7,9 +7,9 @@
  * @copyright 2017 - 2019 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  *}
-{$name}
+{$name|escape:'html':'UTF-8'}
 {if !empty($description)}
-			<span class="payment-method-description">{$description}</span>
+			<span class="payment-method-description">{wallee_clean_html text=$description}</span>
 {/if}
 
 {if !empty($surchargeValues)}

@@ -11,8 +11,6 @@
 
 class AdminWalleeMethodSettingsController extends ModuleAdminController
 {
-    
-
     public function __construct()
     {
         parent::__construct();
@@ -27,29 +25,40 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             $shopContext = (! Shop::isFeatureActive() || Shop::getContext() == Shop::CONTEXT_SHOP);
             if (! $shopContext) {
                 $this->displayWarning(
-                    $this->module->l('You can only save the settings in a shop context.', 'adminwalleemethodsettingscontroller')
+                    $this->module->l(
+                        'You can only save the settings in a shop context.',
+                        'adminwalleemethodsettingscontroller'
+                    )
                 );
                 return;
             }
-            $spaceId = Configuration::get(Wallee::CK_SPACE_ID);
+            $spaceId = Configuration::get(WalleeBasemodule::CK_SPACE_ID);
             if ($spaceId === false) {
                 $this->displayWarning(
-                    $this->module->l('You have to configure a Space Id for the current shop.', 'adminwalleemethodsettingscontroller')
+                    $this->module->l(
+                        'You have to configure a Space Id for the current shop.',
+                        'adminwalleemethodsettingscontroller'
+                    )
                 );
                 return;
             }
             $methodId = Tools::getValue('method_id', null);
             if ($methodId === null || ! ctype_digit($methodId)) {
-                $this->displayWarning($this->module->l('No valid method provided.', 'adminwalleemethodsettingscontroller'));
+                $this->displayWarning(
+                    $this->module->l('No valid method provided.', 'adminwalleemethodsettingscontroller')
+                );
                 return;
             }
-            $method = Wallee_Model_MethodConfiguration::loadByIdWithChecks(
+            $method = WalleeModelMethodconfiguration::loadByIdWithChecks(
                 $methodId,
                 Context::getContext()->shop->id
             );
             if ($method === false) {
                 $this->displayWarning(
-                    $this->module->l('This method is not configurable in this shop context.', 'adminwalleemethodsettingscontroller')
+                    $this->module->l(
+                        'This method is not configurable in this shop context.',
+                        'adminwalleemethodsettingscontroller'
+                    )
                 );
                 return;
             }
@@ -65,7 +74,9 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 $method->setFeeAddTax((int) Tools::getValue('fee_add_tax'));
             }
             $method->update();
-            $this->setRedirectAfter(self::$currentIndex.'&token='.$this->token.'&method_id='.(int)Tools::getValue('method_id'));
+            $this->setRedirectAfter(
+                self::$currentIndex . '&token=' . $this->token . '&method_id=' . (int) Tools::getValue('method_id')
+            );
         }
     }
 
@@ -83,35 +94,49 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
     private function handleList()
     {
         $this->display = 'list';
-        $this->context->smarty->assign('title', 'wallee '. $this->module->l('Payment Methods', 'adminwalleemethodsettingscontroller'));
-        
+        $this->context->smarty->assign(
+            'title',
+            'wallee ' .
+            $this->module->l('Payment Methods', 'adminwalleemethodsettingscontroller')
+        );
+
         $shopContext = (! Shop::isFeatureActive() || Shop::getContext() == Shop::CONTEXT_SHOP);
         if (! $shopContext) {
             $this->displayWarning(
-                $this->module->l('You have more than one shop and must select one to configure the payment methods.', 'adminwalleemethodsettingscontroller')
+                $this->module->l(
+                    'You have more than one shop and must select one to configure the payment methods.',
+                    'adminwalleemethodsettingscontroller'
+                )
             );
             return;
         }
-        $spaceId = Configuration::get(Wallee::CK_SPACE_ID);
+        $spaceId = Configuration::get(WalleeBasemodule::CK_SPACE_ID);
         if ($spaceId === false) {
             $this->displayWarning(
-                $this->module->l('You have to configure a Space Id for the current shop.', 'adminwalleemethodsettingscontroller')
+                $this->module->l(
+                    'You have to configure a Space Id for the current shop.',
+                    'adminwalleemethodsettingscontroller'
+                )
             );
             return;
         }
         $methodConfigurations = array();
-        $methods = Wallee_Model_MethodConfiguration::loadValidForShop(
-            Context::getContext()->shop->id
-        );
-        $spaceViewId = Configuration::get(Wallee::CK_SPACE_VIEW_ID);
+        $methods = WalleeModelMethodconfiguration::loadValidForShop(Context::getContext()->shop->id);
+        $spaceViewId = Configuration::get(WalleeBasemodule::CK_SPACE_VIEW_ID);
         foreach ($methods as $method) {
             $methodConfigurations[] = array(
                 'id' => $method->getId(),
                 'configurationName' => $method->getConfigurationName(),
-                'imageUrl' => Wallee_Helper::getResourceUrl($method->getImageBase(), $method->getImage(), Wallee_Helper::convertLanguageIdToIETF($this->context->language->id), $spaceId, $spaceViewId)
+                'imageUrl' => WalleeHelper::getResourceUrl(
+                    $method->getImageBase(),
+                    $method->getImage(),
+                    WalleeHelper::convertLanguageIdToIETF($this->context->language->id),
+                    $spaceId,
+                    $spaceViewId
+                )
             );
         }
-        
+
         $this->context->smarty->assign('methodConfigurations', $methodConfigurations);
     }
 
@@ -120,31 +145,48 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         $shopContext = (! Shop::isFeatureActive() || Shop::getContext() == Shop::CONTEXT_SHOP);
         if (! $shopContext) {
             $this->displayWarning(
-                $this->module->l('You can only edit the settings in a shop context.', 'adminwalleemethodsettingscontroller')
+                $this->module->l(
+                    'You can only edit the settings in a shop context.',
+                    'adminwalleemethodsettingscontroller'
+                )
             );
             return;
         }
-        $spaceId = Configuration::get(Wallee::CK_SPACE_ID);
+        $spaceId = Configuration::get(WalleeBasemodule::CK_SPACE_ID);
         if ($spaceId === false) {
             $this->displayWarning(
-                $this->module->l('You have to configure a Space Id for the current shop.', 'adminwalleemethodsettingscontroller')
+                $this->module->l(
+                    'You have to configure a Space Id for the current shop.',
+                    'adminwalleemethodsettingscontroller'
+                )
             );
             return;
         }
-        $method = Wallee_Model_MethodConfiguration::loadByIdWithChecks(
+        $method = WalleeModelMethodconfiguration::loadByIdWithChecks(
             $methodId,
             Context::getContext()->shop->id
         );
         if ($method === false) {
             $this->displayWarning(
-                $this->module->l('This method is not available in this shop context.', 'adminwalleemethodsettingscontroller')
+                $this->module->l(
+                    'This method is not available in this shop context.',
+                    'adminwalleemethodsettingscontroller'
+                )
             );
             return;
         }
         $this->display = 'edit';
-        
+
         $form = $this->displayConfig($method);
         $this->toolbar_title = $method->getConfigurationName();
+        $this->context->smarty->registerPlugin(
+            'function',
+            'wallee_output_method_form',
+            array(
+                'WalleeSmartyfunctions',
+                'outputMethodForm'
+            )
+        );
         $this->context->smarty->assign('formHtml', $form);
     }
 
@@ -157,10 +199,11 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         $helper->allow_employee_form_lang = Configuration::get('PS_BO_ALLOW_EMPLOYEE_FORM_LANG') ? Configuration::get(
             'PS_BO_ALLOW_EMPLOYEE_FORM_LANG'
         ) : 0;
-        
+
         $helper->identifier = $this->identifier;
-        $helper->title = 'wallee '.$this->module->l('Payment Methods', 'adminwalleemethodsettingscontroller');
-        
+        $helper->title = 'wallee ' .
+            $this->module->l('Payment Methods', 'adminwalleemethodsettingscontroller');
+
         $helper->module = $this->module;
         $helper->name_controller = 'AdminWalleeMethodSettings';
         $helper->token = Tools::getAdminTokenLite('AdminWalleeMethodSettings');
@@ -171,7 +214,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         return $helper;
     }
 
-    private function displayConfig(Wallee_Model_MethodConfiguration $method)
+    private function displayConfig(WalleeModelMethodconfiguration $method)
     {
         $configuration = array(
             array(
@@ -211,7 +254,10 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             ),
             array(
                 'type' => 'switch',
-                'label' => $this->module->l('Display method description', 'adminwalleemethodsettingscontroller'),
+                'label' => $this->module->l(
+                    'Display method description',
+                    'adminwalleemethodsettingscontroller'
+                ),
                 'name' => 'show_description',
                 'is_bool' => true,
                 'values' => array(
@@ -230,7 +276,10 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             ),
             array(
                 'type' => 'switch',
-                'label' => $this->module->l('Display method image', 'adminwalleemethodsettingscontroller'),
+                'label' => $this->module->l(
+                    'Display method image',
+                    'adminwalleemethodsettingscontroller'
+                ),
                 'name' => 'show_image',
                 'is_bool' => true,
                 'values' => array(
@@ -248,14 +297,17 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'lang' => false
             )
         );
-        
+
         $defaultCurrency = Currency::getCurrency(Configuration::get('PS_CURRENCY_DEFAULT'));
         $fees = array(
             array(
                 'type' => 'switch',
                 'label' => $this->module->l('Add tax', 'adminwalleemethodsettingscontroller'),
                 'name' => 'fee_add_tax',
-                'desc' => $this->module->l('Should the tax amount be added after the computation or should the tax be included in the computed fee.', 'adminwalleemethodsettingscontroller'),
+                'desc' => $this->module->l(
+                    'Should the tax amount be added after the computation or should the tax be included in the computed fee.',
+                    'adminwalleemethodsettingscontroller'
+                ),
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -275,7 +327,10 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'type' => 'text',
                 'label' => $this->module->l('Fee Fixed', 'adminwalleemethodsettingscontroller'),
                 'desc' => sprintf(
-                    $this->module->l('The fee has to be entered in the shops default currency. Current default currency: %s', 'adminwalleemethodsettingscontroller'),
+                    $this->module->l(
+                        'The fee has to be entered in the shops default currency. Current default currency: %s',
+                        'adminwalleemethodsettingscontroller'
+                    ),
                     $defaultCurrency['iso_code']
                 ),
                 'name' => 'fee_fixed',
@@ -284,41 +339,64 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             array(
                 'type' => 'text',
                 'label' => $this->module->l('Fee Rate', 'adminwalleemethodsettingscontroller'),
-                'desc' => $this->module->l('The rate in percent.', 'adminwalleemethodsettingscontroller'),
+                'desc' => $this->module->l(
+                    'The rate in percent.',
+                    'adminwalleemethodsettingscontroller'
+                ),
                 'name' => 'fee_rate',
                 'col' => 3
             ),
             array(
                 'type' => 'select',
-                'label' => $this->module->l('Fee is calculated based on:', 'adminwalleemethodsettingscontroller'),
+                'label' => $this->module->l(
+                    'Fee is calculated based on:',
+                    'adminwalleemethodsettingscontroller'
+                ),
                 'name' => 'fee_base',
                 'options' => array(
                     'query' => array(
                         array(
-                            'name' => $this->module->l('Total (inc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_BOTH_INC
+                            'name' => $this->module->l(
+                                'Total (inc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_BOTH_INC
                         ),
                         array(
-                            'name' => $this->module->l('Total (exc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_BOTH_EXC
+                            'name' => $this->module->l(
+                                'Total (exc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_BOTH_EXC
                         ),
                         array(
-                            'name' => $this->module->l('Total without shipping (inc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_WITHOUT_SHIPPING_INC
+                            'name' => $this->module->l(
+                                'Total without shipping (inc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_WITHOUT_SHIPPING_INC
                         ),
                         array(
-                            'name' => $this->module->l('Total without shipping (exc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_WITHOUT_SHIPPING_EXC
+                            'name' => $this->module->l(
+                                'Total without shipping (exc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_WITHOUT_SHIPPING_EXC
                         ),
                         array(
-                            'name' => $this->module->l('Products only (inc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_PRODUCTS_INC
+                            'name' => $this->module->l(
+                                'Products only (inc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_PRODUCTS_INC
                         ),
                         array(
-                            'name' => $this->module->l('Products only (exc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_PRODUCTS_EXC
+                            'name' => $this->module->l(
+                                'Products only (exc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_PRODUCTS_EXC
                         )
-                        
                     ),
                     'id' => 'type',
                     'name' => 'name'
@@ -334,14 +412,14 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             'input' => $configuration,
             'buttons' => array(
                 array(
-                    'title' =>$this->module->l('Save All', 'adminwalleemethodsettingscontroller'),
+                    'title' => $this->module->l('Save All', 'adminwalleemethodsettingscontroller'),
                     'class' => 'pull-right',
                     'type' => 'input',
                     'icon' => 'process-icon-save',
                     'name' => 'save_all'
                 ),
                 array(
-                    'title' =>$this->module->l('Save', 'adminwalleemethodsettingscontroller'),
+                    'title' => $this->module->l('Save', 'adminwalleemethodsettingscontroller'),
                     'class' => 'pull-right',
                     'type' => 'input',
                     'icon' => 'process-icon-save',
@@ -356,14 +434,14 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             'input' => $fees,
             'buttons' => array(
                 array(
-                    'title' =>$this->module->l('Save All', 'adminwalleemethodsettingscontroller'),
+                    'title' => $this->module->l('Save All', 'adminwalleemethodsettingscontroller'),
                     'class' => 'pull-right',
                     'type' => 'input',
                     'icon' => 'process-icon-save',
                     'name' => 'save_all'
                 ),
                 array(
-                    'title' =>$this->module->l('Save', 'adminwalleemethodsettingscontroller'),
+                    'title' => $this->module->l('Save', 'adminwalleemethodsettingscontroller'),
                     'class' => 'pull-right',
                     'type' => 'input',
                     'icon' => 'process-icon-save',
@@ -376,7 +454,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         return $helper->generateForm($fieldsForm);
     }
 
-    private function getBaseValues(Wallee_Model_MethodConfiguration $method)
+    private function getBaseValues(WalleeModelMethodconfiguration $method)
     {
         $result = array();
         $result['active'] = $method->isActive();
@@ -385,11 +463,11 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         $title = array();
         $description = array();
         foreach ($this->context->controller->getLanguages() as $language) {
-            $title[$language['id_lang']] = Wallee_Helper::translate(
+            $title[$language['id_lang']] = WalleeHelper::translate(
                 $method->getTitle(),
                 $language['id_lang']
             );
-            $description[$language['id_lang']] = Wallee_Helper::translate(
+            $description[$language['id_lang']] = WalleeHelper::translate(
                 $method->getDescription(),
                 $language['id_lang']
             );
@@ -399,7 +477,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         return $result;
     }
 
-    private function displayFeeConfig(Wallee_Model_MethodConfiguration $method)
+    private function displayFeeConfig(WalleeModelMethodconfiguration $method)
     {
         $submit = array(
             'title' => $this->module->l('Save', 'adminwalleemethodsettingscontroller'),
@@ -412,7 +490,10 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'type' => 'switch',
                 'label' => $this->module->l('Add tax', 'adminwalleemethodsettingscontroller'),
                 'name' => 'fee_add_tax',
-                'desc' => $this->module->l('Should the tax amount be added after the computation or should the tax be included in the computed fee.', 'adminwalleemethodsettingscontroller'),
+                'desc' => $this->module->l(
+                    'Should the tax amount be added after the computation or should the tax be included in the computed fee.',
+                    'adminwalleemethodsettingscontroller'
+                ),
                 'is_bool' => true,
                 'values' => array(
                     array(
@@ -432,7 +513,10 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
                 'type' => 'text',
                 'label' => $this->module->l('Fee Fixed', 'adminwalleemethodsettingscontroller'),
                 'desc' => sprintf(
-                    $this->module->l('The fee has to be entered in the shops default currency. Current default currency: %s', 'adminwalleemethodsettingscontroller'),
+                    $this->module->l(
+                        'The fee has to be entered in the shops default currency. Current default currency: %s',
+                        'adminwalleemethodsettingscontroller'
+                    ),
                     $defaultCurrency['iso_code']
                 ),
                 'name' => 'fee_fixed',
@@ -441,48 +525,71 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
             array(
                 'type' => 'text',
                 'label' => $this->module->l('Fee Rate', 'adminwalleemethodsettingscontroller'),
-                'desc' => $this->module->l('The rate in percent.', 'adminwalleemethodsettingscontroller'),
+                'desc' => $this->module->l(
+                    'The rate in percent.',
+                    'adminwalleemethodsettingscontroller'
+                ),
                 'name' => 'fee_rate',
                 'col' => 3
             ),
             array(
                 'type' => 'select',
-                'label' => $this->module->l('Fee is calculated based on:', 'adminwalleemethodsettingscontroller'),
+                'label' => $this->module->l(
+                    'Fee is calculated based on:',
+                    'adminwalleemethodsettingscontroller'
+                ),
                 'name' => 'fee_base',
                 'options' => array(
                     'query' => array(
                         array(
-                            'name' => $this->module->l('Total (inc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_BOTH_INC
+                            'name' => $this->module->l(
+                                'Total (inc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_BOTH_INC
                         ),
                         array(
-                            'name' => $this->module->l('Total (exc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_BOTH_EXC
+                            'name' => $this->module->l(
+                                'Total (exc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_BOTH_EXC
                         ),
                         array(
-                            'name' => $this->module->l('Total without shipping (inc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_WITHOUT_SHIPPING_INC
+                            'name' => $this->module->l(
+                                'Total without shipping (inc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_WITHOUT_SHIPPING_INC
                         ),
                         array(
-                            'name' => $this->module->l('Total without shipping (exc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_WITHOUT_SHIPPING_EXC
+                            'name' => $this->module->l(
+                                'Total without shipping (exc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_WITHOUT_SHIPPING_EXC
                         ),
                         array(
-                            'name' => $this->module->l('Products only (inc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_PRODUCTS_INC
+                            'name' => $this->module->l(
+                                'Products only (inc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_PRODUCTS_INC
                         ),
                         array(
-                            'name' => $this->module->l('Products only (exc Tax)', 'adminwalleemethodsettingscontroller'),
-                            'type' => Wallee::TOTAL_MODE_PRODUCTS_EXC
+                            'name' => $this->module->l(
+                                'Products only (exc Tax)',
+                                'adminwalleemethodsettingscontroller'
+                            ),
+                            'type' => WalleeBasemodule::TOTAL_MODE_PRODUCTS_EXC
                         )
-                    
                     ),
                     'id' => 'type',
                     'name' => 'name'
                 )
             )
         );
-        
+
         $fieldsForm[]['form'] = array(
             'legend' => array(
                 'title' => $this->module->l('Payment Fee', 'adminwalleemethodsettingscontroller')
@@ -496,7 +603,7 @@ class AdminWalleeMethodSettingsController extends ModuleAdminController
         return $helper->generateForm($fieldsForm);
     }
 
-    private function getFeeValues(Wallee_Model_MethodConfiguration $method)
+    private function getFeeValues(WalleeModelMethodconfiguration $method)
     {
         $result = array();
         $result['fee_rate'] = $method->getFeeRate();

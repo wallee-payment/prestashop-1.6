@@ -11,7 +11,6 @@
 
 class AdminWalleeCronJobsController extends ModuleAdminController
 {
-    
     public function __construct()
     {
         parent::__construct();
@@ -19,7 +18,7 @@ class AdminWalleeCronJobsController extends ModuleAdminController
         $this->tpl_folder = 'cronjob/';
         $this->bootstrap = true;
     }
-    
+
     public function initContent()
     {
         $this->handleList();
@@ -29,6 +28,6 @@ class AdminWalleeCronJobsController extends ModuleAdminController
     private function handleList()
     {
         $this->display = 'list';
-        $this->context->smarty->assign('jobs', Wallee_Cron::getAllCronJobs());
+        $this->context->smarty->assign('jobs', WalleeCron::getAllCronJobs());
     }
 }

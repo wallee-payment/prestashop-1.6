@@ -12,10 +12,12 @@
 /**
  * Abstract implementation of a provider.
  */
-abstract class Wallee_Provider_Abstract
+abstract class WalleeProviderAbstract
 {
     private static $instances = array();
+
     private $cacheKey;
+
     private $data;
 
     /**
@@ -29,12 +31,13 @@ abstract class Wallee_Provider_Abstract
     }
 
     /**
+     *
      * @return static
      */
     public static function instance()
     {
         $class = get_called_class();
-        if (!isset(self::$instances[$class])) {
+        if (! isset(self::$instances[$class])) {
             self::$instances[$class] = new $class();
         }
         return self::$instances[$class];
@@ -66,7 +69,7 @@ abstract class Wallee_Provider_Abstract
         if ($this->data == null) {
             $this->loadData();
         }
-        
+
         if (isset($this->data[$id])) {
             return $this->data[$id];
         } else {
@@ -84,7 +87,7 @@ abstract class Wallee_Provider_Abstract
         if ($this->data == null) {
             $this->loadData();
         }
-        if (!is_array($this->data)) {
+        if (! is_array($this->data)) {
             return array();
         }
         return $this->data;
@@ -94,7 +97,7 @@ abstract class Wallee_Provider_Abstract
     {
         $cachedData = Cache::retrieve($this->cacheKey);
         if ($cachedData !== null) {
-            $decoded =  base64_decode($cachedData, true);
+            $decoded = WalleeTools::base64Decode($cachedData, true);
             if ($decoded === false) {
                 $decoded = $cachedData;
             }
@@ -104,13 +107,13 @@ abstract class Wallee_Provider_Abstract
                 return;
             }
         }
-        
+
         $this->data = array();
         try {
             foreach ($this->fetchData() as $entry) {
                 $this->data[$this->getId($entry)] = $entry;
             }
-            Cache::store($this->cacheKey, base64_encode(serialize($this->data)));
+            Cache::store($this->cacheKey, WalleeTools::base64Encode(serialize($this->data)));
         } catch (\Wallee\Sdk\ApiException $e) {
         } catch (\Wallee\Sdk\Http\ConnectionException $e) {
         }

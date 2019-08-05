@@ -12,9 +12,8 @@
 /**
  * Provider of language information from the gateway.
  */
-class Wallee_Provider_Language extends Wallee_Provider_Abstract
+class WalleeProviderLanguage extends WalleeProviderAbstract
 {
-
     protected function __construct()
     {
         parent::__construct('wallee_languages');
@@ -45,7 +44,7 @@ class Wallee_Provider_Language extends Wallee_Provider_Abstract
                 return $language;
             }
         }
-        
+
         return false;
     }
 
@@ -61,7 +60,9 @@ class Wallee_Provider_Language extends Wallee_Provider_Abstract
 
     protected function fetchData()
     {
-        $languageService = new \Wallee\Sdk\Service\LanguageService(Wallee_Helper::getApiClient());
+        $languageService = new \Wallee\Sdk\Service\LanguageService(
+            WalleeHelper::getApiClient()
+        );
         return $languageService->all();
     }
 

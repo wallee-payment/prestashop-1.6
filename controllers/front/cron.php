@@ -11,7 +11,6 @@
 
 class WalleeCronModuleFrontController extends ModuleFrontController
 {
-
     public $display_column_left = false;
 
     public $ssl = true;
@@ -35,29 +34,28 @@ class WalleeCronModuleFrontController extends ModuleFrontController
         if (is_callable('fastcgi_finish_request')) {
             fastcgi_finish_request();
         }
-        
+
         $securityToken = Tools::getValue('security_token', false);
         if (! $securityToken) {
             die();
         }
         $time = new DateTime();
-        Wallee_Helper::startDBTransaction();
+        WalleeHelper::startDBTransaction();
         try {
             $sqlUpdate = 'UPDATE ' . _DB_PREFIX_ . 'wle_cron_job SET constraint_key = 0, state = "' .
-                 pSQL(Wallee_Cron::STATE_PROCESSING) . '" , date_started = "' .
-                 pSQL($time->format('Y-m-d H:i:s')) . '" WHERE security_token = "' . pSQL(
-                     $securityToken
-                 ) . '" AND state = "' . pSQL(Wallee_Cron::STATE_PENDING) . '"';
-            
+                pSQL(WalleeCron::STATE_PROCESSING) . '" , date_started = "' .
+                pSQL($time->format('Y-m-d H:i:s')) . '" WHERE security_token = "' . pSQL($securityToken) .
+                '" AND state = "' . pSQL(WalleeCron::STATE_PENDING) . '"';
+
             $updateResult = DB::getInstance()->execute($sqlUpdate, false);
             if (! $updateResult) {
                 $code = DB::getInstance()->getNumberError();
-                if ($code == Wallee::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
-                    Wallee_Helper::rollbackDBTransaction();
+                if ($code == WalleeBasemodule::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
+                    WalleeHelper::rollbackDBTransaction();
                     // Another Cron already running
                     die();
                 } else {
-                    Wallee_Helper::rollbackDBTransaction();
+                    WalleeHelper::rollbackDBTransaction();
                     PrestaShopLogger::addLog(
                         'Could not update cron job. ' . DB::getInstance()->getMsgError(),
                         2,
@@ -69,17 +67,17 @@ class WalleeCronModuleFrontController extends ModuleFrontController
             }
             if (DB::getInstance()->Affected_Rows() == 0) {
                 // Simultaneous Request
-                Wallee_Helper::commitDBTransaction();
+                WalleeHelper::commitDBTransaction();
                 die();
             }
         } catch (PrestaShopDatabaseException $e) {
             $code = DB::getInstance()->getNumberError();
-            if ($code == Wallee::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
-                Wallee_Helper::rollbackDBTransaction();
+            if ($code == WalleeBasemodule::MYSQL_DUPLICATE_CONSTRAINT_ERROR_CODE) {
+                WalleeHelper::rollbackDBTransaction();
                 // Another Cron already running
                 die();
             } else {
-                Wallee_Helper::rollbackDBTransaction();
+                WalleeHelper::rollbackDBTransaction();
                 PrestaShopLogger::addLog(
                     'Could not update cron job. ' . DB::getInstance()->getMsgError(),
                     2,
@@ -89,12 +87,12 @@ class WalleeCronModuleFrontController extends ModuleFrontController
                 die();
             }
         }
-        Wallee_Helper::commitDBTransaction();
-        
+        WalleeHelper::commitDBTransaction();
+
         // We reduce max running time, so th cron has time to clean up.
         $maxTime = $time->format("U");
-        $maxTime += Wallee_Cron::MAX_RUN_TIME_MINUTES * 60 - 60;
-        
+        $maxTime += WalleeCron::MAX_RUN_TIME_MINUTES * 60 - 60;
+
         $tasks = Hook::exec("walleeCron", array(), null, true, false);
         $error = array();
         foreach ($tasks as $module => $subTasks) {
@@ -112,7 +110,7 @@ class WalleeCronModuleFrontController extends ModuleFrontController
                     call_user_func($subTask, $maxTime);
                 } catch (Exception $e) {
                     $error[] = "Module '$module' does not handle all exceptions in task '$callableName'. Exception Message: " .
-                         $e->getMessage();
+                        $e->getMessage();
                 }
                 if ($maxTime + 15 < time()) {
                     $error[] = "Module '$module' returns not callable task '$callableName' does not respect the max runtime.";
@@ -120,23 +118,23 @@ class WalleeCronModuleFrontController extends ModuleFrontController
                 }
             }
         }
-        Wallee_Helper::startDBTransaction();
+        WalleeHelper::startDBTransaction();
         try {
-            $status = Wallee_Cron::STATE_SUCCESS;
+            $status = WalleeCron::STATE_SUCCESS;
             $errorMessage = "";
             if (! empty($error)) {
-                $status = Wallee_Cron::STATE_ERROR;
+                $status = WalleeCron::STATE_ERROR;
                 $errorMessage = implode("\n", $error);
             }
             $endTime = new DateTime();
             $sqlUpdate = 'UPDATE ' . _DB_PREFIX_ . 'wle_cron_job SET constraint_key = id_cron_job, state = "' .
-                 pSQL($status) . '" , date_finished = "' . pSQL($endTime->format('Y-m-d H:i:s')) .
-                 '", error_msg = "'.pSQL($errorMessage).'" WHERE security_token = "' . pSQL($securityToken) . '" AND state = "' .
-                 pSQL(Wallee_Cron::STATE_PROCESSING) . '"';
-            
+                pSQL($status) . '" , date_finished = "' . pSQL($endTime->format('Y-m-d H:i:s')) . '", error_msg = "' .
+                pSQL($errorMessage) . '" WHERE security_token = "' . pSQL($securityToken) . '" AND state = "' .
+                pSQL(WalleeCron::STATE_PROCESSING) . '"';
+
             $updateResult = DB::getInstance()->execute($sqlUpdate, false);
             if (! $updateResult) {
-                Wallee_Helper::rollbackDBTransaction();
+                WalleeHelper::rollbackDBTransaction();
                 PrestaShopLogger::addLog(
                     'Could not update finished cron job. ' . DB::getInstance()->getMsgError(),
                     2,
@@ -145,9 +143,9 @@ class WalleeCronModuleFrontController extends ModuleFrontController
                 );
                 die();
             }
-            Wallee_Helper::commitDBTransaction();
+            WalleeHelper::commitDBTransaction();
         } catch (PrestaShopDatabaseException $e) {
-            Wallee_Helper::rollbackDBTransaction();
+            WalleeHelper::rollbackDBTransaction();
             PrestaShopLogger::addLog(
                 'Could not update finished cron job. ' . DB::getInstance()->getMsgError(),
                 2,
@@ -156,7 +154,7 @@ class WalleeCronModuleFrontController extends ModuleFrontController
             );
             die();
         }
-        Wallee_Cron::insertNewPendingCron();
+        WalleeCron::insertNewPendingCron();
         die();
     }
 

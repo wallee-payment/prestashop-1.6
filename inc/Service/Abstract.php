@@ -10,9 +10,9 @@
  */
 
 /**
- * Wallee_Service_Abstract Class.
+ * Abstract implementation of services
  */
-abstract class Wallee_Service_Abstract
+abstract class WalleeServiceAbstract
 {
     private static $instances = array();
 
@@ -23,14 +23,13 @@ abstract class Wallee_Service_Abstract
     public static function instance()
     {
         $class = get_called_class();
-        if (!isset(self::$instances[$class])) {
+        if (! isset(self::$instances[$class])) {
             self::$instances[$class] = new $class();
         }
         $object = self::$instances[$class];
-        
+
         return $object;
     }
-
 
     /**
      * Returns the fraction digits for the given currency.
@@ -40,7 +39,7 @@ abstract class Wallee_Service_Abstract
      */
     protected function getCurrencyFractionDigits($currencyCode)
     {
-        return Wallee_Helper::getCurrencyFractionDigits($currencyCode);
+        return WalleeHelper::getCurrencyFractionDigits($currencyCode);
     }
 
     /**
@@ -52,9 +51,9 @@ abstract class Wallee_Service_Abstract
      */
     protected function roundAmount($amount, $currencyCode)
     {
-        return Wallee_Helper::roundAmount($amount, $currencyCode);
+        return WalleeHelper::roundAmount($amount, $currencyCode);
     }
-    
+
     /**
      * Returns the resource part of the resolved url
      *
@@ -69,7 +68,7 @@ abstract class Wallee_Service_Abstract
         $index = strpos($resolvedUrl, 'resource/');
         return Tools::substr($resolvedUrl, $index + Tools::strlen('resource/'));
     }
-    
+
     /**
      * Returns the base part of the resolved url
      *
@@ -82,7 +81,7 @@ abstract class Wallee_Service_Abstract
             return $resolvedUrl;
         }
         $parts = parse_url($resolvedUrl);
-        return $parts['scheme']."://".$parts['host']."/";
+        return $parts['scheme'] . "://" . $parts['host'] . "/";
     }
 
     /**
@@ -93,8 +92,11 @@ abstract class Wallee_Service_Abstract
      * @param string $operator
      * @return \Wallee\Sdk\Model\EntityQueryFilter
      */
-    protected function createEntityFilter($fieldName, $value, $operator = \Wallee\Sdk\Model\CriteriaOperator::EQUALS)
-    {
+    protected function createEntityFilter(
+        $fieldName,
+        $value,
+        $operator = \Wallee\Sdk\Model\CriteriaOperator::EQUALS
+    ) {
         $filter = new \Wallee\Sdk\Model\EntityQueryFilter();
         $filter->setType(\Wallee\Sdk\Model\EntityQueryFilterType::LEAF);
         $filter->setOperator($operator);
@@ -110,8 +112,10 @@ abstract class Wallee_Service_Abstract
      * @param string $sortOrder
      * @return \Wallee\Sdk\Model\EntityQueryOrderBy
      */
-    protected function createEntityOrderBy($fieldName, $sortOrder = \Wallee\Sdk\Model\EntityQueryOrderByType::DESC)
-    {
+    protected function createEntityOrderBy(
+        $fieldName,
+        $sortOrder = \Wallee\Sdk\Model\EntityQueryOrderByType::DESC
+    ) {
         $orderBy = new \Wallee\Sdk\Model\EntityQueryOrderBy();
         $orderBy->setFieldName($fieldName);
         $orderBy->setSorting($sortOrder);

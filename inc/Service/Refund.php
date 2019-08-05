@@ -12,9 +12,8 @@
 /**
  * This service provides functions to deal with wallee refunds.
  */
-class Wallee_Service_Refund extends Wallee_Service_Abstract
+class WalleeServiceRefund extends WalleeServiceAbstract
 {
-
     private static $refundableStates = array(
         \Wallee\Sdk\Model\TransactionState::COMPLETED,
         \Wallee\Sdk\Model\TransactionState::DECLINE,
@@ -52,52 +51,61 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
     {
         $currentRefundJob = null;
         try {
-            Wallee_Helper::startDBTransaction();
-            $transactionInfo = Wallee_Helper::getTransactionInfoForOrder($order);
+            WalleeHelper::startDBTransaction();
+            $transactionInfo = WalleeHelper::getTransactionInfoForOrder($order);
             if ($transactionInfo === null) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('Could not load corresponding transaction', 'refund')
+                    WalleeHelper::getModuleInstance()->l(
+                        'Could not load corresponding transaction',
+                        'refund'
+                    )
                 );
             }
-            
-            Wallee_Helper::lockByTransactionId(
+
+            WalleeHelper::lockByTransactionId(
                 $transactionInfo->getSpaceId(),
                 $transactionInfo->getTransactionId()
             );
             // Reload after locking
-            $transactionInfo = Wallee_Model_TransactionInfo::loadByTransaction(
+            $transactionInfo = WalleeModelTransactioninfo::loadByTransaction(
                 $transactionInfo->getSpaceId(),
                 $transactionInfo->getTransactionId()
             );
             $spaceId = $transactionInfo->getSpaceId();
             $transactionId = $transactionInfo->getTransactionId();
-            
+
             if (! in_array($transactionInfo->getState(), self::$refundableStates)) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('The transaction is not in a state to be refunded.', 'refund')
+                    WalleeHelper::getModuleInstance()->l(
+                        'The transaction is not in a state to be refunded.',
+                        'refund'
+                    )
                 );
             }
-            
-            if (Wallee_Model_RefundJob::isRefundRunningForTransaction($spaceId, $transactionId)) {
+
+            if (WalleeModelRefundjob::isRefundRunningForTransaction($spaceId, $transactionId)) {
                 throw new Exception(
-                    Wallee_Helper::getModuleInstance()->l('Please wait until the existing refund is processed.', 'refund')
+                    WalleeHelper::getModuleInstance()->l(
+                        'Please wait until the existing refund is processed.',
+                        'refund'
+                    )
                 );
             }
-            
-            $refundJob = new Wallee_Model_RefundJob();
-            $refundJob->setState(Wallee_Model_RefundJob::STATE_CREATED);
+
+            $refundJob = new WalleeModelRefundjob();
+            $refundJob->setState(WalleeModelRefundjob::STATE_CREATED);
             $refundJob->setOrderId($order->id);
             $refundJob->setSpaceId($transactionInfo->getSpaceId());
             $refundJob->setTransactionId($transactionInfo->getTransactionId());
             $refundJob->setExternalId(uniqid($order->id . '-'));
             $refundJob->setRefundParameters($parsedParameters);
             $refundJob->save();
-            //validate Refund Job
+            // validate Refund Job
             $this->createRefundObject($refundJob);
             $currentRefundJob = $refundJob->getId();
-            Wallee_Helper::commitDBTransaction();
+            WalleeHelper::commitDBTransaction();
         } catch (Exception $e) {
-            Wallee_Helper::rollbackDBTransaction();
+            WalleeHelper::rollbackDBTransaction();
             throw $e;
         }
         $this->sendRefund($currentRefundJob);
@@ -105,172 +113,170 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
 
     protected function sendRefund($refundJobId)
     {
-        $refundJob = new Wallee_Model_RefundJob($refundJobId);
-        Wallee_Helper::startDBTransaction();
-        Wallee_Helper::lockByTransactionId($refundJob->getSpaceId(), $refundJob->getTransactionId());
+        $refundJob = new WalleeModelRefundjob($refundJobId);
+        WalleeHelper::startDBTransaction();
+        WalleeHelper::lockByTransactionId($refundJob->getSpaceId(), $refundJob->getTransactionId());
         // Reload refund job;
-        $refundJob = new Wallee_Model_RefundJob($refundJobId);
-        if ($refundJob->getState() != Wallee_Model_RefundJob::STATE_CREATED) {
+        $refundJob = new WalleeModelRefundjob($refundJobId);
+        if ($refundJob->getState() != WalleeModelRefundjob::STATE_CREATED) {
             // Already sent in the meantime
-            Wallee_Helper::rollbackDBTransaction();
+            WalleeHelper::rollbackDBTransaction();
             return;
         }
         try {
-            $refundService = Wallee_Service_Refund::instance();
-            $executedRefund = $refundService->refund(
-                $refundJob->getSpaceId(),
-                $this->createRefundObject($refundJob)
-            );
-            $refundJob->setState(Wallee_Model_RefundJob::STATE_SENT);
+            $executedRefund = $this->refund($refundJob->getSpaceId(), $this->createRefundObject($refundJob));
+            $refundJob->setState(WalleeModelRefundjob::STATE_SENT);
             $refundJob->setRefundId($executedRefund->getId());
-            
+
             if ($executedRefund->getState() == \Wallee\Sdk\Model\RefundState::PENDING) {
-                $refundJob->setState(Wallee_Model_RefundJob::STATE_PENDING);
+                $refundJob->setState(WalleeModelRefundjob::STATE_PENDING);
             }
             $refundJob->save();
-            Wallee_Helper::commitDBTransaction();
+            WalleeHelper::commitDBTransaction();
         } catch (\Wallee\Sdk\ApiException $e) {
             if ($e->getResponseObject() instanceof \Wallee\Sdk\Model\ClientError) {
                 $refundJob->setFailureReason(
                     array(
                         'en-US' => sprintf(
-                            Wallee_Helper::getModuleInstance()->l('Could not send the refund to %s. Error: %s', 'refund'),
+                            WalleeHelper::getModuleInstance()->l(
+                                'Could not send the refund to %s. Error: %s',
+                                'refund'
+                            ),
                             'wallee',
-                            Wallee_Helper::cleanExceptionMessage($e->getMessage())
+                            WalleeHelper::cleanExceptionMessage($e->getMessage())
                         )
                     )
                 );
-                $refundJob->setState(Wallee_Model_RefundJob::STATE_FAILURE);
+                $refundJob->setState(WalleeModelRefundjob::STATE_FAILURE);
                 $refundJob->save();
-                Wallee_Helper::commitDBTransaction();
+                WalleeHelper::commitDBTransaction();
             } else {
                 $refundJob->save();
-                Wallee_Helper::commitDBTransaction();
+                WalleeHelper::commitDBTransaction();
                 $message = sprintf(
-                    Wallee_Helper::getModuleInstance()->l('Error sending refund job with id %d: %s', 'refund'),
+                    WalleeHelper::getModuleInstance()->l(
+                        'Error sending refund job with id %d: %s',
+                        'refund'
+                    ),
                     $refundJobId,
                     $e->getMessage()
                 );
-                PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_RefundJob');
+                PrestaShopLogger::addLog($message, 3, null, 'WalleeModelRefundjob');
                 throw $e;
             }
         } catch (Exception $e) {
             $refundJob->save();
-            Wallee_Helper::commitDBTransaction();
+            WalleeHelper::commitDBTransaction();
             $message = sprintf(
-                Wallee_Helper::getModuleInstance()->l('Error sending refund job with id %d: %s', 'refund'),
+                WalleeHelper::getModuleInstance()->l('Error sending refund job with id %d: %s', 'refund'),
                 $refundJobId,
                 $e->getMessage()
             );
-            PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_RefundJob');
+            PrestaShopLogger::addLog($message, 3, null, 'WalleeModelRefundjob');
             throw $e;
         }
     }
 
     public function applyRefundToShop($refundJobId)
     {
-        $refundJob = new Wallee_Model_RefundJob($refundJobId);
-        Wallee_Helper::startDBTransaction();
-        Wallee_Helper::lockByTransactionId($refundJob->getSpaceId(), $refundJob->getTransactionId());
+        $refundJob = new WalleeModelRefundjob($refundJobId);
+        WalleeHelper::startDBTransaction();
+        WalleeHelper::lockByTransactionId($refundJob->getSpaceId(), $refundJob->getTransactionId());
         // Reload refund job;
-        $refundJob = new Wallee_Model_RefundJob($refundJobId);
-        if ($refundJob->getState() != Wallee_Model_RefundJob::STATE_APPLY) {
+        $refundJob = new WalleeModelRefundjob($refundJobId);
+        if ($refundJob->getState() != WalleeModelRefundjob::STATE_APPLY) {
             // Already processed in the meantime
-            Wallee_Helper::rollbackDBTransaction();
+            WalleeHelper::rollbackDBTransaction();
             return;
         }
         try {
             $order = new Order($refundJob->getOrderId());
-            $strategy = Wallee_Backend_StrategyProvider::getStrategy();
+            $strategy = WalleeBackendStrategyprovider::getStrategy();
             $appliedData = $strategy->applyRefund($order, $refundJob->getRefundParameters());
-            $refundJob->setState(Wallee_Model_RefundJob::STATE_SUCCESS);
+            $refundJob->setState(WalleeModelRefundjob::STATE_SUCCESS);
             $refundJob->save();
-            Wallee_Helper::commitDBTransaction();
+            WalleeHelper::commitDBTransaction();
             try {
                 $strategy->afterApplyRefundActions($order, $refundJob->getRefundParameters(), $appliedData);
             } catch (Exception $e) {
                 // We ignore errors in the after apply actions
             }
         } catch (Exception $e) {
-            Wallee_Helper::rollbackDBTransaction();
-            Wallee_Helper::startDBTransaction();
-            Wallee_Helper::lockByTransactionId(
-                $refundJob->getSpaceId(),
-                $refundJob->getTransactionId()
-            );
-            $refundJob = new Wallee_Model_RefundJob($refundJobId);
+            WalleeHelper::rollbackDBTransaction();
+            WalleeHelper::startDBTransaction();
+            WalleeHelper::lockByTransactionId($refundJob->getSpaceId(), $refundJob->getTransactionId());
+            $refundJob = new WalleeModelRefundjob($refundJobId);
             $refundJob->increaseApplyTries();
             if ($refundJob->getApplyTries() > 3) {
-                $refundJob->setState(Wallee_Model_RefundJob::STATE_FAILURE);
-                $refundJob->setFailureReason(
-                    array(
-                        'en-US' => sprintf(
-                            $e->getMessage()
-                        )
-                    )
-                );
+                $refundJob->setState(WalleeModelRefundjob::STATE_FAILURE);
+                $refundJob->setFailureReason(array(
+                    'en-US' => sprintf($e->getMessage())
+                ));
             }
             $refundJob->save();
-            Wallee_Helper::commitDBTransaction();
+            WalleeHelper::commitDBTransaction();
         }
     }
 
     public function updateForOrder($order)
     {
-        $transactionInfo = Wallee_Helper::getTransactionInfoForOrder($order);
+        $transactionInfo = WalleeHelper::getTransactionInfoForOrder($order);
         $spaceId = $transactionInfo->getSpaceId();
         $transactionId = $transactionInfo->getTransactionId();
-        $refundJob = Wallee_Model_RefundJob::loadRunningRefundForTransaction(
-            $spaceId,
-            $transactionId
-        );
-        if ($refundJob->getState() == Wallee_Model_RefundJob::STATE_CREATED) {
+        $refundJob = WalleeModelRefundjob::loadRunningRefundForTransaction($spaceId, $transactionId);
+        if ($refundJob->getState() == WalleeModelRefundjob::STATE_CREATED) {
             $this->sendRefund($refundJob->getId());
-        } elseif ($refundJob->getState() == Wallee_Model_RefundJob::STATE_APPLY) {
+        } elseif ($refundJob->getState() == WalleeModelRefundjob::STATE_APPLY) {
             $this->applyRefundToShop($refundJob->getId());
         }
     }
 
     public function updateRefunds($endTime = null)
     {
-        $toSend = Wallee_Model_RefundJob::loadNotSentJobIds();
+        $toSend = WalleeModelRefundjob::loadNotSentJobIds();
         foreach ($toSend as $id) {
-            if ($endTime!== null && time() + 15 > $endTime) {
+            if ($endTime !== null && time() + 15 > $endTime) {
                 return;
             }
             try {
                 $this->sendRefund($id);
             } catch (Exception $e) {
                 $message = sprintf(
-                    Wallee_Helper::getModuleInstance()->l('Error updating refund job with id %d: %s', 'refund'),
+                    WalleeHelper::getModuleInstance()->l(
+                        'Error updating refund job with id %d: %s',
+                        'refund'
+                    ),
                     $id,
                     $e->getMessage()
                 );
-                PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_RefundJob');
+                PrestaShopLogger::addLog($message, 3, null, 'WalleeModelRefundjob');
             }
         }
-        $toApply = Wallee_Model_RefundJob::loadNotAppliedJobIds();
+        $toApply = WalleeModelRefundjob::loadNotAppliedJobIds();
         foreach ($toApply as $id) {
-            if ($endTime!== null && time() + 15 > $endTime) {
+            if ($endTime !== null && time() + 15 > $endTime) {
                 return;
             }
             try {
                 $this->applyRefundToShop($id);
             } catch (Exception $e) {
                 $message = sprintf(
-                    Wallee_Helper::getModuleInstance()->l('Error applying refund job with id %d: %s', 'refund'),
+                    WalleeHelper::getModuleInstance()->l(
+                        'Error applying refund job with id %d: %s',
+                        'refund'
+                    ),
                     $id,
                     $e->getMessage()
                 );
-                PrestaShopLogger::addLog($message, 3, null, 'Wallee_Model_RefundJob');
+                PrestaShopLogger::addLog($message, 3, null, 'WalleeModelRefundjob');
             }
         }
     }
 
     public function hasPendingRefunds()
     {
-        $toSend = Wallee_Model_RefundJob::loadNotSentJobIds();
-        $toApply = Wallee_Model_RefundJob::loadNotAppliedJobIds();
+        $toSend = WalleeModelRefundjob::loadNotSentJobIds();
+        $toApply = WalleeModelRefundjob::loadNotAppliedJobIds();
         return ! empty($toSend) || ! empty($toApply);
     }
 
@@ -282,35 +288,36 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
      *            Refund data to be determined
      * @return \Wallee\Sdk\Model\RefundCreate
      */
-    protected function createRefundObject(Wallee_Model_RefundJob $refundJob)
+    protected function createRefundObject(WalleeModelRefundjob $refundJob)
     {
         $order = new Order($refundJob->getOrderId());
-        
-        $strategy = Wallee_Backend_StrategyProvider::getStrategy();
-        
+
+        $strategy = WalleeBackendStrategyprovider::getStrategy();
+
         $spaceId = $refundJob->getSpaceId();
         $transactionId = $refundJob->getTransactionId();
         $externalRefundId = $refundJob->getExternalId();
         $parsedData = $refundJob->getRefundParameters();
         $amount = $strategy->getRefundTotal($parsedData);
         $type = $strategy->getWalleeRefundType($parsedData);
-        
+
         $reductions = $strategy->createReductions($order, $parsedData);
         $reductions = $this->fixReductions($amount, $spaceId, $transactionId, $reductions);
-                
+
         $remoteRefund = new \Wallee\Sdk\Model\RefundCreate();
         $remoteRefund->setExternalId($externalRefundId);
         $remoteRefund->setReductions($reductions);
         $remoteRefund->setTransaction($transactionId);
         $remoteRefund->setType($type);
-        
+
         return $remoteRefund;
     }
 
     /**
      * Returns the fixed line item reductions for the refund.
      *
-     * If the amount of the given reductions does not match the refund's grand total, the amount to refund is distributed equally to the line items.
+     * If the amount of the given reductions does not match the refund's grand total, the amount to refund is
+     * distributed equally to the line items.
      *
      * @param float $refundTotal
      * @param int $spaceId
@@ -321,15 +328,14 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
     protected function fixReductions($refundTotal, $spaceId, $transactionId, array $reductions)
     {
         $baseLineItems = $this->getBaseLineItems($spaceId, $transactionId);
-        $reductionAmount = Wallee_Helper::getReductionAmount($baseLineItems, $reductions);
-        
-        $configuration = Wallee_VersionAdapter::getConfigurationInterface();
+        $reductionAmount = WalleeHelper::getReductionAmount($baseLineItems, $reductions);
+
+        $configuration = WalleeVersionadapter::getConfigurationInterface();
         $computePrecision = $configuration->get('_PS_PRICE_COMPUTE_PRECISION_');
-        
-        if (Tools::ps_round($refundTotal, $computePrecision) !=
-            Tools::ps_round($reductionAmount, $computePrecision)) {
+
+        if (Tools::ps_round($refundTotal, $computePrecision) != Tools::ps_round($reductionAmount, $computePrecision)) {
             $fixedReductions = array();
-            $baseAmount = Wallee_Helper::getTotalAmountIncludingTax($baseLineItems);
+            $baseAmount = WalleeHelper::getTotalAmountIncludingTax($baseLineItems);
             $rate = $refundTotal / $baseAmount;
             foreach ($baseLineItems as $lineItem) {
                 $reduction = new \Wallee\Sdk\Model\LineItemReductionCreate();
@@ -340,7 +346,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
                 );
                 $fixedReductions[] = $reduction;
             }
-            
+
             return $fixedReductions;
         } else {
             return $reductions;
@@ -369,11 +375,8 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
      * @param \Wallee\Sdk\Model\Refund $refund
      * @return \Wallee\Sdk\Model\LineItem[]
      */
-    protected function getBaseLineItems(
-        $spaceId,
-        $transactionId,
-        \Wallee\Sdk\Model\Refund $refund = null
-    ) {
+    protected function getBaseLineItems($spaceId, $transactionId, \Wallee\Sdk\Model\Refund $refund = null)
+    {
         $lastSuccessfulRefund = $this->getLastSuccessfulRefund($spaceId, $transactionId, $refund);
         if ($lastSuccessfulRefund) {
             return $lastSuccessfulRefund->getReducedLineItems();
@@ -393,7 +396,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
     protected function getTransactionInvoice($spaceId, $transactionId)
     {
         $query = new \Wallee\Sdk\Model\EntityQuery();
-        
+
         $filter = new \Wallee\Sdk\Model\EntityQueryFilter();
         $filter->setType(\Wallee\Sdk\Model\EntityQueryFilterType::_AND);
         $filter->setChildren(
@@ -403,16 +406,13 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
                     \Wallee\Sdk\Model\TransactionInvoiceState::CANCELED,
                     \Wallee\Sdk\Model\CriteriaOperator::NOT_EQUALS
                 ),
-                $this->createEntityFilter(
-                    'completion.lineItemVersion.transaction.id',
-                    $transactionId
-                )
+                $this->createEntityFilter('completion.lineItemVersion.transaction.id', $transactionId)
             )
         );
         $query->setFilter($filter);
         $query->setNumberOfEntities(1);
         $invoiceService = new \Wallee\Sdk\Service\TransactionInvoiceService(
-            Wallee_Helper::getApiClient()
+            WalleeHelper::getApiClient()
         );
         $result = $invoiceService->search($spaceId, $query);
         if (! empty($result)) {
@@ -436,7 +436,7 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
         \Wallee\Sdk\Model\Refund $refund = null
     ) {
         $query = new \Wallee\Sdk\Model\EntityQuery();
-        
+
         $filter = new \Wallee\Sdk\Model\EntityQueryFilter();
         $filter->setType(\Wallee\Sdk\Model\EntityQueryFilterType::_AND);
         $filters = array(
@@ -450,20 +450,17 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
                 \Wallee\Sdk\Model\CriteriaOperator::NOT_EQUALS
             );
         }
-        
+
         $filter->setChildren($filters);
         $query->setFilter($filter);
-        
+
         $query->setOrderBys(
             array(
-                $this->createEntityOrderBy(
-                    'createdOn',
-                    \Wallee\Sdk\Model\EntityQueryOrderByType::DESC
-                )
+                $this->createEntityOrderBy('createdOn', \Wallee\Sdk\Model\EntityQueryOrderByType::DESC)
             )
         );
         $query->setNumberOfEntities(1);
-        
+
         $result = $this->getRefundService()->search($spaceId, $query);
         if (! empty($result)) {
             return $result[0];
@@ -481,10 +478,10 @@ class Wallee_Service_Refund extends Wallee_Service_Abstract
     {
         if ($this->refundService == null) {
             $this->refundService = new \Wallee\Sdk\Service\RefundService(
-                Wallee_Helper::getApiClient()
+                WalleeHelper::getApiClient()
             );
         }
-        
+
         return $this->refundService;
     }
 }

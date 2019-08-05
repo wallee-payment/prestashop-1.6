@@ -8,7 +8,7 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  *}
 {capture name=path}
-    <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html':'UTF-8'}" title="{l s='Go back to the Checkout' mod='wallee'}">{l s='Checkout' mod='wallee'}</a><span class="navigation-pipe">{$navigationPipe}</span>{$name}
+    <a href="{$link->getPageLink('order', true, NULL, "step=3")|escape:'html'}" title="{l s='Go back to the Checkout' mod='wallee'}">{l s='Checkout' mod='wallee'}</a><span class="navigation-pipe">{$navigationPipe}</span>{$name|escape:'html':'UTF-8'}
 {/capture}
 
 <h1 class="page-heading">
@@ -61,19 +61,19 @@
 	
 	<div id="wallee-payment-container" class="invisible">
 	<h3 class="page-subheading" id="wallee-method-title">
-        <span><span style="font-size:smaller">{l s='Payment Method:' mod='wallee'}</span> {$name}</span>
+        <span><span style="font-size:smaller">{l s='Payment Method:' mod='wallee'}</span> {$name|escape:'html':'UTF-8'}</span>
         
         <button class="button btn btn-default button-medium wallee-submit right" id="wallee-submit-top" disabled>
             <span>{l s='I confirm my order' mod='wallee'}<i class="icon-chevron-right right"></i></span>
         </button>
     </h3>
 	</div>
-	<form action="{$form_target_url|escape:'html':'UTF-8'}" method="post" id="wallee-payment-form">
-    	<input type="hidden" name="cartHash" value="{$cartHash}" />
-    	<input type="hidden" name="methodId" value="{$methodId}" />
+	<form action="{$form_target_url|escape:'html'}" method="post" id="wallee-payment-form">
+    	<input type="hidden" name="cartHash" value="{$cartHash|escape:'html':'UTF-8'}" />
+    	<input type="hidden" name="methodId" value="{$methodId|escape:'html':'UTF-8'}" />
     	
         <div id="wallee-method-configuration" class="wallee-method-configuration" style="display: none;"
-	data-method-id="{$methodId}" data-configuration-id="{$configurationId}"></div>
+	data-method-id="{$methodId|escape:'html':'UTF-8'}" data-configuration-id="{$configurationId|escape:'html':'UTF-8'}"></div>
 		<div id="wallee-method-container">
 			<input type="hidden" id="wallee-iframe-possible" name="wallee-iframe-possible" value="false" />
 			<div class="wallee-loader"></div>		
@@ -81,7 +81,7 @@
 		
 		{if $showTOS && $conditions && $cmsId}
 	 		{if isset($overrideTOSDisplay) && $overrideTOSDisplay}
-	        	{$overrideTOSDisplay}
+	        	{$overrideTOSDisplay|escape:'html':'UTF-8'}
 			{else}
 				<div class="box">
 					<p class="checkbox">

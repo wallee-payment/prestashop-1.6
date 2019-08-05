@@ -11,7 +11,6 @@
 
 class AdminWalleeOrderController extends ModuleAdminController
 {
-
     public function postProcess()
     {
         parent::postProcess();
@@ -31,7 +30,10 @@ class AdminWalleeOrderController extends ModuleAdminController
             echo Tools::jsonEncode(
                 array(
                     'success' => 'false',
-                    'message' => $this->module->l('You do not have permission to edit the order.', 'adminwalleeordercontroller')
+                    'message' => $this->module->l(
+                        'You do not have permission to edit the order.',
+                        'adminwalleeordercontroller'
+                    )
                 )
             );
             die();
@@ -43,19 +45,17 @@ class AdminWalleeOrderController extends ModuleAdminController
         if (Tools::isSubmit('id_order')) {
             try {
                 $order = new Order(Tools::getValue('id_order'));
-                Wallee_Service_TransactionVoid::instance()->updateForOrder($order);
-                Wallee_Service_TransactionCompletion::instance()->updateForOrder($order);
+                WalleeServiceTransactioncompletion::instance()->updateForOrder($order);
+                WalleeServiceTransactioncompletion::instance()->updateForOrder($order);
                 echo Tools::jsonEncode(array(
                     'success' => 'true'
                 ));
                 die();
             } catch (Exception $e) {
-                echo Tools::jsonEncode(
-                    array(
-                        'success' => 'false',
-                        'message' => $e->getMessage()
-                    )
-                );
+                echo Tools::jsonEncode(array(
+                    'success' => 'false',
+                    'message' => $e->getMessage()
+                ));
                 die();
             }
         } else {
@@ -74,11 +74,14 @@ class AdminWalleeOrderController extends ModuleAdminController
         if (Tools::isSubmit('id_order')) {
             try {
                 $order = new Order(Tools::getValue('id_order'));
-                Wallee_Service_TransactionVoid::instance()->executeVoid($order);
+                WalleeServiceTransactionvoid::instance()->executeVoid($order);
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'true',
-                        'message' => $this->module->l('The order is updated automatically once the void is processed.', 'adminwalleeordercontroller')
+                        'message' => $this->module->l(
+                            'The order is updated automatically once the void is processed.',
+                            'adminwalleeordercontroller'
+                        )
                     )
                 );
                 die();
@@ -86,7 +89,7 @@ class AdminWalleeOrderController extends ModuleAdminController
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'false',
-                        'message' => Wallee_Helper::cleanExceptionMessage($e->getMessage())
+                        'message' => WalleeHelper::cleanExceptionMessage($e->getMessage())
                     )
                 );
                 die();
@@ -101,17 +104,20 @@ class AdminWalleeOrderController extends ModuleAdminController
             die();
         }
     }
-    
+
     public function ajaxProcessCompleteOrder()
     {
         if (Tools::isSubmit('id_order')) {
             try {
                 $order = new Order(Tools::getValue('id_order'));
-                Wallee_Service_TransactionCompletion::instance()->executeCompletion($order);
+                WalleeServiceTransactioncompletion::instance()->executeCompletion($order);
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'true',
-                        'message' => $this->module->l('The order is updated automatically once the completion is processed.', 'adminwalleeordercontroller')
+                        'message' => $this->module->l(
+                            'The order is updated automatically once the completion is processed.',
+                            'adminwalleeordercontroller'
+                        )
                     )
                 );
                 die();
@@ -119,7 +125,7 @@ class AdminWalleeOrderController extends ModuleAdminController
                 echo Tools::jsonEncode(
                     array(
                         'success' => 'false',
-                        'message' => Wallee_Helper::cleanExceptionMessage($e->getMessage())
+                        'message' => WalleeHelper::cleanExceptionMessage($e->getMessage())
                     )
                 );
                 die();
