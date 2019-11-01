@@ -59,11 +59,11 @@
 	<div id="wallee-error-messages"></div>
 	
 	
-	<div id="wallee-payment-container" class="invisible">
+	<div id="wallee-payment-container">
 	<h3 class="page-subheading" id="wallee-method-title">
         <span><span style="font-size:smaller">{l s='Payment Method:' mod='wallee'}</span> {$name|escape:'html':'UTF-8'}</span>
         
-        <button class="button btn btn-default button-medium wallee-submit right" id="wallee-submit-top" disabled>
+        <button class="button btn btn-default button-medium wallee-submit right invisible" id="wallee-submit-top" disabled >
             <span>{l s='I confirm my order' mod='wallee'}<i class="icon-chevron-right right"></i></span>
         </button>
     </h3>
