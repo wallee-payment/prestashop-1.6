@@ -126,7 +126,7 @@ jQuery(function ($) {
                             self.iframe_handler.submit();
                             return;
                         } else if (response.result =='redirect') {
-                            location.replace(response.redirect+'&paymentMethodConfigurationId='+self.configuration_id);
+                            location.replace(response.redirect);
                             return;
                         } else if ( response.result == 'failure' ) {
                             if (response.reload == 'true' ) {

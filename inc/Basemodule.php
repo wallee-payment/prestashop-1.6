@@ -1271,6 +1271,7 @@ class WalleeBasemodule
     ) {
         if ($module->active) {
             WalleeHelper::startDBTransaction();
+            $methodConfiguration = null;
             try {
                 $originalCart = new Cart($id_cart);
 
@@ -1333,7 +1334,7 @@ class WalleeBasemodule
                     $duplicateMessage->save();
                 }
 
-                $methodConfiguration = null;
+                
                 if (strpos($payment_method, "wallee_") === 0) {
                     $id = Tools::substr($payment_method, strpos($payment_method, "_") + 1);
                     $methodConfiguration = new WalleeModelMethodconfiguration($id);
@@ -1406,7 +1407,8 @@ class WalleeBasemodule
             try {
                 $transaction = WalleeServiceTransaction::instance()->confirmTransaction(
                     $dataOrder,
-                    $orders
+                    $orders,
+                    $methodConfiguration->getConfigurationId()
                 );
                 WalleeServiceTransaction::instance()->updateTransactionInfo($transaction, $dataOrder);
                 $GLOBALS['walleeTransactionIds'] = array(
