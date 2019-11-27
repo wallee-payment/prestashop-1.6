@@ -35,6 +35,20 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
      * @var \Wallee\Sdk\Service\TransactionService
      */
     private $transactionService;
+    
+    /**
+     * The transaction iframe API service to retrieve js url.
+     *
+     * @var \Wallee\Sdk\Service\TransactionIframeService
+     */
+    private $transactionIframeService;
+    
+    /**
+     * The transaction payment page API service to retrieve redirection url.
+     *
+     * @var \Wallee\Sdk\Service\TransactionPaymentPageService
+     */
+    private $transactionPaymentPageService;
 
     /**
      * The charge attempt API service.
@@ -56,6 +70,36 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
             );
         }
         return $this->transactionService;
+    }
+    
+    /**
+     * Returns the transaction iframe API service.
+     *
+     * @return \Wallee\Sdk\Service\TransactionIframeService
+     */
+    protected function getTransactionIframeService()
+    {
+        if ($this->transactionIframeService === null) {
+            $this->transactionIframeService = new \Wallee\Sdk\Service\TransactionIframeService(
+                WalleeHelper::getApiClient()
+            );
+        }
+        return $this->transactionIframeService;
+    }
+    
+    /**
+     * Returns the transaction API payment page service.
+     *
+     * @return \Wallee\Sdk\Service\TransactionPaymentPageService
+     */
+    protected function getTransactionPaymentPageService()
+    {
+        if ($this->transactionPaymentPageService === null) {
+            $this->transactionPaymentPageService = new \Wallee\Sdk\Service\TransactionPaymentPageService(
+                WalleeHelper::getApiClient()
+            );
+        }
+        return $this->transactionPaymentPageService;
     }
 
     /**
@@ -106,7 +150,7 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
     public function getJavascriptUrl(Cart $cart)
     {
         $transaction = $this->getTransactionFromCart($cart);
-        return $this->getTransactionService()->buildJavaScriptUrl(
+        return $this->getTransactionIframeService()->javascriptUrl(
             $transaction->getLinkedSpaceId(),
             $transaction->getId()
         );
@@ -120,7 +164,7 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
      */
     public function getPaymentPageUrl($spaceId, $transactionId)
     {
-        return $this->getTransactionService()->buildPaymentPageUrl($spaceId, $transactionId);
+        return $this->getTransactionPaymentPageService()->paymentPageUrl($spaceId, $transactionId);
     }
 
     /**
