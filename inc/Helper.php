@@ -123,7 +123,7 @@ class WalleeHelper
 
     public static function roundAmount($amount, $currencyCode)
     {
-        return round($amount, self::getCurrencyFractionDigits($currencyCode));
+        return Tools::ps_round($amount, self::getCurrencyFractionDigits($currencyCode));
     }
 
     public static function convertCurrencyIdToCode($id)
