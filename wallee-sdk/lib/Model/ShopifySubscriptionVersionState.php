@@ -22,7 +22,7 @@ namespace Wallee\Sdk\Model;
 use \Wallee\Sdk\ObjectSerializer;
 
 /**
- * PaymentTerminalDeviceState model
+ * ShopifySubscriptionVersionState model
  *
  * @category    Class
  * @description 
@@ -30,16 +30,14 @@ use \Wallee\Sdk\ObjectSerializer;
  * @author      customweb GmbH
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class PaymentTerminalDeviceState
+class ShopifySubscriptionVersionState
 {
     /**
      * Possible values of this enum
      */
     const CREATE = 'CREATE';
-    const PREPARING = 'PREPARING';
-    const REGISTERED = 'REGISTERED';
-    const DECOMMISSIONING = 'DECOMMISSIONING';
-    const DECOMMISSIONED = 'DECOMMISSIONED';
+    const ACTIVE = 'ACTIVE';
+    const DISCHARGED = 'DISCHARGED';
     
     /**
      * Gets allowable values of the enum
@@ -49,10 +47,8 @@ class PaymentTerminalDeviceState
     {
         return [
             self::CREATE,
-            self::PREPARING,
-            self::REGISTERED,
-            self::DECOMMISSIONING,
-            self::DECOMMISSIONED,
+            self::ACTIVE,
+            self::DISCHARGED,
         ];
     }
 }

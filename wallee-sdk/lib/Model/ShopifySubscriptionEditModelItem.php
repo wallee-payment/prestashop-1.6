@@ -24,7 +24,7 @@ use \ArrayAccess;
 use \Wallee\Sdk\ObjectSerializer;
 
 /**
- * PaymentTerminalReference model
+ * ShopifySubscriptionEditModelItem model
  *
  * @category    Class
  * @description 
@@ -32,7 +32,7 @@ use \Wallee\Sdk\ObjectSerializer;
  * @author      customweb GmbH
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class PaymentTerminalReference implements ModelInterface, ArrayAccess
+class ShopifySubscriptionEditModelItem implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -41,7 +41,7 @@ class PaymentTerminalReference implements ModelInterface, ArrayAccess
       *
       * @var string
       */
-    protected static $swaggerModelName = 'PaymentTerminalReference';
+    protected static $swaggerModelName = 'ShopifySubscriptionEditModel.Item';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -49,14 +49,11 @@ class PaymentTerminalReference implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'created_on' => '\DateTime',
-        'id' => 'int',
-        'linked_space_id' => 'int',
-        'planned_purge_date' => '\DateTime',
-        'space' => '\Wallee\Sdk\Model\Space',
-        'state' => '\Wallee\Sdk\Model\PaymentTerminalState',
-        'terminal_id' => 'int',
-        'version' => 'int'
+        'price_including_tax' => 'float',
+        'product_id' => 'int',
+        'quantity' => 'float',
+        'recalculate_price' => 'bool',
+        'tax_lines' => '\Wallee\Sdk\Model\ShopifySubscriptionEditModelTaxLine[]'
     ];
 
     /**
@@ -65,14 +62,11 @@ class PaymentTerminalReference implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'created_on' => 'date-time',
-        'id' => 'int64',
-        'linked_space_id' => 'int64',
-        'planned_purge_date' => 'date-time',
-        'space' => null,
-        'state' => null,
-        'terminal_id' => 'int64',
-        'version' => 'int32'
+        'price_including_tax' => null,
+        'product_id' => 'int64',
+        'quantity' => null,
+        'recalculate_price' => null,
+        'tax_lines' => null
     ];
 
     /**
@@ -82,14 +76,11 @@ class PaymentTerminalReference implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'created_on' => 'createdOn',
-        'id' => 'id',
-        'linked_space_id' => 'linkedSpaceId',
-        'planned_purge_date' => 'plannedPurgeDate',
-        'space' => 'space',
-        'state' => 'state',
-        'terminal_id' => 'terminalId',
-        'version' => 'version'
+        'price_including_tax' => 'priceIncludingTax',
+        'product_id' => 'productId',
+        'quantity' => 'quantity',
+        'recalculate_price' => 'recalculatePrice',
+        'tax_lines' => 'taxLines'
     ];
 
     /**
@@ -98,14 +89,11 @@ class PaymentTerminalReference implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'created_on' => 'setCreatedOn',
-        'id' => 'setId',
-        'linked_space_id' => 'setLinkedSpaceId',
-        'planned_purge_date' => 'setPlannedPurgeDate',
-        'space' => 'setSpace',
-        'state' => 'setState',
-        'terminal_id' => 'setTerminalId',
-        'version' => 'setVersion'
+        'price_including_tax' => 'setPriceIncludingTax',
+        'product_id' => 'setProductId',
+        'quantity' => 'setQuantity',
+        'recalculate_price' => 'setRecalculatePrice',
+        'tax_lines' => 'setTaxLines'
     ];
 
     /**
@@ -114,14 +102,11 @@ class PaymentTerminalReference implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'created_on' => 'getCreatedOn',
-        'id' => 'getId',
-        'linked_space_id' => 'getLinkedSpaceId',
-        'planned_purge_date' => 'getPlannedPurgeDate',
-        'space' => 'getSpace',
-        'state' => 'getState',
-        'terminal_id' => 'getTerminalId',
-        'version' => 'getVersion'
+        'price_including_tax' => 'getPriceIncludingTax',
+        'product_id' => 'getProductId',
+        'quantity' => 'getQuantity',
+        'recalculate_price' => 'getRecalculatePrice',
+        'tax_lines' => 'getTaxLines'
     ];
 
     
@@ -142,21 +127,15 @@ class PaymentTerminalReference implements ModelInterface, ArrayAccess
     public function __construct(array $data = null)
     {
         
-        $this->container['created_on'] = isset($data['created_on']) ? $data['created_on'] : null;
+        $this->container['price_including_tax'] = isset($data['price_including_tax']) ? $data['price_including_tax'] : null;
         
-        $this->container['id'] = isset($data['id']) ? $data['id'] : null;
+        $this->container['product_id'] = isset($data['product_id']) ? $data['product_id'] : null;
         
-        $this->container['linked_space_id'] = isset($data['linked_space_id']) ? $data['linked_space_id'] : null;
+        $this->container['quantity'] = isset($data['quantity']) ? $data['quantity'] : null;
         
-        $this->container['planned_purge_date'] = isset($data['planned_purge_date']) ? $data['planned_purge_date'] : null;
+        $this->container['recalculate_price'] = isset($data['recalculate_price']) ? $data['recalculate_price'] : null;
         
-        $this->container['space'] = isset($data['space']) ? $data['space'] : null;
-        
-        $this->container['state'] = isset($data['state']) ? $data['state'] : null;
-        
-        $this->container['terminal_id'] = isset($data['terminal_id']) ? $data['terminal_id'] : null;
-        
-        $this->container['version'] = isset($data['version']) ? $data['version'] : null;
+        $this->container['tax_lines'] = isset($data['tax_lines']) ? $data['tax_lines'] : null;
         
     }
 
@@ -250,200 +229,125 @@ class PaymentTerminalReference implements ModelInterface, ArrayAccess
     
 
     /**
-     * Gets created_on
+     * Gets price_including_tax
      *
-     * @return \DateTime
+     * @return float
      */
-    public function getCreatedOn()
+    public function getPriceIncludingTax()
     {
-        return $this->container['created_on'];
+        return $this->container['price_including_tax'];
     }
 
     /**
-     * Sets created_on
+     * Sets price_including_tax
      *
-     * @param \DateTime $created_on The created on date indicates the date on which the entity was stored into the database.
+     * @param float $price_including_tax 
      *
      * @return $this
      */
-    public function setCreatedOn($created_on)
+    public function setPriceIncludingTax($price_including_tax)
     {
-        $this->container['created_on'] = $created_on;
+        $this->container['price_including_tax'] = $price_including_tax;
 
         return $this;
     }
     
 
     /**
-     * Gets id
+     * Gets product_id
      *
      * @return int
      */
-    public function getId()
+    public function getProductId()
     {
-        return $this->container['id'];
+        return $this->container['product_id'];
     }
 
     /**
-     * Sets id
+     * Sets product_id
      *
-     * @param int $id The ID is the primary key of the entity. The ID identifies the entity uniquely.
+     * @param int $product_id 
      *
      * @return $this
      */
-    public function setId($id)
+    public function setProductId($product_id)
     {
-        $this->container['id'] = $id;
+        $this->container['product_id'] = $product_id;
 
         return $this;
     }
     
 
     /**
-     * Gets linked_space_id
+     * Gets quantity
      *
-     * @return int
+     * @return float
      */
-    public function getLinkedSpaceId()
+    public function getQuantity()
     {
-        return $this->container['linked_space_id'];
+        return $this->container['quantity'];
     }
 
     /**
-     * Sets linked_space_id
+     * Sets quantity
      *
-     * @param int $linked_space_id The linked space id holds the ID of the space to which the entity belongs to.
+     * @param float $quantity 
      *
      * @return $this
      */
-    public function setLinkedSpaceId($linked_space_id)
+    public function setQuantity($quantity)
     {
-        $this->container['linked_space_id'] = $linked_space_id;
+        $this->container['quantity'] = $quantity;
 
         return $this;
     }
     
 
     /**
-     * Gets planned_purge_date
+     * Gets recalculate_price
      *
-     * @return \DateTime
+     * @return bool
      */
-    public function getPlannedPurgeDate()
+    public function getRecalculatePrice()
     {
-        return $this->container['planned_purge_date'];
+        return $this->container['recalculate_price'];
     }
 
     /**
-     * Sets planned_purge_date
+     * Sets recalculate_price
      *
-     * @param \DateTime $planned_purge_date The planned purge date indicates when the entity is permanently removed. When the date is null the entity is not planned to be removed.
+     * @param bool $recalculate_price 
      *
      * @return $this
      */
-    public function setPlannedPurgeDate($planned_purge_date)
+    public function setRecalculatePrice($recalculate_price)
     {
-        $this->container['planned_purge_date'] = $planned_purge_date;
+        $this->container['recalculate_price'] = $recalculate_price;
 
         return $this;
     }
     
 
     /**
-     * Gets space
+     * Gets tax_lines
      *
-     * @return \Wallee\Sdk\Model\Space
+     * @return \Wallee\Sdk\Model\ShopifySubscriptionEditModelTaxLine[]
      */
-    public function getSpace()
+    public function getTaxLines()
     {
-        return $this->container['space'];
+        return $this->container['tax_lines'];
     }
 
     /**
-     * Sets space
+     * Sets tax_lines
      *
-     * @param \Wallee\Sdk\Model\Space $space 
+     * @param \Wallee\Sdk\Model\ShopifySubscriptionEditModelTaxLine[] $tax_lines 
      *
      * @return $this
      */
-    public function setSpace($space)
+    public function setTaxLines($tax_lines)
     {
-        $this->container['space'] = $space;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets state
-     *
-     * @return \Wallee\Sdk\Model\PaymentTerminalState
-     */
-    public function getState()
-    {
-        return $this->container['state'];
-    }
-
-    /**
-     * Sets state
-     *
-     * @param \Wallee\Sdk\Model\PaymentTerminalState $state 
-     *
-     * @return $this
-     */
-    public function setState($state)
-    {
-        $this->container['state'] = $state;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets terminal_id
-     *
-     * @return int
-     */
-    public function getTerminalId()
-    {
-        return $this->container['terminal_id'];
-    }
-
-    /**
-     * Sets terminal_id
-     *
-     * @param int $terminal_id 
-     *
-     * @return $this
-     */
-    public function setTerminalId($terminal_id)
-    {
-        $this->container['terminal_id'] = $terminal_id;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets version
-     *
-     * @return int
-     */
-    public function getVersion()
-    {
-        return $this->container['version'];
-    }
-
-    /**
-     * Sets version
-     *
-     * @param int $version The version number indicates the version of the entity. The version is incremented whenever the entity is changed.
-     *
-     * @return $this
-     */
-    public function setVersion($version)
-    {
-        $this->container['version'] = $version;
+        $this->container['tax_lines'] = $tax_lines;
 
         return $this;
     }

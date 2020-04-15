@@ -24,7 +24,7 @@ use \ArrayAccess;
 use \Wallee\Sdk\ObjectSerializer;
 
 /**
- * PaymentTerminalDeviceModel model
+ * ShopifySubscription model
  *
  * @category    Class
  * @description 
@@ -32,7 +32,7 @@ use \Wallee\Sdk\ObjectSerializer;
  * @author      customweb GmbH
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
+class ShopifySubscription implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -41,7 +41,7 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
       *
       * @var string
       */
-    protected static $swaggerModelName = 'PaymentTerminalDeviceModel';
+    protected static $swaggerModelName = 'ShopifySubscription';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -49,17 +49,19 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'description' => '\Wallee\Sdk\Model\DatabaseTranslatedString',
+        'created_by' => 'int',
+        'created_on' => '\DateTime',
         'id' => 'int',
-        'image' => 'string',
-        'image_type' => 'string',
-        'manufacturer' => '\Wallee\Sdk\Model\PaymentTerminalDeviceManufacturer',
-        'model_id' => 'string',
-        'name' => 'string',
-        'planned_purge_date' => '\DateTime',
-        'scope' => '\Wallee\Sdk\Model\Scope',
-        'state' => '\Wallee\Sdk\Model\CreationEntityState',
-        'title' => '\Wallee\Sdk\Model\DatabaseTranslatedString',
+        'initial_transaction' => 'int',
+        'language' => 'string',
+        'linked_space_id' => 'int',
+        'order_recurrence_number' => 'int',
+        'shop' => 'int',
+        'state' => '\Wallee\Sdk\Model\ShopifySubscriptionState',
+        'subscriber' => '\Wallee\Sdk\Model\ShopifySubscriber',
+        'terminated_by' => 'int',
+        'terminated_on' => '\DateTime',
+        'termination_request_date' => '\DateTime',
         'version' => 'int'
     ];
 
@@ -69,17 +71,19 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'description' => null,
+        'created_by' => 'int64',
+        'created_on' => 'date-time',
         'id' => 'int64',
-        'image' => 'byte',
-        'image_type' => null,
-        'manufacturer' => null,
-        'model_id' => null,
-        'name' => null,
-        'planned_purge_date' => 'date-time',
-        'scope' => null,
+        'initial_transaction' => 'int64',
+        'language' => null,
+        'linked_space_id' => 'int64',
+        'order_recurrence_number' => 'int32',
+        'shop' => 'int64',
         'state' => null,
-        'title' => null,
+        'subscriber' => null,
+        'terminated_by' => 'int64',
+        'terminated_on' => 'date-time',
+        'termination_request_date' => 'date-time',
         'version' => 'int32'
     ];
 
@@ -90,17 +94,19 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'description' => 'description',
+        'created_by' => 'createdBy',
+        'created_on' => 'createdOn',
         'id' => 'id',
-        'image' => 'image',
-        'image_type' => 'imageType',
-        'manufacturer' => 'manufacturer',
-        'model_id' => 'modelId',
-        'name' => 'name',
-        'planned_purge_date' => 'plannedPurgeDate',
-        'scope' => 'scope',
+        'initial_transaction' => 'initialTransaction',
+        'language' => 'language',
+        'linked_space_id' => 'linkedSpaceId',
+        'order_recurrence_number' => 'orderRecurrenceNumber',
+        'shop' => 'shop',
         'state' => 'state',
-        'title' => 'title',
+        'subscriber' => 'subscriber',
+        'terminated_by' => 'terminatedBy',
+        'terminated_on' => 'terminatedOn',
+        'termination_request_date' => 'terminationRequestDate',
         'version' => 'version'
     ];
 
@@ -110,17 +116,19 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'description' => 'setDescription',
+        'created_by' => 'setCreatedBy',
+        'created_on' => 'setCreatedOn',
         'id' => 'setId',
-        'image' => 'setImage',
-        'image_type' => 'setImageType',
-        'manufacturer' => 'setManufacturer',
-        'model_id' => 'setModelId',
-        'name' => 'setName',
-        'planned_purge_date' => 'setPlannedPurgeDate',
-        'scope' => 'setScope',
+        'initial_transaction' => 'setInitialTransaction',
+        'language' => 'setLanguage',
+        'linked_space_id' => 'setLinkedSpaceId',
+        'order_recurrence_number' => 'setOrderRecurrenceNumber',
+        'shop' => 'setShop',
         'state' => 'setState',
-        'title' => 'setTitle',
+        'subscriber' => 'setSubscriber',
+        'terminated_by' => 'setTerminatedBy',
+        'terminated_on' => 'setTerminatedOn',
+        'termination_request_date' => 'setTerminationRequestDate',
         'version' => 'setVersion'
     ];
 
@@ -130,17 +138,19 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'description' => 'getDescription',
+        'created_by' => 'getCreatedBy',
+        'created_on' => 'getCreatedOn',
         'id' => 'getId',
-        'image' => 'getImage',
-        'image_type' => 'getImageType',
-        'manufacturer' => 'getManufacturer',
-        'model_id' => 'getModelId',
-        'name' => 'getName',
-        'planned_purge_date' => 'getPlannedPurgeDate',
-        'scope' => 'getScope',
+        'initial_transaction' => 'getInitialTransaction',
+        'language' => 'getLanguage',
+        'linked_space_id' => 'getLinkedSpaceId',
+        'order_recurrence_number' => 'getOrderRecurrenceNumber',
+        'shop' => 'getShop',
         'state' => 'getState',
-        'title' => 'getTitle',
+        'subscriber' => 'getSubscriber',
+        'terminated_by' => 'getTerminatedBy',
+        'terminated_on' => 'getTerminatedOn',
+        'termination_request_date' => 'getTerminationRequestDate',
         'version' => 'getVersion'
     ];
 
@@ -162,27 +172,31 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
     public function __construct(array $data = null)
     {
         
-        $this->container['description'] = isset($data['description']) ? $data['description'] : null;
+        $this->container['created_by'] = isset($data['created_by']) ? $data['created_by'] : null;
+        
+        $this->container['created_on'] = isset($data['created_on']) ? $data['created_on'] : null;
         
         $this->container['id'] = isset($data['id']) ? $data['id'] : null;
         
-        $this->container['image'] = isset($data['image']) ? $data['image'] : null;
+        $this->container['initial_transaction'] = isset($data['initial_transaction']) ? $data['initial_transaction'] : null;
         
-        $this->container['image_type'] = isset($data['image_type']) ? $data['image_type'] : null;
+        $this->container['language'] = isset($data['language']) ? $data['language'] : null;
         
-        $this->container['manufacturer'] = isset($data['manufacturer']) ? $data['manufacturer'] : null;
+        $this->container['linked_space_id'] = isset($data['linked_space_id']) ? $data['linked_space_id'] : null;
         
-        $this->container['model_id'] = isset($data['model_id']) ? $data['model_id'] : null;
+        $this->container['order_recurrence_number'] = isset($data['order_recurrence_number']) ? $data['order_recurrence_number'] : null;
         
-        $this->container['name'] = isset($data['name']) ? $data['name'] : null;
-        
-        $this->container['planned_purge_date'] = isset($data['planned_purge_date']) ? $data['planned_purge_date'] : null;
-        
-        $this->container['scope'] = isset($data['scope']) ? $data['scope'] : null;
+        $this->container['shop'] = isset($data['shop']) ? $data['shop'] : null;
         
         $this->container['state'] = isset($data['state']) ? $data['state'] : null;
         
-        $this->container['title'] = isset($data['title']) ? $data['title'] : null;
+        $this->container['subscriber'] = isset($data['subscriber']) ? $data['subscriber'] : null;
+        
+        $this->container['terminated_by'] = isset($data['terminated_by']) ? $data['terminated_by'] : null;
+        
+        $this->container['terminated_on'] = isset($data['terminated_on']) ? $data['terminated_on'] : null;
+        
+        $this->container['termination_request_date'] = isset($data['termination_request_date']) ? $data['termination_request_date'] : null;
         
         $this->container['version'] = isset($data['version']) ? $data['version'] : null;
         
@@ -278,25 +292,50 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
     
 
     /**
-     * Gets description
+     * Gets created_by
      *
-     * @return \Wallee\Sdk\Model\DatabaseTranslatedString
+     * @return int
      */
-    public function getDescription()
+    public function getCreatedBy()
     {
-        return $this->container['description'];
+        return $this->container['created_by'];
     }
 
     /**
-     * Sets description
+     * Sets created_by
      *
-     * @param \Wallee\Sdk\Model\DatabaseTranslatedString $description 
+     * @param int $created_by 
      *
      * @return $this
      */
-    public function setDescription($description)
+    public function setCreatedBy($created_by)
     {
-        $this->container['description'] = $description;
+        $this->container['created_by'] = $created_by;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets created_on
+     *
+     * @return \DateTime
+     */
+    public function getCreatedOn()
+    {
+        return $this->container['created_on'];
+    }
+
+    /**
+     * Sets created_on
+     *
+     * @param \DateTime $created_on 
+     *
+     * @return $this
+     */
+    public function setCreatedOn($created_on)
+    {
+        $this->container['created_on'] = $created_on;
 
         return $this;
     }
@@ -328,177 +367,125 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
     
 
     /**
-     * Gets image
+     * Gets initial_transaction
+     *
+     * @return int
+     */
+    public function getInitialTransaction()
+    {
+        return $this->container['initial_transaction'];
+    }
+
+    /**
+     * Sets initial_transaction
+     *
+     * @param int $initial_transaction 
+     *
+     * @return $this
+     */
+    public function setInitialTransaction($initial_transaction)
+    {
+        $this->container['initial_transaction'] = $initial_transaction;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets language
      *
      * @return string
      */
-    public function getImage()
+    public function getLanguage()
     {
-        return $this->container['image'];
+        return $this->container['language'];
     }
 
     /**
-     * Sets image
+     * Sets language
      *
-     * @param string $image image
+     * @param string $language 
      *
      * @return $this
      */
-    public function setImage($image)
+    public function setLanguage($language)
     {
-
-
-        $this->container['image'] = $image;
+        $this->container['language'] = $language;
 
         return $this;
     }
     
 
     /**
-     * Gets image_type
+     * Gets linked_space_id
      *
-     * @return string
+     * @return int
      */
-    public function getImageType()
+    public function getLinkedSpaceId()
     {
-        return $this->container['image_type'];
+        return $this->container['linked_space_id'];
     }
 
     /**
-     * Sets image_type
+     * Sets linked_space_id
      *
-     * @param string $image_type 
+     * @param int $linked_space_id The linked space id holds the ID of the space to which the entity belongs to.
      *
      * @return $this
      */
-    public function setImageType($image_type)
+    public function setLinkedSpaceId($linked_space_id)
     {
-        $this->container['image_type'] = $image_type;
+        $this->container['linked_space_id'] = $linked_space_id;
 
         return $this;
     }
     
 
     /**
-     * Gets manufacturer
+     * Gets order_recurrence_number
      *
-     * @return \Wallee\Sdk\Model\PaymentTerminalDeviceManufacturer
+     * @return int
      */
-    public function getManufacturer()
+    public function getOrderRecurrenceNumber()
     {
-        return $this->container['manufacturer'];
+        return $this->container['order_recurrence_number'];
     }
 
     /**
-     * Sets manufacturer
+     * Sets order_recurrence_number
      *
-     * @param \Wallee\Sdk\Model\PaymentTerminalDeviceManufacturer $manufacturer 
+     * @param int $order_recurrence_number 
      *
      * @return $this
      */
-    public function setManufacturer($manufacturer)
+    public function setOrderRecurrenceNumber($order_recurrence_number)
     {
-        $this->container['manufacturer'] = $manufacturer;
+        $this->container['order_recurrence_number'] = $order_recurrence_number;
 
         return $this;
     }
     
 
     /**
-     * Gets model_id
+     * Gets shop
      *
-     * @return string
+     * @return int
      */
-    public function getModelId()
+    public function getShop()
     {
-        return $this->container['model_id'];
+        return $this->container['shop'];
     }
 
     /**
-     * Sets model_id
+     * Sets shop
      *
-     * @param string $model_id The model identifier of the device. The model identifier can be a number (e.g. a part number) or a name of the device model.
+     * @param int $shop 
      *
      * @return $this
      */
-    public function setModelId($model_id)
+    public function setShop($shop)
     {
-        $this->container['model_id'] = $model_id;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets name
-     *
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->container['name'];
-    }
-
-    /**
-     * Sets name
-     *
-     * @param string $name 
-     *
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->container['name'] = $name;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets planned_purge_date
-     *
-     * @return \DateTime
-     */
-    public function getPlannedPurgeDate()
-    {
-        return $this->container['planned_purge_date'];
-    }
-
-    /**
-     * Sets planned_purge_date
-     *
-     * @param \DateTime $planned_purge_date The planned purge date indicates when the entity is permanently removed. When the date is null the entity is not planned to be removed.
-     *
-     * @return $this
-     */
-    public function setPlannedPurgeDate($planned_purge_date)
-    {
-        $this->container['planned_purge_date'] = $planned_purge_date;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets scope
-     *
-     * @return \Wallee\Sdk\Model\Scope
-     */
-    public function getScope()
-    {
-        return $this->container['scope'];
-    }
-
-    /**
-     * Sets scope
-     *
-     * @param \Wallee\Sdk\Model\Scope $scope 
-     *
-     * @return $this
-     */
-    public function setScope($scope)
-    {
-        $this->container['scope'] = $scope;
+        $this->container['shop'] = $shop;
 
         return $this;
     }
@@ -507,7 +494,7 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
     /**
      * Gets state
      *
-     * @return \Wallee\Sdk\Model\CreationEntityState
+     * @return \Wallee\Sdk\Model\ShopifySubscriptionState
      */
     public function getState()
     {
@@ -517,7 +504,7 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
     /**
      * Sets state
      *
-     * @param \Wallee\Sdk\Model\CreationEntityState $state 
+     * @param \Wallee\Sdk\Model\ShopifySubscriptionState $state 
      *
      * @return $this
      */
@@ -530,25 +517,100 @@ class PaymentTerminalDeviceModel implements ModelInterface, ArrayAccess
     
 
     /**
-     * Gets title
+     * Gets subscriber
      *
-     * @return \Wallee\Sdk\Model\DatabaseTranslatedString
+     * @return \Wallee\Sdk\Model\ShopifySubscriber
      */
-    public function getTitle()
+    public function getSubscriber()
     {
-        return $this->container['title'];
+        return $this->container['subscriber'];
     }
 
     /**
-     * Sets title
+     * Sets subscriber
      *
-     * @param \Wallee\Sdk\Model\DatabaseTranslatedString $title 
+     * @param \Wallee\Sdk\Model\ShopifySubscriber $subscriber 
      *
      * @return $this
      */
-    public function setTitle($title)
+    public function setSubscriber($subscriber)
     {
-        $this->container['title'] = $title;
+        $this->container['subscriber'] = $subscriber;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets terminated_by
+     *
+     * @return int
+     */
+    public function getTerminatedBy()
+    {
+        return $this->container['terminated_by'];
+    }
+
+    /**
+     * Sets terminated_by
+     *
+     * @param int $terminated_by 
+     *
+     * @return $this
+     */
+    public function setTerminatedBy($terminated_by)
+    {
+        $this->container['terminated_by'] = $terminated_by;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets terminated_on
+     *
+     * @return \DateTime
+     */
+    public function getTerminatedOn()
+    {
+        return $this->container['terminated_on'];
+    }
+
+    /**
+     * Sets terminated_on
+     *
+     * @param \DateTime $terminated_on 
+     *
+     * @return $this
+     */
+    public function setTerminatedOn($terminated_on)
+    {
+        $this->container['terminated_on'] = $terminated_on;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets termination_request_date
+     *
+     * @return \DateTime
+     */
+    public function getTerminationRequestDate()
+    {
+        return $this->container['termination_request_date'];
+    }
+
+    /**
+     * Sets termination_request_date
+     *
+     * @param \DateTime $termination_request_date 
+     *
+     * @return $this
+     */
+    public function setTerminationRequestDate($termination_request_date)
+    {
+        $this->container['termination_request_date'] = $termination_request_date;
 
         return $this;
     }

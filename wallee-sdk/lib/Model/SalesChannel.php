@@ -24,7 +24,7 @@ use \ArrayAccess;
 use \Wallee\Sdk\ObjectSerializer;
 
 /**
- * PaymentTerminalDevice model
+ * SalesChannel model
  *
  * @category    Class
  * @description 
@@ -32,7 +32,7 @@ use \Wallee\Sdk\ObjectSerializer;
  * @author      customweb GmbH
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class PaymentTerminalDevice implements ModelInterface, ArrayAccess
+class SalesChannel implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -41,7 +41,7 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
       *
       * @var string
       */
-    protected static $swaggerModelName = 'PaymentTerminalDevice';
+    protected static $swaggerModelName = 'SalesChannel';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -49,15 +49,9 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'account' => '\Wallee\Sdk\Model\Account',
-        'created_on' => '\DateTime',
+        'description' => 'map[string,string]',
         'id' => 'int',
-        'model' => '\Wallee\Sdk\Model\PaymentTerminalDeviceModel',
-        'name' => 'string',
-        'serial_number' => 'string',
-        'state' => '\Wallee\Sdk\Model\PaymentTerminalDeviceState',
-        'terminal' => '\Wallee\Sdk\Model\PaymentTerminalReference',
-        'version' => 'int'
+        'name' => 'map[string,string]'
     ];
 
     /**
@@ -66,15 +60,9 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'account' => null,
-        'created_on' => 'date-time',
+        'description' => null,
         'id' => 'int64',
-        'model' => null,
-        'name' => null,
-        'serial_number' => null,
-        'state' => null,
-        'terminal' => null,
-        'version' => 'int32'
+        'name' => null
     ];
 
     /**
@@ -84,15 +72,9 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'account' => 'account',
-        'created_on' => 'createdOn',
+        'description' => 'description',
         'id' => 'id',
-        'model' => 'model',
-        'name' => 'name',
-        'serial_number' => 'serialNumber',
-        'state' => 'state',
-        'terminal' => 'terminal',
-        'version' => 'version'
+        'name' => 'name'
     ];
 
     /**
@@ -101,15 +83,9 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'account' => 'setAccount',
-        'created_on' => 'setCreatedOn',
+        'description' => 'setDescription',
         'id' => 'setId',
-        'model' => 'setModel',
-        'name' => 'setName',
-        'serial_number' => 'setSerialNumber',
-        'state' => 'setState',
-        'terminal' => 'setTerminal',
-        'version' => 'setVersion'
+        'name' => 'setName'
     ];
 
     /**
@@ -118,15 +94,9 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'account' => 'getAccount',
-        'created_on' => 'getCreatedOn',
+        'description' => 'getDescription',
         'id' => 'getId',
-        'model' => 'getModel',
-        'name' => 'getName',
-        'serial_number' => 'getSerialNumber',
-        'state' => 'getState',
-        'terminal' => 'getTerminal',
-        'version' => 'getVersion'
+        'name' => 'getName'
     ];
 
     
@@ -147,23 +117,11 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
     public function __construct(array $data = null)
     {
         
-        $this->container['account'] = isset($data['account']) ? $data['account'] : null;
-        
-        $this->container['created_on'] = isset($data['created_on']) ? $data['created_on'] : null;
+        $this->container['description'] = isset($data['description']) ? $data['description'] : null;
         
         $this->container['id'] = isset($data['id']) ? $data['id'] : null;
         
-        $this->container['model'] = isset($data['model']) ? $data['model'] : null;
-        
         $this->container['name'] = isset($data['name']) ? $data['name'] : null;
-        
-        $this->container['serial_number'] = isset($data['serial_number']) ? $data['serial_number'] : null;
-        
-        $this->container['state'] = isset($data['state']) ? $data['state'] : null;
-        
-        $this->container['terminal'] = isset($data['terminal']) ? $data['terminal'] : null;
-        
-        $this->container['version'] = isset($data['version']) ? $data['version'] : null;
         
     }
 
@@ -257,50 +215,25 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
     
 
     /**
-     * Gets account
+     * Gets description
      *
-     * @return \Wallee\Sdk\Model\Account
+     * @return map[string,string]
      */
-    public function getAccount()
+    public function getDescription()
     {
-        return $this->container['account'];
+        return $this->container['description'];
     }
 
     /**
-     * Sets account
+     * Sets description
      *
-     * @param \Wallee\Sdk\Model\Account $account 
+     * @param map[string,string] $description 
      *
      * @return $this
      */
-    public function setAccount($account)
+    public function setDescription($description)
     {
-        $this->container['account'] = $account;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets created_on
-     *
-     * @return \DateTime
-     */
-    public function getCreatedOn()
-    {
-        return $this->container['created_on'];
-    }
-
-    /**
-     * Sets created_on
-     *
-     * @param \DateTime $created_on The created on date indicates the date on which the entity was stored into the database.
-     *
-     * @return $this
-     */
-    public function setCreatedOn($created_on)
-    {
-        $this->container['created_on'] = $created_on;
+        $this->container['description'] = $description;
 
         return $this;
     }
@@ -332,34 +265,9 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
     
 
     /**
-     * Gets model
-     *
-     * @return \Wallee\Sdk\Model\PaymentTerminalDeviceModel
-     */
-    public function getModel()
-    {
-        return $this->container['model'];
-    }
-
-    /**
-     * Sets model
-     *
-     * @param \Wallee\Sdk\Model\PaymentTerminalDeviceModel $model 
-     *
-     * @return $this
-     */
-    public function setModel($model)
-    {
-        $this->container['model'] = $model;
-
-        return $this;
-    }
-    
-
-    /**
      * Gets name
      *
-     * @return string
+     * @return map[string,string]
      */
     public function getName()
     {
@@ -369,113 +277,13 @@ class PaymentTerminalDevice implements ModelInterface, ArrayAccess
     /**
      * Sets name
      *
-     * @param string $name 
+     * @param map[string,string] $name 
      *
      * @return $this
      */
     public function setName($name)
     {
         $this->container['name'] = $name;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets serial_number
-     *
-     * @return string
-     */
-    public function getSerialNumber()
-    {
-        return $this->container['serial_number'];
-    }
-
-    /**
-     * Sets serial_number
-     *
-     * @param string $serial_number 
-     *
-     * @return $this
-     */
-    public function setSerialNumber($serial_number)
-    {
-        $this->container['serial_number'] = $serial_number;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets state
-     *
-     * @return \Wallee\Sdk\Model\PaymentTerminalDeviceState
-     */
-    public function getState()
-    {
-        return $this->container['state'];
-    }
-
-    /**
-     * Sets state
-     *
-     * @param \Wallee\Sdk\Model\PaymentTerminalDeviceState $state 
-     *
-     * @return $this
-     */
-    public function setState($state)
-    {
-        $this->container['state'] = $state;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets terminal
-     *
-     * @return \Wallee\Sdk\Model\PaymentTerminalReference
-     */
-    public function getTerminal()
-    {
-        return $this->container['terminal'];
-    }
-
-    /**
-     * Sets terminal
-     *
-     * @param \Wallee\Sdk\Model\PaymentTerminalReference $terminal 
-     *
-     * @return $this
-     */
-    public function setTerminal($terminal)
-    {
-        $this->container['terminal'] = $terminal;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets version
-     *
-     * @return int
-     */
-    public function getVersion()
-    {
-        return $this->container['version'];
-    }
-
-    /**
-     * Sets version
-     *
-     * @param int $version The version number indicates the version of the entity. The version is incremented whenever the entity is changed.
-     *
-     * @return $this
-     */
-    public function setVersion($version)
-    {
-        $this->container['version'] = $version;
 
         return $this;
     }

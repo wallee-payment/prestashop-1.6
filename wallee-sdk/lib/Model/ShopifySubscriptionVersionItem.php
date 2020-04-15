@@ -24,7 +24,7 @@ use \ArrayAccess;
 use \Wallee\Sdk\ObjectSerializer;
 
 /**
- * PaymentTerminalDeviceManufacturer model
+ * ShopifySubscriptionVersionItem model
  *
  * @category    Class
  * @description 
@@ -32,7 +32,7 @@ use \Wallee\Sdk\ObjectSerializer;
  * @author      customweb GmbH
  * @license     http://www.apache.org/licenses/LICENSE-2.0 Apache License v2
  */
-class PaymentTerminalDeviceManufacturer implements ModelInterface, ArrayAccess
+class ShopifySubscriptionVersionItem implements ModelInterface, ArrayAccess
 {
     const DISCRIMINATOR = null;
 
@@ -41,7 +41,7 @@ class PaymentTerminalDeviceManufacturer implements ModelInterface, ArrayAccess
       *
       * @var string
       */
-    protected static $swaggerModelName = 'PaymentTerminalDeviceManufacturer';
+    protected static $swaggerModelName = 'ShopifySubscriptionVersionItem';
 
     /**
       * Array of property to type mappings. Used for (de)serialization
@@ -49,13 +49,11 @@ class PaymentTerminalDeviceManufacturer implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerTypes = [
-        'id' => 'int',
-        'name' => 'string',
-        'planned_purge_date' => '\DateTime',
-        'scope' => '\Wallee\Sdk\Model\Scope',
-        'state' => '\Wallee\Sdk\Model\CreationEntityState',
-        'title' => '\Wallee\Sdk\Model\DatabaseTranslatedString',
-        'version' => 'int'
+        'price_including_tax' => 'float',
+        'price_strategy' => '\Wallee\Sdk\Model\ShopifySubscriptionVersionItemPriceStrategy',
+        'product' => 'int',
+        'quantity' => 'float',
+        'tax_lines' => '\Wallee\Sdk\Model\ShopifyTaxLine[]'
     ];
 
     /**
@@ -64,13 +62,11 @@ class PaymentTerminalDeviceManufacturer implements ModelInterface, ArrayAccess
       * @var string[]
       */
     protected static $swaggerFormats = [
-        'id' => 'int64',
-        'name' => null,
-        'planned_purge_date' => 'date-time',
-        'scope' => null,
-        'state' => null,
-        'title' => null,
-        'version' => 'int32'
+        'price_including_tax' => null,
+        'price_strategy' => null,
+        'product' => 'int64',
+        'quantity' => null,
+        'tax_lines' => null
     ];
 
     /**
@@ -80,13 +76,11 @@ class PaymentTerminalDeviceManufacturer implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $attributeMap = [
-        'id' => 'id',
-        'name' => 'name',
-        'planned_purge_date' => 'plannedPurgeDate',
-        'scope' => 'scope',
-        'state' => 'state',
-        'title' => 'title',
-        'version' => 'version'
+        'price_including_tax' => 'priceIncludingTax',
+        'price_strategy' => 'priceStrategy',
+        'product' => 'product',
+        'quantity' => 'quantity',
+        'tax_lines' => 'taxLines'
     ];
 
     /**
@@ -95,13 +89,11 @@ class PaymentTerminalDeviceManufacturer implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $setters = [
-        'id' => 'setId',
-        'name' => 'setName',
-        'planned_purge_date' => 'setPlannedPurgeDate',
-        'scope' => 'setScope',
-        'state' => 'setState',
-        'title' => 'setTitle',
-        'version' => 'setVersion'
+        'price_including_tax' => 'setPriceIncludingTax',
+        'price_strategy' => 'setPriceStrategy',
+        'product' => 'setProduct',
+        'quantity' => 'setQuantity',
+        'tax_lines' => 'setTaxLines'
     ];
 
     /**
@@ -110,13 +102,11 @@ class PaymentTerminalDeviceManufacturer implements ModelInterface, ArrayAccess
      * @var string[]
      */
     protected static $getters = [
-        'id' => 'getId',
-        'name' => 'getName',
-        'planned_purge_date' => 'getPlannedPurgeDate',
-        'scope' => 'getScope',
-        'state' => 'getState',
-        'title' => 'getTitle',
-        'version' => 'getVersion'
+        'price_including_tax' => 'getPriceIncludingTax',
+        'price_strategy' => 'getPriceStrategy',
+        'product' => 'getProduct',
+        'quantity' => 'getQuantity',
+        'tax_lines' => 'getTaxLines'
     ];
 
     
@@ -137,19 +127,15 @@ class PaymentTerminalDeviceManufacturer implements ModelInterface, ArrayAccess
     public function __construct(array $data = null)
     {
         
-        $this->container['id'] = isset($data['id']) ? $data['id'] : null;
+        $this->container['price_including_tax'] = isset($data['price_including_tax']) ? $data['price_including_tax'] : null;
         
-        $this->container['name'] = isset($data['name']) ? $data['name'] : null;
+        $this->container['price_strategy'] = isset($data['price_strategy']) ? $data['price_strategy'] : null;
         
-        $this->container['planned_purge_date'] = isset($data['planned_purge_date']) ? $data['planned_purge_date'] : null;
+        $this->container['product'] = isset($data['product']) ? $data['product'] : null;
         
-        $this->container['scope'] = isset($data['scope']) ? $data['scope'] : null;
+        $this->container['quantity'] = isset($data['quantity']) ? $data['quantity'] : null;
         
-        $this->container['state'] = isset($data['state']) ? $data['state'] : null;
-        
-        $this->container['title'] = isset($data['title']) ? $data['title'] : null;
-        
-        $this->container['version'] = isset($data['version']) ? $data['version'] : null;
+        $this->container['tax_lines'] = isset($data['tax_lines']) ? $data['tax_lines'] : null;
         
     }
 
@@ -243,175 +229,125 @@ class PaymentTerminalDeviceManufacturer implements ModelInterface, ArrayAccess
     
 
     /**
-     * Gets id
+     * Gets price_including_tax
+     *
+     * @return float
+     */
+    public function getPriceIncludingTax()
+    {
+        return $this->container['price_including_tax'];
+    }
+
+    /**
+     * Sets price_including_tax
+     *
+     * @param float $price_including_tax 
+     *
+     * @return $this
+     */
+    public function setPriceIncludingTax($price_including_tax)
+    {
+        $this->container['price_including_tax'] = $price_including_tax;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets price_strategy
+     *
+     * @return \Wallee\Sdk\Model\ShopifySubscriptionVersionItemPriceStrategy
+     */
+    public function getPriceStrategy()
+    {
+        return $this->container['price_strategy'];
+    }
+
+    /**
+     * Sets price_strategy
+     *
+     * @param \Wallee\Sdk\Model\ShopifySubscriptionVersionItemPriceStrategy $price_strategy 
+     *
+     * @return $this
+     */
+    public function setPriceStrategy($price_strategy)
+    {
+        $this->container['price_strategy'] = $price_strategy;
+
+        return $this;
+    }
+    
+
+    /**
+     * Gets product
      *
      * @return int
      */
-    public function getId()
+    public function getProduct()
     {
-        return $this->container['id'];
+        return $this->container['product'];
     }
 
     /**
-     * Sets id
+     * Sets product
      *
-     * @param int $id The ID is the primary key of the entity. The ID identifies the entity uniquely.
+     * @param int $product 
      *
      * @return $this
      */
-    public function setId($id)
+    public function setProduct($product)
     {
-        $this->container['id'] = $id;
+        $this->container['product'] = $product;
 
         return $this;
     }
     
 
     /**
-     * Gets name
+     * Gets quantity
      *
-     * @return string
+     * @return float
      */
-    public function getName()
+    public function getQuantity()
     {
-        return $this->container['name'];
+        return $this->container['quantity'];
     }
 
     /**
-     * Sets name
+     * Sets quantity
      *
-     * @param string $name 
+     * @param float $quantity 
      *
      * @return $this
      */
-    public function setName($name)
+    public function setQuantity($quantity)
     {
-        $this->container['name'] = $name;
+        $this->container['quantity'] = $quantity;
 
         return $this;
     }
     
 
     /**
-     * Gets planned_purge_date
+     * Gets tax_lines
      *
-     * @return \DateTime
+     * @return \Wallee\Sdk\Model\ShopifyTaxLine[]
      */
-    public function getPlannedPurgeDate()
+    public function getTaxLines()
     {
-        return $this->container['planned_purge_date'];
+        return $this->container['tax_lines'];
     }
 
     /**
-     * Sets planned_purge_date
+     * Sets tax_lines
      *
-     * @param \DateTime $planned_purge_date The planned purge date indicates when the entity is permanently removed. When the date is null the entity is not planned to be removed.
+     * @param \Wallee\Sdk\Model\ShopifyTaxLine[] $tax_lines 
      *
      * @return $this
      */
-    public function setPlannedPurgeDate($planned_purge_date)
+    public function setTaxLines($tax_lines)
     {
-        $this->container['planned_purge_date'] = $planned_purge_date;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets scope
-     *
-     * @return \Wallee\Sdk\Model\Scope
-     */
-    public function getScope()
-    {
-        return $this->container['scope'];
-    }
-
-    /**
-     * Sets scope
-     *
-     * @param \Wallee\Sdk\Model\Scope $scope 
-     *
-     * @return $this
-     */
-    public function setScope($scope)
-    {
-        $this->container['scope'] = $scope;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets state
-     *
-     * @return \Wallee\Sdk\Model\CreationEntityState
-     */
-    public function getState()
-    {
-        return $this->container['state'];
-    }
-
-    /**
-     * Sets state
-     *
-     * @param \Wallee\Sdk\Model\CreationEntityState $state 
-     *
-     * @return $this
-     */
-    public function setState($state)
-    {
-        $this->container['state'] = $state;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets title
-     *
-     * @return \Wallee\Sdk\Model\DatabaseTranslatedString
-     */
-    public function getTitle()
-    {
-        return $this->container['title'];
-    }
-
-    /**
-     * Sets title
-     *
-     * @param \Wallee\Sdk\Model\DatabaseTranslatedString $title 
-     *
-     * @return $this
-     */
-    public function setTitle($title)
-    {
-        $this->container['title'] = $title;
-
-        return $this;
-    }
-    
-
-    /**
-     * Gets version
-     *
-     * @return int
-     */
-    public function getVersion()
-    {
-        return $this->container['version'];
-    }
-
-    /**
-     * Sets version
-     *
-     * @param int $version The version number indicates the version of the entity. The version is incremented whenever the entity is changed.
-     *
-     * @return $this
-     */
-    public function setVersion($version)
-    {
-        $this->container['version'] = $version;
+        $this->container['tax_lines'] = $tax_lines;
 
         return $this;
     }
