@@ -26,7 +26,7 @@ jQuery(function ($) {
 
         register_method : function () {
             var self = this;
-            if (typeof window.IframeCheckoutHandler === 'undefined') {
+            if (typeof window.walleeIFrameCheckoutHandler === 'undefined') {
                 if (this.handlerCounter > 20) {
                     $('.wallee-loader').remove();
                     this.enable_pay_button();
@@ -42,7 +42,7 @@ jQuery(function ($) {
             if (this.iframe_handler != null) {
                 return;
             }
-            this.iframe_handler = window.IframeCheckoutHandler(this.configuration_id);
+            this.iframe_handler = window.walleeIFrameCheckoutHandler(this.configuration_id);
             this.iframe_handler.setValidationCallback(function (validation_result) {
                 self.process_validation(validation_result);
             });
