@@ -374,7 +374,7 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
                     $transaction->getLinkedSpaceId(),
                     $transaction->getId()
                 );
-            } catch (\WhitelabelMachineName\Sdk\ApiException $e) {
+            } catch (\Wallee\Sdk\ApiException $e) {
                 self::$possiblePaymentMethodCache[$currentCartId] = array();
                 throw $e;
             } catch (WalleeExceptionInvalidtransactionamount $e) {
