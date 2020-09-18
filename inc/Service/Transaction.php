@@ -545,7 +545,8 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
      *
      * @param Cart $cart
      * @return \Wallee\Sdk\Model\TransactionCreate
-     */
+	 * @throws \WalleeExceptionInvalidtransactionamount
+	 */
     protected function createTransactionFromCart(Cart $cart)
     {
         $spaceId = Configuration::get(WalleeBasemodule::CK_SPACE_ID, null, $cart->id_shop_group, $cart->id_shop);
@@ -586,8 +587,9 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
             try {
                 $ids = WalleeHelper::getCartMeta($cart, 'mappingIds');
                 $transaction = $this->getTransaction($ids['spaceId'], $ids['transactionId']);
+                $customerId = $transaction->getCustomerId();
                 if ($transaction->getState() != \Wallee\Sdk\Model\TransactionState::PENDING ||
-                    (! empty($transaction->getCustomerId()) && $transaction->getCustomerId() != $cart->id_customer)) {
+                    (! empty($customerId) && $customerId != $cart->id_customer)) {
                     return $this->createTransactionFromCart($cart);
                 }
                 $pendingTransaction = new \Wallee\Sdk\Model\TransactionPending();
@@ -605,9 +607,12 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
     /**
      * Assemble the transaction data for the given quote.
      *
-     * @param Cart $cart
-     * @param \Wallee\Sdk\Model\TransactionPending $transaction
-     */
+	 * @param \Cart                                                       $cart
+	 * @param \Wallee\Sdk\Model\AbstractTransactionPending $transaction
+	 *
+	 * @return \Wallee\Sdk\Model\AbstractTransactionPending
+	 * @throws \WalleeExceptionInvalidtransactionamount
+	 */
     protected function assembleCartTransactionData(
         Cart $cart,
         \Wallee\Sdk\Model\AbstractTransactionPending $transaction
@@ -627,6 +632,7 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
         $transaction->setLineItems(WalleeServiceLineitem::instance()->getItemsFromCart($cart));
 
         $transaction->setAllowedPaymentMethodConfigurations(array());
+        return $transaction;
     }
 
     /**

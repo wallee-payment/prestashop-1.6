@@ -167,18 +167,35 @@ class WalleeHelper
     /**
      * Cleans the given line items by ensuring uniqueness and introducing adjustment line items if necessary.
      *
-     * @param \Wallee\Sdk\Model\LineItemCreate[] $lineItems
-     * @param float $expectedSum
-     * @param string $currency
-     * @return \Wallee\Sdk\Model\LineItemCreate[]
-     */
-    public static function cleanupLineItems(array $lineItems, $expectedSum, $currencyCode)
+	 * @param \Wallee\Sdk\Model\LineItemCreate[] $lineItems
+	 * @param float $expectedSum
+	 * @param string $currencyCode
+	 *
+	 * @return \Wallee\Sdk\Model\LineItemCreate[]
+	 * @throws \WalleeExceptionInvalidtransactionamount
+	 */
+    public static function cleanupLineItems(array &$lineItems, $expectedSum, $currencyCode)
     {
         $effectiveSum = self::roundAmount(self::getTotalAmountIncludingTax($lineItems), $currencyCode);
-        $roundedExcpected = self::roundAmount($expectedSum, $currencyCode);
-        $diff = $roundedExcpected - $effectiveSum;
+        $roundedExpected = self::roundAmount($expectedSum, $currencyCode);
+        $diff = $roundedExpected - $effectiveSum;
         if ($diff != 0) {
-            throw new WalleeExceptionInvalidtransactionamount($effectiveSum, $roundedExcpected);
+        	if((int) Configuration::getGlobalValue(WalleeBasemodule::CK_LINE_ITEM_CONSISTENCY)){
+				throw new WalleeExceptionInvalidtransactionamount($effectiveSum, $roundedExpected);
+			}else{
+				$lineItem = (new \Wallee\Sdk\Model\LineItemCreate())
+					->setName(self::getModuleInstance()->l('Adjustment LineItem', 'helper'))
+					->setUniqueId('Adjustment-Line-Item')
+					->setSku('Adjustment-Line-Item')
+					->setQuantity(1);
+				/** @noinspection PhpParamsInspection */
+				$lineItem->setAmountIncludingTax($diff)->setType(($diff > 0) ? \Wallee\Sdk\Model\LineItemType::FEE : \Wallee\Sdk\Model\LineItemType::DISCOUNT);
+
+				if (!$lineItem->valid()) {
+					throw new \Exception('Adjustment LineItem payload invalid:' . json_encode($lineItem->listInvalidProperties()));
+				}
+				$lineItems[] = $lineItem;
+			}
         }
 
         return self::ensureUniqueIds($lineItems);
@@ -188,8 +205,10 @@ class WalleeHelper
      * Ensures uniqueness of the line items.
      *
      * @param \Wallee\Sdk\Model\LineItemCreate[] $lineItems
+	 *
      * @return \Wallee\Sdk\Model\LineItemCreate[]
-     */
+	 * @throws \Exception
+	 */
     public static function ensureUniqueIds(array $lineItems)
     {
         $uniqueIds = array();
@@ -450,7 +469,9 @@ class WalleeHelper
      * Sorts an array of WalleeModelMethodconfiguration by their sort order
      *
      * @param WalleeModelMethodconfiguration[] $configurations
-     */
+	 *
+	 * @return array
+	 */
     public static function sortMethodConfiguration(array $configurations)
     {
         usort(

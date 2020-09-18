@@ -18,9 +18,11 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
     /**
      * Returns the line items from the given cart
      *
-     * @param Cart $cart
-     * @return \Wallee\Sdk\Model\LineItemCreate[]
-     */
+	 * @param \Cart $cart
+	 *
+	 * @return \Wallee\Sdk\Model\LineItemCreate[]
+	 * @throws \WalleeExceptionInvalidtransactionamount
+	 */
     public function getItemsFromCart(Cart $cart)
     {
         $currencyCode = WalleeHelper::convertCurrencyIdToCode($cart->id_currency);
@@ -161,7 +163,6 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
             $item->setSku('wrapping');
             if (Configuration::get('PS_ATCP_SHIPWRAP')) {
                 if ($wrappingCostExcl > 0) {
-                    $taxRate = 0;
                     $taxName = WalleeHelper::getModuleInstance()->l('Tax', 'lineitem');
                     $taxRate = ($wrappingCosts - $wrappingCostExcl) / $wrappingCostExcl * 100;
                 }
@@ -282,9 +283,11 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
     /**
      * Returns the line items from the given cart
      *
-     * @param Order[] $orders
-     * @return \Wallee\Sdk\Model\LineItemCreate[]
-     */
+	 * @param array $orders
+	 *
+	 * @return \Wallee\Sdk\Model\LineItemCreate[]
+	 * @throws \WalleeExceptionInvalidtransactionamount
+	 */
     public function getItemsFromOrders(array $orders)
     {
         $orderTotal = 0;
@@ -302,6 +305,12 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
         return $cleaned;
     }
 
+	/**
+	 * @param array $orders
+	 * @param       $orderTotal
+	 *
+	 * @return array
+	 */
     protected function getItemsFromOrdersInner(array $orders, $orderTotal)
     {
         $items = array();
