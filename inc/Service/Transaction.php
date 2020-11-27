@@ -370,9 +370,10 @@ class WalleeServiceTransaction extends WalleeServiceAbstract
             self::$possiblePaymentMethodCache[$currentCartId] == null) {
             $transaction = $this->getTransactionFromCart($cart);
             try {
-                $paymentMethods = $this->getTransactionService()->fetchPossiblePaymentMethods(
+                $paymentMethods = $this->getTransactionService()->fetchPaymentMethods(
                     $transaction->getLinkedSpaceId(),
-                    $transaction->getId()
+                    $transaction->getId(),
+                    'iframe'
                 );
             } catch (\Wallee\Sdk\ApiException $e) {
                 self::$possiblePaymentMethodCache[$currentCartId] = array();
