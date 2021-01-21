@@ -4,7 +4,7 @@
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
- * @copyright 2017 - 2020 customweb GmbH
+ * @copyright 2017 - 2021 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 div.wallee-method div.wallee.no_logo {
@@ -130,12 +130,12 @@ p.wallee-indent {
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.3);
-    z-index: 90000;
+    z-index: 9000;
 }
 
 .wallee-processing-spinner {
     position: fixed;
-    z-index: 90002;
+    z-index: 9002;
     overflow: visible;
     top: 30%;
     left: 50%;
