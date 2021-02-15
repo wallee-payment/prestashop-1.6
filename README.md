@@ -7,13 +7,13 @@ This repository contains the PrestaShop wallee payment module that enables the s
 
 ## Requirements
 
-* [PrestaShop](https://www.prestashop.com/) 1.6.x
+* [PrestaShop](https://www.prestashop.com/) 1.6.1.0 or later
 * [PHP](http://php.net/) 5.6 or later
 * [Mailhook](https://github.com/wallee-payment/prestashop-mailhook/releases) to modify PrestaShop email behavior.
 
 ## Documentation
 
-* [English](https://plugin-documentation.wallee.com/wallee-payment/prestashop-1.6/1.2.2/docs/en/documentation.html)
+* [English](https://plugin-documentation.wallee.com/wallee-payment/prestashop-1.6/1.2.3/docs/en/documentation.html)
 
 ## Support
 
@@ -21,7 +21,7 @@ Support queries can be issued on the [wallee support site](https://app-wallee.co
 
 ## License
 
-Please see the [license file](https://github.com/wallee-payment/prestashop-1.6/blob/1.2.2/LICENSE) for more information.
+Please see the [license file](https://github.com/wallee-payment/prestashop-1.6/blob/1.2.3/LICENSE) for more information.
 
 ## Other PrestaShop Versions
 
