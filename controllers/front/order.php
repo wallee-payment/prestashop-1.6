@@ -19,7 +19,7 @@ class WalleeOrderModuleFrontController extends WalleeFrontpaymentcontroller
         $cartHash = Tools::getValue('cartHash', null);
         if ($methodId == null || $cartHash == null) {
             $this->context->cookie->wle_error = $this->module->l(
-                'There was a techincal issue, please try again.',
+                'There was a technical issue, please try again.',
                 'order'
             );
             echo json_encode(

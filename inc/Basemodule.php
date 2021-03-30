@@ -9,6 +9,8 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
+use PrestaShop\PrestaShop\Core\Domain\Order\CancellationActionType;
+
 /**
  * Base implementation for common features for PS1.6 and 1.7
  * Because of the PrestaShop Module Validator we can not use inheritance
@@ -126,8 +128,9 @@ class WalleeBasemodule
             $module->registerHook('actionOrderEdited') && $module->registerHook('displayAdminAfterHeader') &&
             $module->registerHook('displayAdminOrder') && $module->registerHook('displayAdminOrderContentOrder') &&
             $module->registerHook('displayAdminOrderLeft') && $module->registerHook('displayAdminOrderTabOrder') &&
+            $module->registerHook('displayAdminOrderMain') && $module->registerHook('displayAdminOrderTabLink') &&
             $module->registerHook('displayBackOfficeHeader') && $module->registerHook('displayOrderDetail') &&
-            $module->registerHook('walleeSettingsChanged');
+            $module->registerHook('actionProductCancel') && $module->registerHook('walleeSettingsChanged');
     }
 
     public static function installConfigurationValues()
@@ -1317,13 +1320,13 @@ class WalleeBasemodule
                 if (! isset($rs['success']) || ! isset($rs['cart'])) {
                     $error = 'The cart duplication failed. May be some module prevents it.';
                     PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', (int) $module->id);
-                    throw new Exception("There was a techincal issue, please try again.");
+                    throw new Exception("There was a technical issue, please try again.");
                 }
                 $cart = $rs['cart'];
                 if (! ($cart instanceof Cart)) {
                     $error = 'The duplicated cart is not of type "Cart".';
                     PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', (int) $module->id);
-                    throw new Exception("There was a techincal issue, please try again.");
+                    throw new Exception("There was a technical issue, please try again.");
                 }
                 foreach ($originalCart->getCartRules() as $rule) {
                     $ruleObject = $rule['obj'];
@@ -1381,7 +1384,7 @@ class WalleeBasemodule
                     $error = 'Wallee method configuration called with wrong payment method configuration. Method: ' .
                         $payment_method;
                     PrestaShopLogger::addLog($error, 3, '0000002', 'PaymentModule', (int) $module->id);
-                    throw new Exception("There was a techincal issue, please try again.");
+                    throw new Exception("There was a technical issue, please try again.");
                 }
 
                 $title = $methodConfiguration->getConfigurationName();
@@ -1462,7 +1465,7 @@ class WalleeBasemodule
                 WalleeBasemodule::stopRecordingMailMessages();
                 throw new Exception(
                     WalleeHelper::getModuleInstance()->l(
-                        'There was a techincal issue, please try again.',
+                        'There was a technical issue, please try again.',
                         'basemodule'
                     )
                 );
@@ -1470,10 +1473,55 @@ class WalleeBasemodule
         } else {
             throw new Exception(
                 WalleeHelper::getModuleInstance()->l(
-                    'There was a techincal issue, please try again.',
+                    'There was a technical issue, please try again.',
                     'basemodule'
                 )
             );
+        }
+    }
+
+    public static function hookActionProductCancel(Wallee $module, $params)
+    {
+        // check version too here to only run on > 1.7.7 for now 
+        // as there is some overlap in functionality with some previous versions 1.7+
+        if ($params['action'] === CancellationActionType::PARTIAL_REFUND && version_compare(_PS_VERSION_, '1.7.7', '>=')) {
+
+            $idOrder = Tools::getValue('id_order');
+            $refundParameters = Tools::getAllValues();
+
+            $order = $params['order'];
+
+            if (! Validate::isLoadedObject($order) || $order->module != $module->name) {
+                return;
+            }
+
+            $strategy = WalleeBackendStrategyprovider::getStrategy();
+            if ($strategy->isVoucherOnlyWallee($order, $refundParameters)) {
+                return;
+            }
+            
+            // need to manually set this here as it's expected downstream
+            $refundParameters['partialRefund'] = true;
+
+            $backendController = Context::getContext()->controller;
+            $editAccess = 0;
+
+            $access = Profile::getProfileAccess(
+                Context::getContext()->employee->id_profile,
+                (int) Tab::getIdFromClassName('AdminOrders')
+            );
+            $editAccess = isset($access['edit']) && $access['edit'] == 1;
+
+            if ($editAccess) {
+                try {
+                    $parsedData = $strategy->simplifiedRefund($refundParameters);
+                    WalleeServiceRefund::instance()->executeRefund($order, $parsedData);
+                } catch (Exception $e) {
+                    $backendController->errors[] = WalleeHelper::cleanExceptionMessage($e->getMessage());
+                }
+            } else {
+                $backendController->errors[] = Tools::displayError('You do not have permission to delete this.');
+            }
         }
     }
 
@@ -1738,6 +1786,17 @@ class WalleeBasemodule
      * @param array $params
      * @return string
      */
+    public static function hookDisplayAdminOrderMain(Wallee $module, $params)
+    {
+        self::hookDisplayAdminOrderLeft($module, $params);
+    }
+
+    /**
+     * Show transaction information
+     *
+     * @param array $params
+     * @return string
+     */
     public static function hookDisplayAdminOrderLeft(Wallee $module, $params)
     {
         $orderId = $params['id_order'];
@@ -1823,6 +1882,17 @@ class WalleeBasemodule
 
         $module->getContext()->smarty->assign($tplVars);
         return $module->display(dirname(dirname(__FILE__)), 'views/templates/admin/hook/admin_order_left.tpl');
+    }
+
+    /**
+     * Show wallee documents tab
+     *
+     * @param array $params
+     * @return string
+     */
+    public static function hookDisplayAdminOrderTabLink(Wallee $module, $params)
+    {
+        self::hookDisplayAdminOrderTabOrder($module, $params);
     }
 
     /**

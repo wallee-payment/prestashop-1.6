@@ -7,11 +7,12 @@
  * @copyright 2017 - 2021 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
 *}
-<div id="walleeTransactionInfo" class="panel">
-	<div class="panel-heading">
+<div id="walleeTransactionInfo" class="card">
+	<div class="card-header">
 		<i class="icon-rocket"></i>
 		wallee {l s='Transaction Information' mod='wallee'}
 	</div>
+	<div class="card-body">
 	<div class="wallee-transaction-data-column-container">
 		<div class="wallee-transaction-column">
 			<p>
@@ -268,6 +269,6 @@
 			</div>
 		</div>
 	{/if}
-		
+	</div>	
 
 </div>
