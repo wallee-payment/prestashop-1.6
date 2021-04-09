@@ -1788,7 +1788,89 @@ class WalleeBasemodule
      */
     public static function hookDisplayAdminOrderMain(Wallee $module, $params)
     {
-        self::hookDisplayAdminOrderLeft($module, $params);
+        $orderId = $params['id_order'];
+        $order = new Order($orderId);
+        if ($order->module != $module->name) {
+            return;
+        }
+        $transactionInfo = WalleeHelper::getTransactionInfoForOrder($order);
+        if ($transactionInfo == null) {
+            return '';
+        }
+        $spaceId = $transactionInfo->getSpaceId();
+        $transactionId = $transactionInfo->getTransactionId();
+        $methodId = WalleeHelper::getOrderMeta($order, 'walleeMethodId');
+        $method = new WalleeModelMethodconfiguration($methodId);
+        $tplVars = array(
+            'currency' => new Currency($order->id_currency),
+            'configurationName' => $method->getConfigurationName(),
+            'methodImage' => WalleeHelper::getResourceUrl(
+                $transactionInfo->getImageBase(),
+                $transactionInfo->getImage(),
+                WalleeHelper::convertLanguageIdToIETF($order->id_lang),
+                $spaceId,
+                $transactionInfo->getSpaceViewId()
+            ),
+            'transactionState' => WalleeHelper::getTransactionState($transactionInfo),
+            'failureReason' => WalleeHelper::translate($transactionInfo->getFailureReason()),
+            'authorizationAmount' => $transactionInfo->getAuthorizationAmount(),
+            'transactionUrl' => WalleeHelper::getTransactionUrl($transactionInfo),
+            'labelsByGroup' => WalleeHelper::getGroupedChargeAttemptLabels($transactionInfo),
+            'voids' => WalleeModelVoidjob::loadByTransactionId($spaceId, $transactionId),
+            'completions' => WalleeModelCompletionjob::loadByTransactionId($spaceId, $transactionId),
+            'refunds' => WalleeModelRefundjob::loadByTransactionId($spaceId, $transactionId)
+        );
+        $module->getContext()->smarty->registerPlugin(
+            'function',
+            'wallee_translate',
+            array(
+                'WalleeSmartyfunctions',
+                'translate'
+            )
+        );
+        $module->getContext()->smarty->registerPlugin(
+            'function',
+            'wallee_refund_url',
+            array(
+                'WalleeSmartyfunctions',
+                'getRefundUrl'
+            )
+        );
+        $module->getContext()->smarty->registerPlugin(
+            'function',
+            'wallee_refund_amount',
+            array(
+                'WalleeSmartyfunctions',
+                'getRefundAmount'
+            )
+        );
+        $module->getContext()->smarty->registerPlugin(
+            'function',
+            'wallee_refund_type',
+            array(
+                'WalleeSmartyfunctions',
+                'getRefundType'
+            )
+        );
+        $module->getContext()->smarty->registerPlugin(
+            'function',
+            'wallee_completion_url',
+            array(
+                'WalleeSmartyfunctions',
+                'getCompletionUrl'
+            )
+        );
+        $module->getContext()->smarty->registerPlugin(
+            'function',
+            'wallee_void_url',
+            array(
+                'WalleeSmartyfunctions',
+                'getVoidUrl'
+            )
+        );
+
+        $module->getContext()->smarty->assign($tplVars);
+        return $module->display(dirname(dirname(__FILE__)), 'views/templates/admin/hook/admin_order_left.tpl');
     }
 
     /**
@@ -2044,7 +2126,11 @@ class WalleeBasemodule
             $templateVars['refundPending'] = true;
         }
         $module->getContext()->smarty->assign($templateVars);
-        return $module->display(dirname(dirname(__FILE__)), 'views/templates/admin/hook/admin_order.tpl');
+        if (version_compare(_PS_VERSION_, '1.7.7', '>=')) {
+            return $module->display(dirname(dirname(__FILE__)), 'views/templates/admin/hook/admin_order177.tpl');
+        } else {
+            return $module->display(dirname(dirname(__FILE__)), 'views/templates/admin/hook/admin_order.tpl');
+        }
     }
 
     public static function hookActionAdminOrdersControllerBefore(Wallee $module, $params)

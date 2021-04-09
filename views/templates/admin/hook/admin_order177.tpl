@@ -7,21 +7,33 @@
  * @copyright 2017 - 2021 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
 *}
-{if (isset($showAuthorizedActions) && $showAuthorizedActions)}
+
 	<div style="display:none;" class="hidden-print">
-		<a class="btn btn-default wallee-management-btn"  id="wallee_void">
+		<a class="btn btn-action wallee-management-btn"  id="wallee_void">
 			<i class="icon-remove"></i>
 			{l s='Void' mod='wallee'}
 		</a>
-		<a class="btn btn-default wallee-management-btn"  id="wallee_completion">
+		<a class="btn btn-action wallee-management-btn"  id="wallee_completion">
 			<i class="icon-check"></i>
 			{l s='Completion' mod='wallee'}
 		</a>	
 	</div>
+
+	<script type="text/javascript">
+		var wallee_void_title = "{l s='Are you sure?' mod='wallee' js=1}";
+		var wallee_void_btn_confirm_txt = "{l s='Void Order' mod='wallee' js=1}";
+		var wallee_void_btn_deny_txt = "{l s='No' mod='wallee' js=1}";
+
+		var wallee_completion_title = "{l s='Are you sure?' mod='wallee' js=1}";
+		var wallee_completion_btn_confirm_txt = "{l s='Complete Order'  mod='wallee' js=1}";
+		var wallee_completion_btn_deny_txt = "{l s='No' mod='wallee' js=1}";
+
+		var wallee_msg_general_error = "{l s='The server experienced an unexpected error, please try again.'  mod='wallee' js=1}";
+		var wallee_msg_general_title_succes = "{l s='Success'  mod='wallee' js=1}";
+		var wallee_msg_general_title_error = "{l s='Error'  mod='wallee' js=1}";
+		var wallee_btn_info_confirm_txt = "{l s='OK'  mod='wallee' js=1}";
+	</script>
 	
-	{addJsDefL name=wallee_void_title}{l s='Are you sure?' mod='wallee' js=1}{/addJsDefL}
-	{addJsDefL name=wallee_void_btn_confirm_txt}{l s='Void Order'  mod='wallee' js=1}{/addJsDefL}
-	{addJsDefL name=wallee_void_btn_deny_txt}{l s='No' mod='wallee' js=1}{/addJsDefL}
 	<div id="wallee_void_msg" class="hidden-print" style="display:none">
 		{if !empty($affectedOrders)}
 			{l s='This will also void the following orders:' mod='wallee' js=1}
@@ -40,9 +52,6 @@
 		{/if}
 	</div>
 	
-	{addJsDefL name=wallee_completion_title}{l s='Are you sure?' mod='wallee' js=1}{/addJsDefL}
-	{addJsDefL name=wallee_completion_btn_confirm_txt}{l s='Complete Order'  mod='wallee' js=1}{/addJsDefL}
-	{addJsDefL name=wallee_completion_btn_deny_txt}{l s='No' mod='wallee' js=1}{/addJsDefL}
 	<div id="wallee_completion_msg" class="hidden-print" style="display:none">
 		{if !empty($affectedOrders)}
 			{l s='This will also complete the following orders:' mod='wallee'}
@@ -59,7 +68,7 @@
 			{l s='This finalizes the order, it no longer can be changed.' mod='wallee'}			
 		{/if}		
 	</div>
-{/if}
+
   
 {if (isset($showUpdateActions) && $showUpdateActions)}
 <div style="display:none;" class="hidden-print">
@@ -70,11 +79,6 @@
 </div>
 {/if}
 
-
-{addJsDefL name=wallee_msg_general_error}{l s='The server experienced an unexpected error, please try again.'  mod='wallee' js=1}{/addJsDefL}
-{addJsDefL name=wallee_msg_general_title_succes}{l s='Success'  mod='wallee' js=1}{/addJsDefL}
-{addJsDefL name=wallee_msg_general_title_error}{l s='Error'  mod='wallee' js=1}{/addJsDefL}
-{addJsDefL name=wallee_btn_info_confirm_txt}{l s='OK'  mod='wallee' js=1}{/addJsDefL}
 
 {if isset($isWalleeTransaction)}
 <div style="display:none;" class="hidden-print" id="wallee_is_transaction"></div>
@@ -142,7 +146,7 @@
 
 
 <script type="text/javascript">
-var isVersionGTE177 = false;
+	var isVersionGTE177 = true;
 {if isset($voidUrl)}
 	var walleeVoidUrl = "{$voidUrl|escape:'javascript':'UTF-8'}";
 {/if}
