@@ -72,10 +72,13 @@ jQuery(function ($) {
     
         handle_iframe_height : function (height) {
             var item = $('#wallee-submit-top');
-            if (height == 0) {
+            if (height === 0) {
                 item.addClass('invisible');
+                item.hide();
             } else {
                 item.removeClass('invisible')
+                item.show();
+                $('#wallee-processing-spinner-container').hide();
             }
         },
     
@@ -103,11 +106,15 @@ jQuery(function ($) {
     
     
         show_processing_spinner : function () {
-            $('#wallee-processing-spinner-container').removeClass('invisible');
+            var spinnerContainer = $('#wallee-processing-spinner-container');
+            spinnerContainer.removeClass('invisible');
+            spinnerContainer.show();
         },
     
         hide_processing_spinner: function () {
-            $('#wallee-processing-spinner-container').addClass('invisible');
+            var spinnerContainer = $('#wallee-processing-spinner-container');
+            spinnerContainer.addClass('invisible');
+            spinnerContainer.hide();
         },
 
     
@@ -122,14 +129,14 @@ jQuery(function ($) {
                     url:        form.attr('action'),
                     data:       form.serialize(),
                     success:    function (response, textStatus, jqXHR) {
-                        if ( response.result == 'success' ) {
+                        if ( response.result === 'success' ) {
                             self.iframe_handler.submit();
                             return;
-                        } else if (response.result =='redirect') {
+                        } else if (response.result === 'redirect') {
                             location.replace(response.redirect);
                             return;
-                        } else if ( response.result == 'failure' ) {
-                            if (response.reload == 'true' ) {
+                        } else if ( response.result === 'failure' ) {
+                            if (response.reload === 'true' ) {
                                 location.reload();
                                 self.hide_processing_spinner();
                                 self.enable_pay_button();
@@ -170,15 +177,17 @@ jQuery(function ($) {
         },
     
         remove_existing_errors : function () {
-            $('#wallee-error-messages').empty();
-            $('#wallee-error-messages').removeClass("alert alert-danger");
+            var error_message_selector = $('#wallee-error-messages');
+            error_message_selector.empty();
+            error_message_selector.removeClass("alert alert-danger");
         },
     
         show_new_errors : function (message) {
-            $('#wallee-error-messages').addClass('alert alert-danger');
-            $('#wallee-error-messages').append('<div>'+message+'</div>');
+            var error_message_selector = $('#wallee-error-messages');
+            error_message_selector.addClass('alert alert-danger');
+            error_message_selector.append('<div>'+message+'</div>');
             $('html, body').animate({
-                scrollTop : ($('#wallee-error-messages').offset().top - 20)
+                scrollTop : (error_message_selector.offset().top - 20)
             }, 1000);
         },
 
@@ -193,7 +202,7 @@ jQuery(function ($) {
             }
             return formatted_message;
         }
-    }
+    };
     wallee_checkout.init();
     
 });
