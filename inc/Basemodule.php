@@ -128,6 +128,7 @@ class WalleeBasemodule
             $module->registerHook('actionOrderEdited') && $module->registerHook('displayAdminAfterHeader') &&
             $module->registerHook('displayAdminOrder') && $module->registerHook('displayAdminOrderContentOrder') &&
             $module->registerHook('displayAdminOrderLeft') && $module->registerHook('displayAdminOrderTabOrder') &&
+            $module->registerHook('displayAdminOrderTabContent') &&
             $module->registerHook('displayAdminOrderMain') && $module->registerHook('displayAdminOrderTabLink') &&
             $module->registerHook('displayBackOfficeHeader') && $module->registerHook('displayOrderDetail') &&
             $module->registerHook('actionProductCancel') && $module->registerHook('walleeSettingsChanged');
@@ -1974,7 +1975,7 @@ class WalleeBasemodule
      */
     public static function hookDisplayAdminOrderTabLink(Wallee $module, $params)
     {
-        self::hookDisplayAdminOrderTabOrder($module, $params);
+        return self::hookDisplayAdminOrderTabOrder($module, $params);
     }
 
     /**
@@ -1986,6 +1987,13 @@ class WalleeBasemodule
     public static function hookDisplayAdminOrderTabOrder(Wallee $module, $params)
     {
         $order = $params['order'];
+
+        // compatibility for versions >= 1.7.7
+        if (is_null($order)) {
+            $orderId = $params['id_order'];
+            $order = new Order($orderId);
+        }
+
         if ($order->module != $module->name) {
             return;
         }
@@ -2018,9 +2026,27 @@ class WalleeBasemodule
      * @param array $params
      * @return string
      */
+    public static function hookDisplayAdminOrderTabContent(Wallee $module, $params)
+    {
+        return self::hookDisplayAdminOrderContentOrder($module, $params);
+    }
+
+    /**
+     * Show wallee documents table.
+     *
+     * @param array $params
+     * @return string
+     */
     public static function hookDisplayAdminOrderContentOrder(Wallee $module, $params)
     {
         $order = $params['order'];
+
+        // compatibility for versions >= 1.7.7
+        if (is_null($order)) {
+            $orderId = $params['id_order'];
+            $order = new Order($orderId);
+        }
+
         $transactionInfo = WalleeHelper::getTransactionInfoForOrder($order);
         if ($transactionInfo == null) {
             return '';

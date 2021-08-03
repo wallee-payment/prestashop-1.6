@@ -8,34 +8,52 @@
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 jQuery(function ($) {
+
+    function isVersionGTE177(){
+        if(_PS_VERSION_ === undefined){
+            return false;
+        } else {
+           return _PS_VERSION_.startsWith('1.7.7');
+        }
+    }
     
     function moveWalleeDocuments()
     {
-        var parentElement = $("#wallee_documents_tab").parent();
-        $("#wallee_documents_tab").detach().appendTo(parentElement);
+        var documentsTab = $('#wallee_documents_tab');
+        if (isVersionGTE177()) {
+            documentsTab.children('a').addClass('nav-link');
+        } else {
+            var parentElement = documentsTab.parent();
+            documentsTab.detach().appendTo(parentElement);
+        }
     }
     
     function moveWalleeActionsAndInfo()
     {
-        $("a.wallee-management-btn").each(function (key, element) {
+        var managementBtn = $('a.wallee-management-btn');
+        var managementInfo = $('span.wallee-management-info');
+        var orderActions = $('div.order-actions');
+        var panel = $('div.panel');
+        
+        managementBtn.each(function (key, element) {
             $(element).detach();
-            if (isVersionGTE177 === true) {
-                $("div.order-actions").find(".order-navigation").before(element);
+            if (isVersionGTE177()) {
+                orderActions.find('.order-navigation').before(element);
             } else {
-                $("div.panel").find("div.well.hidden-print").find("i.icon-print").closest("div.well").append(element);
+                panel.find('div.well.hidden-print').find('i.icon-print').closest('div.well').append(element);
             }
         });
-        $("span.wallee-management-info").each(function (key, element) {
+        managementInfo.each(function (key, element) {
             $(element).detach();
-            if (isVersionGTE177 === true) {
-                $("div.order-actions").find(".order-navigation").before(element);
+            if (isVersionGTE177()) {
+                orderActions.find('.order-navigation').before(element);
             } else {
-                $("div.panel").find("div.well.hidden-print").find("i.icon-print").closest("div.well").append(element);
+                panel.find('div.well.hidden-print').find('i.icon-print').closest('div.well').append(element);
             }
         });
-    //to get the styling of prestashop we have to add this
-        $("a.wallee-management-btn").after("&nbsp;\n");
-        $("span.wallee-management-info").after("&nbsp;\n");
+        //to get the styling of prestashop we have to add this
+        managementBtn.after("&nbsp;\n");
+        managementInfo.after("&nbsp;\n");
     }
     
     function registerWalleeActions()
@@ -76,7 +94,6 @@ jQuery(function ($) {
             'type': 'modal',
             'title': title,
             'content': msg,
-            'closeBtn': false,
             'theme': theme,
             'replaceOtherAlerts': true,
             'closeOnClick': false,
@@ -101,10 +118,10 @@ jQuery(function ($) {
             dataType:   'json',
             url:    walleeUpdateUrl,
             success:    function (response, textStatus, jqXHR) {
-                if ( response.success == 'true' ) {
+                if ( response.success === 'true' ) {
                     location.reload();
                     return;
-                } else if ( response.success == 'false' ) {
+                } else if ( response.success === 'false' ) {
                     if (response.message) {
                         showWalleeInformation(response.message, msg_wallee_confirm_txt);
                     }
@@ -114,7 +131,7 @@ jQuery(function ($) {
             },
             error:  function (jqXHR, textStatus, errorThrown) {
                 showWalleeInformation(wallee_msg_general_error, msg_wallee_confirm_txt);
-            },
+            }
         });
     }
     
@@ -134,7 +151,7 @@ jQuery(function ($) {
             {
                 'text': wallee_void_btn_deny_txt,
                 'closeAlert': true,
-                'theme': 'black',
+                'theme': 'black'
             },
             {
                 'text': wallee_void_btn_confirm_txt,
@@ -144,7 +161,7 @@ jQuery(function ($) {
 
             }
             ],
-            'theme':'blue',
+            'theme':'blue'
         });
         return false;
     }
@@ -157,10 +174,10 @@ jQuery(function ($) {
             dataType:   'json',
             url:    walleeVoidUrl,
             success:    function (response, textStatus, jqXHR) {
-                if ( response.success == 'true' ) {
+                if ( response.success === 'true' ) {
                     showWalleeInformationSuccess(response.message);
                     return;
-                } else if ( response.success == 'false' ) {
+                } else if ( response.success === 'false' ) {
                     if (response.message) {
                         showWalleeInformationFailures(response.message);
                         return;
@@ -170,7 +187,7 @@ jQuery(function ($) {
             },
             error:  function (jqXHR, textStatus, errorThrown) {
                 showWalleeInformationFailures(wallee_msg_general_error);
-            },
+            }
         });
         return false;
     }
@@ -206,7 +223,7 @@ jQuery(function ($) {
             {
                 'text': wallee_completion_btn_deny_txt,
                 'closeAlert': true,
-                'theme': 'black',
+                'theme': 'black'
             },
             {
                 'text': wallee_completion_btn_confirm_txt,
@@ -215,7 +232,7 @@ jQuery(function ($) {
                 'onClick': executeWalleeCompletion
             }
             ],
-            'theme':'blue',
+            'theme':'blue'
         });
 
         return false;
@@ -230,10 +247,10 @@ jQuery(function ($) {
             dataType:   'json',
             url:    walleeCompletionUrl,
             success:    function (response, textStatus, jqXHR) {
-                if ( response.success == 'true' ) {
+                if ( response.success === 'true' ) {
                     showWalleeInformationSuccess(response.message);
                     return;
-                } else if ( response.success == 'false' ) {
+                } else if ( response.success === 'false' ) {
                     if (response.message) {
                         showWalleeInformationFailures(response.message);
                         return;
@@ -243,23 +260,23 @@ jQuery(function ($) {
             },
             error:  function (jqXHR, textStatus, errorThrown) {
                 showWalleeInformationFailures(wallee_msg_general_error);
-            },
+            }
         });
         return false;
     }
     
     function walleeTotalRefundChanges()
     {
-        var generateDiscount =  $('.standard_refund_fields').find('#generateDiscount').attr("checked") == 'checked';
-        var sendOffline = $('#wallee_refund_offline_cb_total').attr("checked") == 'checked';
+        var generateDiscount =  $('.standard_refund_fields').find('#generateDiscount').attr("checked") === 'checked';
+        var sendOffline = $('#wallee_refund_offline_cb_total').attr("checked") === 'checked';
         walleeRefundChanges('total', generateDiscount, sendOffline);
     }
     
     function walleePartialRefundChanges()
     {
     
-        var generateDiscount = $('.partial_refund_fields').find('#generateDiscountRefund').attr("checked") == 'checked';
-        var sendOffline = $('#wallee_refund_offline_cb_partial').attr("checked")  == 'checked';
+        var generateDiscount = $('.partial_refund_fields').find('#generateDiscountRefund').attr("checked") === 'checked';
+        var sendOffline = $('#wallee_refund_offline_cb_partial').attr("checked")  === 'checked';
         walleeRefundChanges('partial', generateDiscount, sendOffline);
     }
     
@@ -286,52 +303,60 @@ jQuery(function ($) {
     
     function handleWalleeLayoutChanges()
     {
+        var addVoucher = $('#add_voucher');
+        var addProduct = $('#add_product');
+        var editProductChangeLink = $('.edit_product_change_link');
+        var descOrderStandardRefund = $('#desc-order-standard_refund');
+        var standardRefundFields = $('.standard_refund_fields');
+        var partialRefundFields = $('.partial_refund_fields');
+        var descOrderPartialRefund = $('#desc-order-partial_refund');
+
         if ($('#wallee_is_transaction').length > 0) {
-            $('#add_voucher').remove();
+            addVoucher.remove();
         }
         if ($('#wallee_remove_edit').length > 0) {
-            $('#add_product').remove();
-            $('#add_voucher').remove();
-            $('.edit_product_change_link').closest('div').remove();
+            addProduct.remove();
+            addVoucher.remove();
+            editProductChangeLink.closest('div').remove();
             $('.panel-vouchers').find('i.icon-minus-sign').closest('a').remove();
         }
         if ($('#wallee_remove_cancel').length > 0) {
-            $('#desc-order-standard_refund').remove();
+            descOrderStandardRefund.remove();
         }
         if ($('#wallee_changes_refund').length > 0) {
             $('#refund_total_3').closest('div').remove();
-            $('.standard_refund_fields').find('div.form-group').after($('#wallee_refund_online_text_total'));
-            $('.standard_refund_fields').find('div.form-group').after($('#wallee_refund_offline_text_total'));
-            $('.standard_refund_fields').find('div.form-group').after($('#wallee_refund_no_text_total'));
-            $('.standard_refund_fields').find('#spanShippingBack').after($('#wallee_refund_offline_span_total'));
-            $('.standard_refund_fields').find('#generateDiscount').off('click.wallee').on('click.wallee', walleeTotalRefundChanges);
+            standardRefundFields.find('div.form-group').after($('#wallee_refund_online_text_total'));
+            standardRefundFields.find('div.form-group').after($('#wallee_refund_offline_text_total'));
+            standardRefundFields.find('div.form-group').after($('#wallee_refund_no_text_total'));
+            standardRefundFields.find('#spanShippingBack').after($('#wallee_refund_offline_span_total'));
+            standardRefundFields.find('#generateDiscount').off('click.wallee').on('click.wallee', walleeTotalRefundChanges);
             $('#wallee_refund_offline_cb_total').on('click.wallee', walleeTotalRefundChanges);
         
             $('#refund_3').closest('div').remove();
-            $('.partial_refund_fields').find('button').before($('#wallee_refund_online_text_partial'));
-            $('.partial_refund_fields').find('button').before($('#wallee_refund_offline_text_partial'));
-            $('.partial_refund_fields').find('button').before($('#wallee_refund_no_text_partial'));
-            $('.partial_refund_fields').find('#generateDiscountRefund').closest('p').after($('#wallee_refund_offline_span_partial'));
-            $('.partial_refund_fields').find('#generateDiscountRefund').off('click.wallee').on('click.wallee', walleePartialRefundChanges);
+            partialRefundFields.find('button').before($('#wallee_refund_online_text_partial'));
+            partialRefundFields.find('button').before($('#wallee_refund_offline_text_partial'));
+            partialRefundFields.find('button').before($('#wallee_refund_no_text_partial'));
+            partialRefundFields.find('#generateDiscountRefund').closest('p').after($('#wallee_refund_offline_span_partial'));
+            partialRefundFields.find('#generateDiscountRefund').off('click.wallee').on('click.wallee', walleePartialRefundChanges);
             $('#wallee_refund_offline_cb_partial').on('click.wallee', walleePartialRefundChanges);
         }
         if ($('#wallee_completion_pending').length > 0) {
-            $('#add_product').remove();
-            $('#add_voucher').remove();
-            $(".edit_product_change_link").closest('div').remove();
-            $('#desc-order-partial_refund').remove();
-            $('#desc-order-standard_refund').remove();
+            addProduct.remove();
+            addVoucher.remove();
+            editProductChangeLink.closest('div').remove();
+            descOrderPartialRefund.remove();
+            descOrderStandardRefund.remove();
         }
         if ($('#wallee_void_pending').length > 0) {
-            $('#add_product').remove();
-            $('#add_voucher').remove();
-            $(".edit_product_change_link").closest('div').remove();
-            $('#desc-order-partial_refund').remove();
-            $('#desc-order-standard_refund').remove();
+            addProduct.remove();
+            addVoucher.remove();
+            editProductChangeLink.closest('div').remove();
+            descOrderPartialRefund.remove();
+            descOrderStandardRefund.remove();
         }
         if ($('#wallee_refund_pending').length > 0) {
-            $('#desc-order-standard_refund').remove();
-            $('#desc-order-partial_refund').remove();
+            descOrderStandardRefund.remove();
+            descOrderPartialRefund.remove();
         }
         moveWalleeDocuments();
         moveWalleeActionsAndInfo();
