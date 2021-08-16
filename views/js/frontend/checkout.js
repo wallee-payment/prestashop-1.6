@@ -10,13 +10,15 @@
 jQuery(function ($) {
 
     var wallee_checkout = {
-        
+
         handlerCounter: 0,
         iframe_handler: null,
         configuration_id: null,
         height: null,
+        element_processing_spinner_container: '#wallee-processing-spinner-container',
 
         init : function () {
+            $(this.element_processing_spinner_container).hide();
             this.handlerCounter = 0;
             var configuration = $('#wallee-method-configuration');
             this.configuration_id = configuration.data("configuration-id");
@@ -38,7 +40,7 @@ jQuery(function ($) {
                 }, 100);
                 return;
             }
-        
+
             if (this.iframe_handler != null) {
                 return;
             }
@@ -62,31 +64,31 @@ jQuery(function ($) {
             });
             this.iframe_handler.create("wallee-method-container");
         },
-    
+
         register_button_handler : function () {
             $('.wallee-submit').off('click.wallee').on('click.wallee', {
                 self : this
                 }, this.handler_submit);
         },
-    
-    
+
+
         handle_iframe_height : function (height) {
             var item = $('#wallee-submit-top');
             if (height === 0) {
                 item.addClass('invisible');
                 item.hide();
             } else {
-                item.removeClass('invisible')
+                item.removeClass('invisible');
                 item.show();
-                $('#wallee-processing-spinner-container').hide();
+                $(this.element_processing_spinner_container).hide();
             }
         },
-    
-    
+
+
         handler_submit : function (event) {
             var self = event.data.self;
             self.disable_pay_button();
-        
+
             var tosInput = $('#cgv');
             if (tosInput.size() > 0) {
                 if (!tosInput.is(':checked')) {
@@ -103,21 +105,21 @@ jQuery(function ($) {
             self.iframe_handler.validate();
             return false;
         },
-    
-    
+
+
         show_processing_spinner : function () {
-            var spinnerContainer = $('#wallee-processing-spinner-container');
+            var spinnerContainer = $(this.element_processing_spinner_container);
             spinnerContainer.removeClass('invisible');
             spinnerContainer.show();
         },
-    
+
         hide_processing_spinner: function () {
-            var spinnerContainer = $('#wallee-processing-spinner-container');
+            var spinnerContainer = $(this.element_processing_spinner_container);
             spinnerContainer.addClass('invisible');
             spinnerContainer.hide();
         },
 
-    
+
         process_validation : function (validation_result) {
             var self = this;
             if (validation_result.success) {
@@ -156,32 +158,32 @@ jQuery(function ($) {
                         self.show_new_errors(wallee_msg_json_error);
                         self.hide_processing_spinner();
                         self.enable_pay_button();
-                    },
+                    }
                 });
             } else {
                 if (validation_result.errors) {
                     this.remove_existing_errors();
                     this.show_new_errors(this.format_error_messages(validation_result.errors));
                 }
-        
+
                 this.enable_pay_button();
             }
         },
-    
+
         disable_pay_button : function () {
             $('.wallee-submit').prop('disabled', true);
         },
-    
+
         enable_pay_button : function () {
             $('.wallee-submit').prop('disabled', false);
         },
-    
+
         remove_existing_errors : function () {
             var error_message_selector = $('#wallee-error-messages');
             error_message_selector.empty();
             error_message_selector.removeClass("alert alert-danger");
         },
-    
+
         show_new_errors : function (message) {
             var error_message_selector = $('#wallee-error-messages');
             error_message_selector.addClass('alert alert-danger');
@@ -204,5 +206,5 @@ jQuery(function ($) {
         }
     };
     wallee_checkout.init();
-    
+
 });
