@@ -18,11 +18,11 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
     /**
      * Returns the line items from the given cart
      *
-	 * @param \Cart $cart
-	 *
-	 * @return \Wallee\Sdk\Model\LineItemCreate[]
-	 * @throws \WalleeExceptionInvalidtransactionamount
-	 */
+     * @param \Cart $cart
+     *
+     * @return \Wallee\Sdk\Model\LineItemCreate[]
+     * @throws \WalleeExceptionInvalidtransactionamount
+     */
     public function getItemsFromCart(Cart $cart)
     {
         $currencyCode = WalleeHelper::convertCurrencyIdToCode($cart->id_currency);
@@ -261,21 +261,20 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
         return $cleaned;
     }
 
-    private function extractTaxName($psTax, $cart) {
-    	$translated = $psTax->name[$cart->id_lang];
-    	
-    	if (empty($translated) || strlen($translated) < 2) {
-    		foreach ($psTax->name as $name) {
-    			if (!empty($name) && strlen($name) >= 2) {
-    				return $name;
-    			}
-    		}
-    		return WalleeHelper::getModuleInstance()->l('Tax', 'lineitem');
-    	}
-    	else {
-    		return $translated;
-    	}
-    	
+    private function extractTaxName($psTax, $cart)
+    {
+        $translated = $psTax->name[$cart->id_lang];
+        
+        if (empty($translated) || strlen($translated) < 2) {
+            foreach ($psTax->name as $name) {
+                if (!empty($name) && strlen($name) >= 2) {
+                    return $name;
+                }
+            }
+            return WalleeHelper::getModuleInstance()->l('Tax', 'lineitem');
+        } else {
+            return $translated;
+        }
     }
     
     private function isFreeShippingDiscountOnlyCart($discounts)
@@ -300,11 +299,11 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
     /**
      * Returns the line items from the given cart
      *
-	 * @param array $orders
-	 *
-	 * @return \Wallee\Sdk\Model\LineItemCreate[]
-	 * @throws \WalleeExceptionInvalidtransactionamount
-	 */
+     * @param array $orders
+     *
+     * @return \Wallee\Sdk\Model\LineItemCreate[]
+     * @throws \WalleeExceptionInvalidtransactionamount
+     */
     public function getItemsFromOrders(array $orders)
     {
         $orderTotal = 0;
@@ -322,12 +321,12 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
         return $cleaned;
     }
 
-	/**
-	 * @param array $orders
-	 * @param       $orderTotal
-	 *
-	 * @return array
-	 */
+    /**
+     * @param array $orders
+     * @param       $orderTotal
+     *
+     * @return array
+     */
     protected function getItemsFromOrdersInner(array $orders, $orderTotal)
     {
         $items = array();
@@ -575,19 +574,20 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
     
     /**
      * This method adjusts the rounding according to the difference of the total amount.
-     * 
+     *
      * PrestaShop is calculating the total amount with the wrong rounding. This comes in effect primarily
      * when the discount is at the half. For example with 1.425 of discount the discounted amount will be rounded
-     * up to 1.43. But the total amount will be calculated with the inverse and it will be rounded up. So 
-     * this will lead to a rounding issue. 
-     * 
+     * up to 1.43. But the total amount will be calculated with the inverse and it will be rounded up. So
+     * this will lead to a rounding issue.
+     *
      * This method tries to accommodate for the above issue and corrects this.
-     * 
+     *
      * @param unknown $discountAmount
      * @param unknown $differnceToTotalAmount
      * @return unknown
      */
-    private function roundDiscount($discountAmount, $differnceToTotalAmount) {
+    private function roundDiscount($discountAmount, $differnceToTotalAmount)
+    {
         $roundingError = round(abs($differnceToTotalAmount - $discountAmount), 2);
         
         if ($roundingError == 0) {
@@ -596,15 +596,13 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
         
         if (Tools::$round_mode == null) {
             $round_mode = (int)Configuration::get('PS_PRICE_ROUND_MODE');
-        }
-        else {
+        } else {
             $round_mode = Tools::$round_mode;
         }
         
         if ($roundingError > 0.01 && $roundingError <= 0.05 && defined('PS_ROUND_CHF_5CTS') && $round_mode == PS_ROUND_CHF_5CTS) {
             return $differnceToTotalAmount;
-        }
-        else {
+        } else {
             $configuration = WalleeVersionadapter::getConfigurationInterface();
             $compute_precision = $configuration->get('_PS_PRICE_COMPUTE_PRECISION_');
             
@@ -612,8 +610,7 @@ class WalleeServiceLineitem extends WalleeServiceAbstract
             
             if ($roundingError <= $allowedRoundingDifference) {
                 return $differnceToTotalAmount;
-            }
-            else {
+            } else {
                 return $discountAmount;
             }
         }

@@ -150,7 +150,7 @@
 {if isset($voidUrl)}
 	var walleeVoidUrl = "{$voidUrl|escape:'javascript':'UTF-8'}";
 {/if}
-{if isset($voidUrl)}
+{if isset($completionUrl)}
 	var walleeCompletionUrl = "{$completionUrl|escape:'javascript':'UTF-8'}";
 {/if}
 {if isset($updateUrl)}

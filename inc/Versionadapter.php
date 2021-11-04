@@ -24,4 +24,9 @@ class WalleeVersionadapter
     public static function clearCartRuleStaticCache()
     {
     }
+
+    public static function getAdminOrderTemplate()
+    {
+        return 'views/templates/admin/hook/admin_order.tpl';
+    }
 }

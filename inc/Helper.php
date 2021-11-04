@@ -167,36 +167,36 @@ class WalleeHelper
     /**
      * Cleans the given line items by ensuring uniqueness and introducing adjustment line items if necessary.
      *
-	 * @param \Wallee\Sdk\Model\LineItemCreate[] $lineItems
-	 * @param float $expectedSum
-	 * @param string $currencyCode
-	 *
-	 * @return \Wallee\Sdk\Model\LineItemCreate[]
-	 * @throws \WalleeExceptionInvalidtransactionamount
-	 */
+     * @param \Wallee\Sdk\Model\LineItemCreate[] $lineItems
+     * @param float $expectedSum
+     * @param string $currencyCode
+     *
+     * @return \Wallee\Sdk\Model\LineItemCreate[]
+     * @throws \WalleeExceptionInvalidtransactionamount
+     */
     public static function cleanupLineItems(array &$lineItems, $expectedSum, $currencyCode)
     {
         $effectiveSum = self::roundAmount(self::getTotalAmountIncludingTax($lineItems), $currencyCode);
         $roundedExpected = self::roundAmount($expectedSum, $currencyCode);
         $diff = $roundedExpected - $effectiveSum;
         if ($diff != 0) {
-        	if((int) Configuration::getGlobalValue(WalleeBasemodule::CK_LINE_ITEM_CONSISTENCY)){
-				throw new WalleeExceptionInvalidtransactionamount($effectiveSum, $roundedExpected);
-			}else{
-				$diffAmount = self::roundAmount($diff, $currencyCode);
-				$lineItem = (new \Wallee\Sdk\Model\LineItemCreate())
-					->setName(self::getModuleInstance()->l('Adjustment LineItem', 'helper'))
-					->setUniqueId('Adjustment-Line-Item')
-					->setSku('Adjustment-Line-Item')
-					->setQuantity(1);
-				/** @noinspection PhpParamsInspection */
-				$lineItem->setAmountIncludingTax($diffAmount)->setType(($diff > 0) ? \Wallee\Sdk\Model\LineItemType::FEE : \Wallee\Sdk\Model\LineItemType::DISCOUNT);
+            if ((int) Configuration::getGlobalValue(WalleeBasemodule::CK_LINE_ITEM_CONSISTENCY)) {
+                throw new WalleeExceptionInvalidtransactionamount($effectiveSum, $roundedExpected);
+            } else {
+                $diffAmount = self::roundAmount($diff, $currencyCode);
+                $lineItem = (new \Wallee\Sdk\Model\LineItemCreate())
+                    ->setName(self::getModuleInstance()->l('Adjustment LineItem', 'helper'))
+                    ->setUniqueId('Adjustment-Line-Item')
+                    ->setSku('Adjustment-Line-Item')
+                    ->setQuantity(1);
+                /** @noinspection PhpParamsInspection */
+                $lineItem->setAmountIncludingTax($diffAmount)->setType(($diff > 0) ? \Wallee\Sdk\Model\LineItemType::FEE : \Wallee\Sdk\Model\LineItemType::DISCOUNT);
 
-				if (!$lineItem->valid()) {
-					throw new \Exception('Adjustment LineItem payload invalid:' . json_encode($lineItem->listInvalidProperties()));
-				}
-				$lineItems[] = $lineItem;
-			}
+                if (!$lineItem->valid()) {
+                    throw new \Exception('Adjustment LineItem payload invalid:' . json_encode($lineItem->listInvalidProperties()));
+                }
+                $lineItems[] = $lineItem;
+            }
         }
 
         return self::ensureUniqueIds($lineItems);
@@ -206,10 +206,10 @@ class WalleeHelper
      * Ensures uniqueness of the line items.
      *
      * @param \Wallee\Sdk\Model\LineItemCreate[] $lineItems
-	 *
+     *
      * @return \Wallee\Sdk\Model\LineItemCreate[]
-	 * @throws \Exception
-	 */
+     * @throws \Exception
+     */
     public static function ensureUniqueIds(array $lineItems)
     {
         $uniqueIds = array();
@@ -470,9 +470,9 @@ class WalleeHelper
      * Sorts an array of WalleeModelMethodconfiguration by their sort order
      *
      * @param WalleeModelMethodconfiguration[] $configurations
-	 *
-	 * @return array
-	 */
+     *
+     * @return array
+     */
     public static function sortMethodConfiguration(array $configurations)
     {
         usort(
@@ -650,14 +650,14 @@ class WalleeHelper
         return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
     }
     
-    public static function getMaxExecutionTime() {
+    public static function getMaxExecutionTime()
+    {
         $maxExecutionTime = ini_get('max_execution_time');
         
         // Returns the default value, in case the ini_get fails.
         if ($maxExecutionTime === null || empty($maxExecutionTime) || $maxExecutionTime < 0) {
             return 30;
-        }
-        else {
+        } else {
             return intval($maxExecutionTime);
         }
     }
