@@ -16,6 +16,7 @@ jQuery(function ($) {
         configuration_id: null,
         height: null,
         element_processing_spinner_container: '#wallee-processing-spinner-container',
+        processing: false,
 
         init : function () {
             $(this.element_processing_spinner_container).hide();
@@ -86,23 +87,25 @@ jQuery(function ($) {
 
 
         handler_submit : function (event) {
-            var self = event.data.self;
-            self.disable_pay_button();
+            if (!self.processing) {
+                var self = event.data.self;
+                self.disable_pay_button();
 
-            var tosInput = $('#cgv');
-            if (tosInput.size() > 0) {
-                if (!tosInput.is(':checked')) {
-                    self.remove_existing_errors();
-                    self.show_new_errors(wallee_msg_tos_error);
-                    self.enable_pay_button();
+                var tosInput = $('#cgv');
+                if (tosInput.size() > 0) {
+                    if (!tosInput.is(':checked')) {
+                        self.remove_existing_errors();
+                        self.show_new_errors(wallee_msg_tos_error);
+                        self.enable_pay_button();
+                        return false;
+                    }
+                }
+                if (self.iframe_handler == null) {
+                    self.process_validation({success: true});
                     return false;
                 }
+                self.iframe_handler.validate();
             }
-            if (self.iframe_handler == null) {
-                self.process_validation({success: true});
-                return false;
-            }
-            self.iframe_handler.validate();
             return false;
         },
 
@@ -172,10 +175,12 @@ jQuery(function ($) {
 
         disable_pay_button : function () {
             $('.wallee-submit').prop('disabled', true);
+            this.processing = true;
         },
 
         enable_pay_button : function () {
             $('.wallee-submit').prop('disabled', false);
+            this.processing = false;
         },
 
         remove_existing_errors : function () {
