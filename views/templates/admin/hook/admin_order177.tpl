@@ -7,7 +7,7 @@
  * @copyright 2017 - 2021 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
 *}
-
+{if (isset($showAuthorizedActions) && $showAuthorizedActions)}
 	<div style="display:none;" class="hidden-print">
 		<a class="btn btn-action wallee-management-btn"  id="wallee_void">
 			<i class="icon-remove"></i>
@@ -68,7 +68,7 @@
 			{l s='This finalizes the order, it no longer can be changed.' mod='wallee'}			
 		{/if}		
 	</div>
-
+{/if}
   
 {if (isset($showUpdateActions) && $showUpdateActions)}
 <div style="display:none;" class="hidden-print">

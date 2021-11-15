@@ -87,7 +87,7 @@ jQuery(function ($) {
 
 
         handler_submit : function (event) {
-            if (!self.processing) {
+            if(!self.processing) {
                 var self = event.data.self;
                 self.disable_pay_button();
 
