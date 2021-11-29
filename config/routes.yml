@@ -1,0 +1,14 @@
+download_packing_slip:
+  path: wallee/{orderId}/packingslip
+  methods: [GET]
+  defaults:
+    _controller: PrestaShop\Module\Wallee\Controller\Admin\processWalleePackingSlip::processWalleePackingSlip
+  requirements:
+      orderId: \d+
+download_invoice:
+  path: wallee/{orderId}/invoice
+  methods: [GET]
+  defaults:
+    _controller: PrestaShop\Module\Wallee\Controller\Admin\processWalleeInvoice::processWalleeInvoice
+  requirements:
+      orderId: \d+
