@@ -13,22 +13,22 @@ jQuery(function ($) {
         let urlSegment = string.split('wallee')[1];
         return urlSegment.split('/')[1]
     }
-
+    
     function initialiseDocumentButtons() {
-        if ($('.grid-download-wallee-invoice-row-link').length) {
-            $('.grid-download-packing-slip-row-link').click(function(e) {
+        if ($('[data-original-title="Download Wallee Invoice"]').length) {
+            $('[data-original-title="Download Packing Slip"]').click(function(e) {
                 e.preventDefault();
                 let id_order = getOrderIdFromUrl($(this).attr('href'));
                 window.open(wallee_admin_token + "&action=walleePackingSlip&id_order=" + id_order, "_blank");
             });
         
-            $('.grid-download-wallee-invoice-row-link').click(function(e) {
+            $('[data-original-title="Download Wallee Invoice"]').click(function(e) {
                 e.preventDefault();
                 let id_order = getOrderIdFromUrl($(this).attr('href'));
                 window.open(wallee_admin_token + "&action=walleeInvoice&id_order=" + id_order, "_blank");
             });
         
-            $('.grid-download-wallee-invoice-row-link').each(function() {
+            $('#order_grid_table tr').each(function() {
                 let $this = $(this);
                 let $row = $this.closest('tr');
                 let isWPayment = "0";
@@ -39,8 +39,8 @@ jQuery(function ($) {
                 }
                 let paymentStatusText = $paymentStatusCol.find('.btn').text();
                 if (!paymentStatusText.includes("Payment accepted") || isWPayment.includes("0")) {
-                    $row.find('.grid-download-wallee-invoice-row-link').hide();
-                    $row.find('.grid-download-packing-slip-row-link').hide();
+                    $row.find('[data-original-title="Download Wallee Invoice"]').hide();
+                    $row.find('[data-original-title="Download Packing Slip"]').hide();
                 }
             });
         }
