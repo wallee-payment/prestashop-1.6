@@ -87,8 +87,8 @@ jQuery(function ($) {
 
 
         handler_submit : function (event) {
+            var self = event.data.self;
             if(!self.processing) {
-                var self = event.data.self;
                 self.disable_pay_button();
 
                 var tosInput = $('#cgv');
