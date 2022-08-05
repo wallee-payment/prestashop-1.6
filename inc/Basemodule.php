@@ -141,7 +141,8 @@ class WalleeBasemodule
             $module->registerHook('displayAdminOrderTabContent') &&
             $module->registerHook('displayAdminOrderMain') && $module->registerHook('displayAdminOrderTabLink') &&
             $module->registerHook('displayBackOfficeHeader') && $module->registerHook('displayOrderDetail') &&
-            $module->registerHook('actionProductCancel') && $module->registerHook('walleeSettingsChanged');
+            $module->registerHook('actionProductCancel') && $module->registerHook('walleeSettingsChanged') &&
+            $module->registerHook('actionOrderSlipAdd');
     }
 
     public static function installConfigurationValues()
@@ -1834,10 +1835,9 @@ class WalleeBasemodule
         }
         self::handleVoucherAddRequest($module);
         self::handleVoucherDeleteRequest($module);
-        self::handleRefundRequest($module);
+        // self::handleRefundRequest($module);
         self::handleCancelProductRequest($module);
     }
-
 
     private static function handleVoucherAddRequest(Wallee $module)
     {
