@@ -117,6 +117,14 @@ class WalleeBasemodule
 
     public function checkRequirements(Wallee $module)
     {
+        if (!Module::isInstalled('mailhook')) {
+            $module->addError(
+                Tools::displayError(
+                    'The module mailhook is required.'
+                )
+            );
+            return false;
+        }
         try {
             \Wallee\Sdk\Http\HttpClientFactory::getClient();
         } catch (Exception $e) {
