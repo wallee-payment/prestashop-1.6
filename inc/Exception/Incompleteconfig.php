@@ -24,7 +24,7 @@ class WalleeExceptionIncompleteconfig extends Exception
      * @param Throwable|null $previous
      *   The previously thrown exception.
      */
-    public function __construct($message = "The configuration is not complete", int $code = 0, ?Throwable $previous = null) {
+    public function __construct($message = "The configuration is not complete", $code = 0, Throwable $previous = null) {
         parent::__construct($message, $code, $previous);
     }
 }
