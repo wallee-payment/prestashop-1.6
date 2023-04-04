@@ -29,4 +29,15 @@ class WalleeVersionadapter
     {
         return 'views/templates/admin/hook/admin_order.tpl';
     }
+
+    /**
+     * Returns true if the refund is only voucher, not required to be sent to Wallee.
+     *
+     * @param [] $postData
+     * @return boolean
+     */
+    public static function isVoucherOnlyWallee($postData)
+    {
+        return isset($postData['generateDiscountRefund']) && ! isset($postData['wallee_offline']);
+    }
 }
