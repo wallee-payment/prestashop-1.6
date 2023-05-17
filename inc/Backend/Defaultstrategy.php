@@ -1019,10 +1019,7 @@ class WalleeBackendDefaultstrategy implements WalleeBackendIstrategy
 
     public function isVoucherOnlyWallee(Order $order, array $postData)
     {
-        if (method_exists('WalleeVersionadapter', 'isVoucherOnlyWallee')) {
-            return WalleeVersionadapter::isVoucherOnlyWallee($postData);
-        }
-        return FALSE;
+        return WalleeVersionadapter::isVoucherOnlyWallee($postData);
     }
 
     public function isCancelRequest(Order $order, array $postData)
