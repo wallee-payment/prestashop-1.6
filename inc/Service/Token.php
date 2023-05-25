@@ -79,7 +79,11 @@ class WalleeServiceToken extends WalleeServiceAbstract
             ->getCustomerId());
         $info->setName($tokenVersion->getName());
 
-        $info->setPaymentMethodId(
+	if ($tokenVersion->getPaymentConnectorConfiguration() === null) {
+	    return;
+	}
+
+	$info->setPaymentMethodId(
             $tokenVersion->getPaymentConnectorConfiguration()
                 ->getPaymentMethodConfiguration()
                 ->getId()

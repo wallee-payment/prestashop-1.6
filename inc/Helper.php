@@ -11,9 +11,9 @@
 
 class WalleeHelper
 {
-	public const SHOP_SYSTEM = 'x-meta-shop-system';
-	public const SHOP_SYSTEM_VERSION = 'x-meta-shop-system-version';
-	public const SHOP_SYSTEM_AND_VERSION = 'x-meta-shop-system-and-version';
+	protected static $shop_system = 'x-meta-shop-system';
+	protected static $shop_system_version = 'x-meta-shop-system-version';
+	protected static $shop_system_and_version = 'x-meta-shop-system-and-version';
 
     private static $apiClient;
 
@@ -675,11 +675,18 @@ class WalleeHelper
 	protected static function getDefaultHeaderData()
 	{
 		$shop_version = _PS_VERSION_;
-		[$major_version, $minor_version, $_] = explode('.', $shop_version, 3);
+        $version_array = explode('.', $shop_version, 3);
+        if (count($version_array) < 2) {
+            // The format in _PS_VERSION_ has changed and it's unknown to us.
+            return [];
+
+        }
+        $major_version = current($version_array);
+        $minor_version = next($version_array);
 		return [
-			self::SHOP_SYSTEM             => 'prestashop',
-			self::SHOP_SYSTEM_VERSION     => $shop_version,
-			self::SHOP_SYSTEM_AND_VERSION => 'prestashop-' . $major_version . '.' . $minor_version,
+			self::$shop_system             => 'prestashop',
+			self::$shop_system_version     => $shop_version,
+			self::$shop_system_and_version => 'prestashop-' . $major_version . '.' . $minor_version,
 		];
 	}
 }
