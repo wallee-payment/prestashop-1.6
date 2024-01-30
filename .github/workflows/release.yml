@@ -25,6 +25,9 @@ jobs:
         release_name: Release ${{ github.ref }}
         body: |
           Release notes for ${{ github.ref }}
+        draft: false
+        prerelease: false
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Upload Release Asset
       id: upload-release-asset
@@ -32,5 +35,6 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./wallee.zip
-        asset_name: asset.zip
+        asset_name: wallee.zip
         asset_content_type: application/zip
+        token: ${{ secrets.GITHUB_TOKEN }}
