@@ -6,15 +6,11 @@ on:
       - test
 
 jobs:
-  build:
+  tag:
+    name: New release
     runs-on: ubuntu-latest
-    permissions: write-all
-
     steps:
-      - name: Upload binaries to GitHub release
-        run: |
-          echo $GITHUB_WORKSPACE
-
+      - name: Upload binaries to Github release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
