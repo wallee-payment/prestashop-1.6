@@ -5,7 +5,7 @@
  * This Prestashop module enables to process payments with wallee (https://www.wallee.com).
  *
  * @author customweb GmbH (http://www.customweb.com/)
- * @copyright 2017 - 2023 customweb GmbH
+ * @copyright 2017 - 2024 customweb GmbH
  * @license http://www.apache.org/licenses/LICENSE-2.0 Apache Software License (ASL 2.0)
  */
 
@@ -34,7 +34,7 @@ class Wallee extends PaymentModule
         $this->author = 'Customweb GmbH';
         $this->bootstrap = true;
         $this->need_instance = 0;
-        $this->version = '1.2.38';
+        $this->version = '1.2.39';
         $this->displayName = 'wallee';
         $this->description = $this->l('This PrestaShop module enables to process payments with %s.');
         $this->description = sprintf($this->description, 'wallee');
