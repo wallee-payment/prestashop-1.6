@@ -19,10 +19,19 @@ jobs:
         with:
           go-version: 1.17
 
+      - name: Get Latest Release
+        id: get_latest_release
+        run: |
+          latest_release=$(curl -sSL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                          "https://api.github.com/repos/wallee-payment/prestashop-1.6/releases/latest" | \
+                          jq -r .tag_name)
+          echo "Latest release: $latest_release"
+          echo "::set-output name=latest_release::$latest_release"
+
       - name: Upload binaries to GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: wallee.zip
           asset_name: wallee.zip
-          tag: '1.2.38'
+          tag: ${{ steps.get_latest_release.outputs.latest_release }}
