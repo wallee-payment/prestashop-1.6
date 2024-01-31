@@ -16,18 +16,26 @@ jobs:
       - name: Build and package
         run: |
           # Your build commands here
+          # Example: npm install, build, etc.
+
+      - name: Get latest release
+        id: get_latest_release
+        run: |
+          latest_release=$(curl -sSL -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+                          "https://api.github.com/repos/${{ github.repository }}/releases/latest" | \
+                          jq -r .tag_name)
+          echo "Latest release: $latest_release"
+          echo "::set-output name=latest_release::$latest_release"
 
       - name: Create Release
         id: create_release
         uses: actions/create-release@v1
         with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
+          tag_name: ${{ steps.get_latest_release.outputs.latest_release }}
+          release_name: Release ${{ steps.get_latest_release.outputs.latest_release }}
           body: |
-            Release notes for ${{ github.ref }}
+            Release notes for ${{ steps.get_latest_release.outputs.latest_release }}
           draft: false
-          prerelease: false
-          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Release Asset
         id: upload-release-asset
@@ -37,4 +45,3 @@ jobs:
           asset_path: ./wallee.zip
           asset_name: asset.zip
           asset_content_type: application/zip
-          token: ${{ secrets.GITHUB_TOKEN }}
