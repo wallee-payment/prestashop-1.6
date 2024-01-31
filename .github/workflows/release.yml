@@ -19,15 +19,6 @@ jobs:
         with:
           go-version: 1.17
 
-      - name: Build and package
-        run: |
-          # Your build commands here
-          # Example: go build, npm install, etc.
-
-          # Ensure that 'wallee.zip' is created in the root directory
-          # If it's created in a subdirectory, adjust the file path accordingly
-          pwd
-
       - name: Upload binaries to GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
