@@ -12,6 +12,9 @@ jobs:
 
     steps:
       - name: Upload binaries to GitHub release
+        run: |
+          echo $GITHUB_WORKSPACE
+
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
