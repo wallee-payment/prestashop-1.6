@@ -11,10 +11,10 @@ jobs:
     permissions: write-all
 
     steps:
-      - name: Upload binaries to Github release
+      - name: Upload binaries to GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{GITHUB_WORKSPACE}}/wallee.zip
+          file: ${{ GITHUB_WORKSPACE }}/wallee.zip
           asset_name: wallee.zip
           tag: ${{ github.ref }}
