@@ -8,13 +8,15 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions: write-all
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
       - name: Upload binaries to GitHub release
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
-          file: ${{ GITHUB_WORKSPACE }}/wallee.zip
+          file: wallee.zip
           asset_name: wallee.zip
           tag: ${{ github.ref }}
